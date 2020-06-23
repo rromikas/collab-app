@@ -1,0 +1,224 @@
+$body-bg-main: #f4f5f7;
+$color-primary: #f83f67;
+$color-theme-700: #737373;
+$color-600: #8e8e8e;
+$border-primary: #dadada;
+$page-paper-main: #fff;
+$color-secondary: #f83f67;
+$color-theme-900: #373737;
+$shadow-primary: 0 64px 64px 0 rgba(0, 0, 0, 0.06),
+  0 32px 32px 0 rgba(0, 0, 0, 0.03), 0 16px 16px 0 rgba(0, 0, 0, 0.02),
+  0 4px 4px 0 rgba(0, 0, 0, 0.02), 0 2px 2px 0 rgba(0, 0, 0, 0.02);
+
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+}
+
+body {
+  background-color: $body-bg-main !important;
+  font-family: Montserrat, Helvetica, Arial, sans-serif !important;
+  font-size: 13px;
+}
+
+.logo-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #282c34;
+}
+
+.react-logo {
+  animation: rotate 4s linear infinite;
+  width: 450px;
+}
+
+@keyframes rotate {
+  0% {
+    transform: rotate(0);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.btn {
+  line-height: 30px !important;
+  color: $color-theme-700 !important;
+  font-weight: 500 !important;
+  height: 32px !important;
+  padding: 0 16px !important;
+  border: 1px solid $border-primary !important;
+  border-radius: 30px !important;
+  font-size: 14px !important;
+}
+
+.btn:hover {
+  border: 1px solid $color-primary !important;
+  text-decoration: none !important;
+  color: $color-600 !important;
+}
+
+.menu-item {
+  height: 47px;
+  line-height: 47px;
+  color: $color-theme-700;
+  font-weight: 400;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.menu-item:hover {
+  color: $color-secondary !important;
+  background: transparent;
+  background-repeat: no-repeat;
+  background-position: 40px center;
+}
+
+.page-title {
+  width: calc(100% - 310px);
+  display: inline-block;
+  font-size: 32px !important;
+  line-height: 32px !important;
+  font-weight: 300 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  color: $color-theme-900 !important;
+  border: none !important;
+  vertical-align: top;
+}
+
+.project-card {
+  box-shadow: 0 4px 30px 0 rgba(0, 0, 0, 0.1);
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.project-card:hover {
+  box-shadow: 0 10px 45px 0 rgba(0, 0, 0, 0.2);
+}
+
+.project-card .description {
+  font-size: 14px;
+  color: $color-theme-700;
+}
+
+.project-card .title {
+  color: $color-theme-900;
+  padding-bottom: 5px;
+  font-size: 17px;
+}
+
+.project-card .for-company {
+  font-size: 12px;
+  font-weight: 600;
+  color: $color-theme-700;
+}
+
+.project-card .for-company {
+  font-size: 12px;
+  padding-bottom: 5px;
+  color: $color-theme-700;
+  font-weight: 600;
+}
+
+.popover-inner {
+  font-size: 13px;
+}
+
+.popover-inner .popover-content-item {
+  background: inherit;
+  transition: all 0.3s;
+  color: $color-theme-700;
+  cursor: pointer;
+  padding: 0 10px;
+  text-align: left;
+}
+
+.popover-inner .popover-content-item:hover {
+  background: $color-primary;
+  color: white;
+}
+
+.popover-inner hr {
+  margin: 5px 0;
+}
+
+.popover-inner-dark {
+  color: white;
+  font-size: 13px;
+}
+
+.hoverable-gray {
+  color: $color-600;
+  transition: all 0.3s;
+}
+
+.hoverable-gray:hover {
+  color: $color-theme-700;
+}
+
+.calendar-container {
+  border-radius: 0.5rem;
+}
+
+.rbc-event.rbc-selected,
+.rbc-event {
+  background-color: $color-primary !important;
+}
+
+.collab-calendar {
+  box-shadow: $shadow-primary;
+  border-radius: 0.5rem;
+}
+
+.btn-pro:hover {
+  background: $color-primary
+    radial-gradient(circle, transparent 1%, $color-primary 1%) center/15000% !important;
+  box-shadow: 0 0 0 3px $color-primary;
+}
+
+.btn-pro {
+  line-height: 32px !important;
+  height: 32px !important;
+  padding: 0 16px !important;
+  background-color: $color-primary;
+  color: $page-paper-main !important;
+  border: 1px solid transparent;
+  background: $color-primary;
+  border-radius: 16px;
+  background-position: center;
+  transition: box-shadow 0.3s ease, background 0.3s ease;
+  cursor: pointer;
+}
+
+.popover-label {
+  font-size: 12px;
+  color: $color-theme-700;
+}
+
+.note-textarea {
+  padding: 2px;
+  margin: 0;
+  font-size: 12px;
+  min-width: 100%;
+  max-width: 100%;
+  color: $color-theme-700;
+}
+
+.activity-date {
+  color: $color-theme-700;
+}
+
+.collab-activity {
+  width: 300px;
+}
