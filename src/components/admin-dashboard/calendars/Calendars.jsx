@@ -29,20 +29,20 @@ const Calendars = () => {
     {
       id: 1,
       title: "Meeting",
-      start: "Thu Jun 11 2020",
-      end: "Thu Jun 11 2020",
+      start: new Date("Thu Jun 04 2020 12:00:00"),
+      end: new Date("Thu Jun 04 2020 12:30:00"),
     },
     {
       id: 2,
       title: "Football game",
-      start: "Thu Jun 3 2020",
-      end: "Thu Jun 3 2020",
+      start: new Date("Thu Jun 15 2020 12:00:00"),
+      end: new Date("Thu Jun 15 2020 12:30:00"),
     },
     {
       id: 3,
       title: "Football game",
-      start: "Thu Jun 15 2020",
-      end: "Thu Jun 15 2020",
+      start: new Date("Thu Jun 19 2020 12:00:00"),
+      end: new Date("Thu Jun 19 2020 12:30:00"),
     },
   ]);
   return (
