@@ -104,7 +104,7 @@ function createDemoUser() {
 
 const MainPage = () => {
   return (
-    <div className="row no-gutters px-2 px-sm-3 px-md-4">
+    <div className="row no-gutters px-2 px-sm-3 px-md-4 py-3">
       <div className="col-12">
         {Object.values(accounts).map((x) => (
           <div
