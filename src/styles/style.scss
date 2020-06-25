@@ -1,14 +1,20 @@
 $body-bg-main: #f4f5f7;
-$color-primary: #f83f67;
+$color-primary: #0a80ff;
+$color-primary-light: #0a80ffa4;
 $color-theme-700: #737373;
 $color-600: #8e8e8e;
+$color-500: #b1afaf;
 $border-primary: #dadada;
 $page-paper-main: #fff;
-$color-secondary: #f83f67;
+$color-secondary: #0a80ff;
 $color-theme-900: #373737;
 $shadow-primary: 0 64px 64px 0 rgba(0, 0, 0, 0.06),
   0 32px 32px 0 rgba(0, 0, 0, 0.03), 0 16px 16px 0 rgba(0, 0, 0, 0.02),
   0 4px 4px 0 rgba(0, 0, 0, 0.02), 0 2px 2px 0 rgba(0, 0, 0, 0.02);
+$shadow-secondary: 0 64px 64px 0 rgba(187, 214, 247, 0.726),
+  0 32px 32px 0 rgba(187, 214, 247, 0.726),
+  0 16px 16px 0 rgba(187, 214, 247, 0.726),
+  0 4px 4px 0 rgba(187, 214, 247, 0.726), 0 2px 2px 0 rgba(187, 214, 247, 0.726);
 
 html,
 body,
@@ -49,19 +55,43 @@ body {
   }
 }
 
+.btn-pro:hover {
+  text-decoration: none !important;
+  box-shadow: 0 0 0 2px $color-primary;
+}
+
+.btn-pro {
+  line-height: 32px !important;
+  height: 32px !important;
+  padding: 0 16px !important;
+  background-color: $color-primary;
+  color: $page-paper-main !important;
+  border: 1px solid transparent;
+  background: $color-primary;
+  border-radius: 16px;
+  transition: all 0.3s;
+  font-weight: 500 !important;
+  font-size: 14px !important;
+  cursor: pointer;
+  outline: none !important;
+  text-decoration: none !important;
+  box-shadow: unset;
+}
+
 .btn {
-  line-height: 30px !important;
+  line-height: 28px !important;
   color: $color-theme-700 !important;
   font-weight: 500 !important;
   height: 32px !important;
   padding: 0 16px !important;
-  border: 1px solid $border-primary !important;
+  border: 2px solid $border-primary !important;
   border-radius: 30px !important;
   font-size: 14px !important;
+  transition: all 0.3s;
 }
 
 .btn:hover {
-  border: 1px solid $color-primary !important;
+  border: 2px solid $color-primary !important;
   text-decoration: none !important;
   color: $color-600 !important;
 }
@@ -71,16 +101,37 @@ body {
   line-height: 47px;
   color: $color-theme-700;
   font-weight: 400;
-  transition: all 0.3s ease;
+  transition: color 0.3s ease;
   cursor: pointer;
   font-size: 16px;
+  user-select: none;
 }
 
 .menu-item:hover {
   color: $color-secondary !important;
-  background: transparent;
-  background-repeat: no-repeat;
-  background-position: 40px center;
+}
+
+.project-menu-item {
+  border-top: 4px solid transparent;
+  border-bottom: 4px solid transparent;
+  height: 47px;
+  line-height: 47px;
+  color: $color-theme-700;
+  font-weight: 400;
+  transition: color 0.3s ease;
+  cursor: pointer;
+  font-size: 16px;
+  user-select: none;
+  box-sizing: content-box;
+}
+
+.project-menu-item:hover {
+  color: $color-secondary !important;
+}
+
+.project-menu-item-chosen {
+  border-bottom: 4px solid $color-primary;
+  color: $color-secondary !important;
 }
 
 .page-title {
@@ -132,7 +183,7 @@ body {
 }
 
 .popover-inner {
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .popover-inner .popover-content-item {
@@ -181,28 +232,8 @@ body {
   border-radius: 0.5rem;
 }
 
-.btn-pro:hover {
-  background: $color-primary
-    radial-gradient(circle, transparent 1%, $color-primary 1%) center/15000% !important;
-  box-shadow: 0 0 0 3px $color-primary;
-}
-
-.btn-pro {
-  line-height: 32px !important;
-  height: 32px !important;
-  padding: 0 16px !important;
-  background-color: $color-primary;
-  color: $page-paper-main !important;
-  border: 1px solid transparent;
-  background: $color-primary;
-  border-radius: 16px;
-  background-position: center;
-  transition: box-shadow 0.3s ease, background 0.3s ease;
-  cursor: pointer;
-}
-
 .popover-label {
-  font-size: 12px;
+  font-size: 13px;
   color: $color-theme-700;
 }
 
@@ -221,4 +252,291 @@ body {
 
 .collab-activity {
   width: 300px;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.h1,
+.h2,
+.h3,
+.h4,
+.h5,
+.h6 {
+  font-weight: 500 !important;
+}
+
+.calendar-event-card {
+  box-shadow: 0 4px 30px 0 rgba(0, 0, 0, 0.1);
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  background: white;
+}
+
+.calendar-event-card:hover {
+  box-shadow: 0 10px 45px 0 rgba(0, 0, 0, 0.2);
+}
+
+.vertical-timeline-element-content {
+  box-shadow: 0 4px 30px 0 rgba(0, 0, 0, 0.1) !important;
+  border-radius: 0.5rem !important;
+  cursor: pointer;
+  transition: all 0.3s;
+  background: white;
+}
+
+.vertical-timeline-element-content:hover {
+  box-shadow: 0 10px 45px 0 rgba(0, 0, 0, 0.2) !important;
+}
+
+.vertical-timeline-element-icon {
+  width: 30px !important;
+  height: 30px !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.vertical-timeline-element-content-arrow {
+  top: 8px !important;
+}
+
+.vertical-timeline-element {
+  margin: 1.5em 0 !important;
+}
+
+.vertical-timeline::before {
+  left: 13px !important;
+}
+
+.vertical-timeline {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.chat-time {
+  font-size: 12px;
+  color: $color-600;
+}
+
+.chat-preview-message {
+  color: $color-600;
+  font-size: 14px;
+}
+
+.chat-preview-message-unread {
+  color: $color-theme-900;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.chat-preview {
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.chat-preview:hover {
+  background: white;
+}
+
+.collab-chat {
+  box-shadow: $shadow-primary;
+  border-radius: 0.5rem !important;
+  overflow: hidden;
+}
+
+.message {
+  padding: 1rem;
+  font-size: 15px;
+  border-radius: 0.5rem !important;
+  font-weight: 400;
+}
+
+.guest-message {
+  background: $body-bg-main;
+  color: $color-theme-700;
+}
+
+.own-message {
+  background: $color-primary;
+  color: white;
+}
+
+.own-message::selection {
+  background: gray;
+}
+
+.collab-input {
+  border-radius: 25px;
+  background: white;
+  border: none;
+  outline: none;
+  box-shadow: $shadow-primary;
+  padding: 0 20px !important;
+  color: $color-theme-700;
+}
+
+.collab-input::placeholder {
+  color: $color-600;
+  font-size: 14px;
+}
+
+.collab-project {
+  box-shadow: $shadow-primary;
+  border-radius: 0.5rem !important;
+  overflow: hidden;
+  color: $color-theme-700;
+}
+
+input[type="text"]::placeholder {
+  color: $color-600;
+}
+
+input[type="text"] {
+  border: 1px solid $border-primary;
+  border-radius: 10px;
+  outline: none;
+  color: $color-theme-700;
+  font-size: 14px;
+  padding: 4px 10px 6px 8px !important;
+  height: 32px;
+  background-color: white;
+  transition: all 0.3s ease;
+}
+
+input[type="text"]:hover {
+  outline: none;
+  border-color: $color-primary;
+}
+
+input[type="text"]:focus {
+  border-color: $color-primary !important;
+  box-shadow: 0 0 0 3px $color-primary-light !important;
+}
+
+label {
+  font-size: 13px;
+  font-weight: bold;
+  line-height: 21px;
+  display: block;
+  color: $color-theme-700;
+  line-height: 13px;
+}
+
+textarea {
+  border: 1px solid $border-primary;
+  border-radius: 10px;
+  outline: none;
+  color: $color-theme-700;
+  font-size: 14px !important;
+  padding: 4px 10px 6px 8px !important;
+  height: 32px;
+  background-color: white;
+  transition: border-color 0.3s ease;
+}
+
+textarea:hover {
+  outline: none;
+  border-color: $color-primary;
+}
+
+textarea:focus {
+  border-color: $color-primary !important;
+  box-shadow: 0 0 0 3px $color-primary-light !important;
+}
+
+textarea::placeholder {
+  font-size: 14px;
+  color: $color-600;
+}
+
+input[type="text"]::placeholder {
+  font-size: 14px;
+}
+
+.clickable-item {
+  cursor: pointer;
+  @extend .hoverable-gray;
+}
+
+.new-project {
+  box-shadow: $shadow-primary;
+  border-radius: 0.5rem !important;
+  overflow: hidden;
+  background: white;
+}
+
+.photo-circle-sm {
+  width: 30px !important;
+  height: 30px !important;
+  border-radius: 50%;
+  background-size: cover;
+  background-position: center;
+}
+
+.basic-card {
+  box-shadow: 0 4px 30px 0 rgba(0, 0, 0, 0.1);
+  border-radius: 0.5rem !important;
+  overflow: hidden;
+  background: white;
+  transition: all 0.3s;
+  color: $color-theme-700;
+}
+
+.basic-card:hover {
+  box-shadow: 0 5px 25px 0 rgba(0, 0, 0, 0.2);
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.people-list-item {
+  font-size: 14px;
+}
+
+.navbar-icon {
+  border-radius: 50%;
+  width: 40px !important;
+  height: 40px !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+  cursor: pointer;
+  @extend .hoverable-gray;
+}
+
+.navbar-icon:hover {
+  background: white;
+  box-shadow: 0 6px 15px 0 rgba(0, 0, 0, 0.15);
+}
+
+.notification-item {
+  background: white;
+  color: $color-theme-900;
+  cursor: pointer;
+  padding: 10px;
+  text-align: left;
+  transition: all 0.3s;
+}
+
+.notification-item:hover {
+  background: $body-bg-main;
+}
+
+.times-table-row {
+  background: $body-bg-main;
+  padding: 5px 10px;
+  color: $color-theme-900;
+  border-bottom: 1px solid $color-600;
+}
+
+.time-record-date {
+  color: $color-theme-900;
+  font-size: 14px;
 }

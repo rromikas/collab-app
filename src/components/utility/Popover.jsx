@@ -24,6 +24,7 @@ const Popover = ({
       interactive={true}
       animation={animation}
       open={open}
+      unmountHTMLWhenHide={true}
     >
       {rest.children}
     </Tooltip>

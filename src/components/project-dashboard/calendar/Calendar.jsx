@@ -1,65 +1,39 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Calendar, momentLocalizer } from "react-big-calendar";
+import {
+  Calendar as CustomCalendar,
+  momentLocalizer,
+} from "react-big-calendar";
 import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import { BsChevronDown } from "react-icons/bs";
 import Popover from "../../utility/Popover";
 import DayPicker from "react-day-picker";
 import "react-day-picker/lib/style.css";
 import { uid } from "react-uid";
-import store from "../../../store/store";
+import uniqid from "uniqid";
 import * as firebase from "../../../database/firebase";
 
 const localizer = momentLocalizer(moment); // or globalizeLocalizer
 
-const calendarsList = ["Calendar 1", "Calendar 2", "Calendar 3"];
+const Calendar = ({ events, addEvent, projectId }) => {
+  console.log("proejct calendar evetns", events);
+  let onlyEvents = { ...events };
+  delete onlyEvents["AAAPlaceholder"];
 
-const Calendars = ({ projects }) => {
   const [newEvent, setNewEvent] = useState({
     start: new Date(Date.now()),
     end: new Date(Date.now()),
     position: { left: 0, top: 0 },
     title: "",
-    id: uid(Date.now()),
+    id: uniqid("event-"),
     open: false,
+    purpose: "",
   });
-
-  const [projectId, setProjectId] = useState(-1);
-
-  useEffect(() => {
-    store.dispatch({ type: "SET_PAGE_TITLE", pageTitle: "Calendar" });
-  }, []);
-
-  useEffect(() => {
-    if (projectId !== -1) {
-      firebase.GetFromDatabase(`/`);
-    }
-  }, [projectId]);
 
   const container = useRef(null);
   const newEventContainer = useRef(null);
   const startDateRef = useRef(null);
   const endDateRef = useRef(null);
-  const [myEventsList, setMyEventsList] = useState([
-    {
-      id: 1,
-      title: "Meeting",
-      start: new Date("Thu Jun 04 2020 12:00:00"),
-      end: new Date("Thu Jun 04 2020 12:30:00"),
-    },
-    {
-      id: 2,
-      title: "Football game",
-      start: new Date("Thu Jun 15 2020 12:00:00"),
-      end: new Date("Thu Jun 15 2020 12:30:00"),
-    },
-    {
-      id: 3,
-      title: "Football game",
-      start: new Date("Thu Jun 19 2020 12:00:00"),
-      end: new Date("Thu Jun 19 2020 12:30:00"),
-    },
-  ]);
+
   return (
     <div
       className="row no-gutters position-relative px-2 px-sm-3 px-md-4"
@@ -80,8 +54,10 @@ const Calendars = ({ projects }) => {
           open={newEvent.open}
           content={
             <div>
+              <div>{newEvent.purpose}</div>
               <div className="mb-1">
                 <input
+                  type="text"
                   placeholder="Event name"
                   value={newEvent.title}
                   onChange={(e) => {
@@ -148,11 +124,15 @@ const Calendars = ({ projects }) => {
                   className="btn-pro col-6 mr-1"
                   onClick={() => {
                     if (newEvent.title) {
-                      let ev = { ...newEvent };
-                      setMyEventsList((prev) => prev.concat(ev));
+                      let updates = {};
+                      updates[
+                        `projects/${projectId}/events/${newEvent.id}`
+                      ] = newEvent;
+                      console.log("NEW EVENT BEFORE FIREBASING", newEvent);
+                      firebase.UpdateDatabase(updates);
                       setNewEvent((prev) =>
                         Object.assign({}, prev, {
-                          id: uid(Date.now()),
+                          id: uniqid("event-"),
                           title: "",
                           open: false,
                         })
@@ -189,10 +169,10 @@ const Calendars = ({ projects }) => {
         <div className="row no-gutters">
           <div className="col-12 text-center">
             <DayPicker
-              selectedDays={myEventsList.map((x) => {
-                let after = new Date(x.start.getTime());
+              selectedDays={Object.values(onlyEvents).map((x) => {
+                let after = new Date(new Date(x.start).getTime());
                 after.setDate(after.getDate() - 1);
-                let before = new Date(x.end.getTime());
+                let before = new Date(new Date(x.end).getTime());
                 before.setDate(before.getDate() + 1);
                 return { after: after, before: before };
               })}
@@ -207,14 +187,15 @@ const Calendars = ({ projects }) => {
             ></DayPicker>
           </div>
           <div className="col-12">
-            {myEventsList.map((x) => (
+            {Object.values(onlyEvents).map((x) => (
               <div
                 key={uid(x)}
                 className="row no-gutters calendar-event-card p-3 mb-2"
               >
                 <div className="col-12">{x.title}</div>
                 <div className="col-12">
-                  {x.start.toDateString()}-{x.end.toDateString()}
+                  {new Date(x.start).toDateString()}-
+                  {new Date(x.end).toDateString()}
                 </div>
               </div>
             ))}
@@ -222,36 +203,41 @@ const Calendars = ({ projects }) => {
         </div>
       </div>
       <div className="col-12 d-none d-md-block">
-        <div className="p-4 row no-gutters w-100 bg-white calendar-container collab-calendar">
-          <Popover
-            content={
-              <div className="popover-inner">
-                {Object.values(projects).map((x) => (
-                  <div className="popover-content-item" key={uid(x)}>
-                    {x.title}
-                  </div>
-                ))}
-              </div>
-            }
-          >
-            <div className="col-auto btn d-flex align-items-center mb-2">
-              <div>Calendars</div>
-              <BsChevronDown fontSize="14px" className="ml-2"></BsChevronDown>
-            </div>
-          </Popover>
-
-          <div style={{ height: "570px" }} className="col-12">
-            <Calendar
+        <div className="p-4 row no-gutters w-100">
+          <div style={{ height: "540px" }} className="col-12">
+            <CustomCalendar
               views={["month"]}
               localizer={localizer}
               events={
-                newEvent.open ? myEventsList.concat(newEvent) : myEventsList
+                newEvent.open && newEvent.purpose === "Add new event"
+                  ? Object.values(onlyEvents).concat(newEvent)
+                  : Object.values(onlyEvents)
               }
               startAccessor="start"
               endAccessor="end"
               selectable={true}
-              onSelectEvent={(ev) => {
-                console.log("event selected", ev);
+              onSelectEvent={(obj) => {
+                console.log(obj);
+                setNewEvent((prev) => {
+                  let offset = container.current.getBoundingClientRect();
+                  let startDate = new Date(obj.start);
+                  startDate.setHours(12, 0, 0);
+                  let endDate = new Date(obj.end);
+                  endDate.setHours(12, 0, 0);
+                  return Object.assign({}, prev, {
+                    position: {
+                      left: obj?.position?.left,
+                      top: obj?.position?.top,
+                    },
+                    start: startDate,
+                    end: endDate,
+                    open: true,
+                    id: obj.id,
+                    title: obj.title,
+                    note: obj.note,
+                    purpose: "Edit event",
+                  });
+                });
               }}
               onSelectSlot={(obj) => {
                 let startDate = obj.start;
@@ -268,13 +254,14 @@ const Calendars = ({ projects }) => {
                     },
                     start: startDate,
                     end: endDate,
+                    title: "",
+                    note: "",
+                    id: uniqid("event-"),
                     open: true,
+                    purpose: "Add new event",
                   });
                 });
-                newEventContainer.current.click();
-                console.log("slot selected", obj);
                 let date = obj.start.toTimeString();
-                console.log("DATA: ", date);
               }}
             />
           </div>
@@ -284,4 +271,27 @@ const Calendars = ({ projects }) => {
   );
 };
 
-export default Calendars;
+export default Calendar;
+
+function handleCalendarClick(obj, purpose, setNewEvent) {}
+
+const eventukai = [
+  {
+    id: 1,
+    title: "Meeting",
+    start: new Date("Thu Jun 04 2020 12:00:00"),
+    end: new Date("Thu Jun 04 2020 12:30:00"),
+  },
+  {
+    id: 2,
+    title: "Football game",
+    start: new Date("Thu Jun 15 2020 12:00:00"),
+    end: new Date("Thu Jun 15 2020 12:30:00"),
+  },
+  {
+    id: 3,
+    title: "Football game",
+    start: new Date("Thu Jun 19 2020 12:00:00"),
+    end: new Date("Thu Jun 19 2020 12:30:00"),
+  },
+];
