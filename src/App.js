@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { Router, Switch, Route } from "react-router-dom";
-import history from "./History";
+import history from "./history";
 import UserDashobard from "./components/user-dashboard/UserDashboard";
 import { connect } from "react-redux";
 import store from "./store/store";

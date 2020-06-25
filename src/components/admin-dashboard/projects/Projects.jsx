@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { BsThreeDots, BsStarFill } from "react-icons/bs";
 import Popover from "../../utility/Popover";
 import { uid } from "react-uid";
-import history from "../../../History";
+import history from "../../../history";
 import NoProjects from "../../../pictures/NoProjects";
 import * as firebase from "../../../database/firebase";
 import store from "../../../store/store";

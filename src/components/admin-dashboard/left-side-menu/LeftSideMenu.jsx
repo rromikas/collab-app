@@ -7,7 +7,7 @@ import {
   BsGraphUp,
 } from "react-icons/bs";
 import { uid } from "react-uid";
-import history from "../../../History";
+import history from "../../../history";
 
 const LeftSideMenu = ({ userId }) => {
   const items = [

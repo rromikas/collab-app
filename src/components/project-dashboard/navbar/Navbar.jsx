@@ -1,6 +1,6 @@
 import React from "react";
 import { uid } from "react-uid";
-import history from "../../../History";
+import history from "../../../history";
 
 const navItems = ["Files", "Messages", "Calendar", "Time", "Activity"];
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import store from "../../../store/store";
-import history from "../../../History";
+import history from "../../../history";
 import * as firebase from "../../../database/firebase";
 import uniqid from "uniqid";
 

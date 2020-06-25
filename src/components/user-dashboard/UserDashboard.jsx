@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import AdminDashboard from "../admin-dashboard/AdminDashboard";
 import ClientDashboard from "../client-dashboard/ClientDashboard";
 import { connect } from "react-redux";
-import history from "../../History";
+import history from "../../history";
 import * as firebase from "../../database/firebase";
 import store from "../../store/store";
 

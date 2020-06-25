@@ -1,6 +1,6 @@
 import React, { useRef } from "react";
 import { connect } from "react-redux";
-import history from "../../../History";
+import history from "../../../history";
 import { BsChevronLeft } from "react-icons/bs";
 import Popover from "../../utility/Popover";
 import store from "../../../store/store";
