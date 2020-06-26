@@ -93,7 +93,6 @@ export const UploadFile = (
     function () {
       // Handle successful uploads on complete
       // For instance, get the download URL: https://firebasestorage.googleapis.com/...
-      console.log("REF", uploadTask.snapshot.ref);
       uploadTask.snapshot.ref.getDownloadURL().then(function (downloadURL) {
         onSuccess({
           fullPath: uploadTask.snapshot.ref.fullPath,
@@ -117,16 +116,5 @@ export const GetFiles = (path) => {
       });
   });
 };
-
-firebase
-  .storage()
-  .ref("project-kbv08wpd/folder_for_8_teorija.pdf")
-  .listAll()
-  .then((res) => {
-    console.log("Asdasfinqe", res);
-    console.log(
-      res.items[0].getMetadata().then((asd) => console.log("Asdads", asd))
-    );
-  });
 
 export const instance = firebase;

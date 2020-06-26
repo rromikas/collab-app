@@ -2,12 +2,13 @@ import React from "react";
 import { uid } from "react-uid";
 import history from "../../../history";
 
-const navItems = ["Files", "Messages", "Calendar", "Time", "Activity"];
-
-const Navbar = ({ projectId, page, userId }) => {
+const ownerItems = ["Files", "Messages", "Calendar", "Time", "Activity"];
+const clientItems = ["Files", "Messages", "Calendar"];
+const Navbar = ({ projectId, page, userId, people }) => {
+  const permissions = people[userId] ? people[userId].permissions : "client";
   return (
     <div className="row no-gutters border-bottom">
-      {navItems.map((x) => (
+      {(permissions === "owner" ? ownerItems : clientItems).map((x) => (
         <div
           onClick={() =>
             history.push(`/${userId}/projects/${projectId}/${x.toLowerCase()}`)

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect } from "react";
 import "react-tippy/dist/tippy.css";
 import { Tooltip } from "react-tippy";
 
@@ -12,6 +12,14 @@ const Popover = ({
   open = undefined,
   ...rest
 }) => {
+  useEffect(() => {
+    return function cleanUp() {
+      let popovers = document.getElementsByClassName("tippy-popper");
+      for (let i = 0; i < popovers.length; i++) {
+        popovers[i].parentNode.removeChild(popovers[i]);
+      }
+    };
+  }, []);
   return (
     <Tooltip
       delay={delay}

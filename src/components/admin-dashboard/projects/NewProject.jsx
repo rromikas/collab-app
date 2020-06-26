@@ -15,33 +15,23 @@ const createProject = (project) => {
 };
 
 const NewProject = ({ user }) => {
-  console.log("rerender new roject");
   const [project, setProject] = useState({
     title: "",
     description: "",
     id: uniqid("project-"),
     starred: false,
     date: new Date(Date.now()).toString(),
-    events: {
-      AAAPlaceholder: {
-        id: "AAAplaceholder",
+    people: {
+      [user.id]: {
+        id: user.id,
+        photo: user.photo,
+        username: user.username,
+        email: user.email,
+        permissions: "owner",
       },
     },
-    times: {
-      AAAPlaceholder: {
-        id: "AAAplaceholder",
-      },
-    },
-    chats: {
-      AAAPlaceholder: {
-        id: "AAAplaceholder",
-      },
-    },
-    files: {
-      AAAPlaceholder: {
-        id: "AAAplaceholder",
-      },
-    },
+
+    status: "Running",
     creator: { username: user.username, photo: user.photo, id: user.id },
   });
 

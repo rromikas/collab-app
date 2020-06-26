@@ -6,6 +6,8 @@ import * as firebase from "../../../database/firebase";
 import md5 from "md5";
 import { BsFillReplyFill } from "react-icons/bs";
 import uniqid from "uniqid";
+import Checkbox from "../../utility/Checkbox";
+import { BsChevronDown } from "react-icons/bs";
 
 const sendInvitation = (invitation, user) => {
   let id = uniqid("invitation-");
@@ -14,6 +16,7 @@ const sendInvitation = (invitation, user) => {
     `projects/${invitation.project.id}/people/${md5(invitation.toWhom)}`
   ] = { status: "invited", email: invitation.toWhom };
   updates[`users/${md5(invitation.toWhom)}/notifications/unseen/${id}`] = {
+    permissions: invitation.permissions,
     photo: user.photo,
     text: `${user.username} invited you to the project "${invitation.project.title}"`,
     type: "invitation",
@@ -25,14 +28,19 @@ const sendInvitation = (invitation, user) => {
 };
 
 const People = ({ projects, user }) => {
+  const runningProjects = Object.values(projects).filter(
+    (x) => x.status !== "Deleted"
+  );
   const [invitation, setInvitation] = useState({
     who: "",
     toWhom: "",
+    permissions: "",
     project: { title: "Select project", description: "", id: "" },
   });
   const [projectId, setProjectId] = useState(
-    Object.keys(projects).length > 0 ? Object.keys(projects)[0] : -1
+    runningProjects.length > 0 ? runningProjects[0].id : -1
   );
+  const [problem, setProblem] = useState("");
   const projectChooser = useRef(null);
   const peopleProjectChooser = useRef(null);
   const invitationMaker = useRef(null);
@@ -59,10 +67,10 @@ const People = ({ projects, user }) => {
     <div className="row no-gutters px-2 px-sm-3 px-md-4">
       <Popover
         content={
-          <div>
-            <div className="mb-1">Invite by email</div>
+          <div className="row no-gutters" style={{ maxWidth: "200px" }}>
+            <div className="mb-1 col-12">Invite by email</div>
             <input
-              className="d-block mb-1"
+              className="d-block mb-1 col-12"
               type="text"
               placeholder="Type email"
               value={invitation.toWhom}
@@ -73,38 +81,104 @@ const People = ({ projects, user }) => {
                 );
               }}
             ></input>
-            <Popover
-              position="right"
-              content={
-                <div className="popover-inner">
-                  {Object.values(projects).map((x) => (
-                    <div
-                      className="popover-content-item"
-                      onClick={() => {
-                        setInvitation((inv) =>
-                          Object.assign({}, inv, { project: x })
-                        );
-                        projectChooser.current.click();
-                      }}
-                    >
-                      {x.title}
-                    </div>
-                  ))}
+            <div className="col-12">
+              <Popover
+                position="right"
+                content={
+                  <div className="popover-inner">
+                    {runningProjects.map((x) => (
+                      <div
+                        className="popover-content-item col-12"
+                        onClick={() => {
+                          setInvitation((inv) =>
+                            Object.assign({}, inv, { project: x })
+                          );
+                          projectChooser.current.click();
+                        }}
+                      >
+                        {x.title}
+                      </div>
+                    ))}
+                  </div>
+                }
+              >
+                <div className="btn mb-2 mx-auto" ref={projectChooser}>
+                  {invitation.project.title}
                 </div>
-              }
-            >
-              <div className="btn mb-3 w-100" ref={projectChooser}>
-                {invitation.project.title}
+              </Popover>
+            </div>
+            <div className="mb-1 col-12">
+              <label>Permissions</label>
+            </div>
+            <div className="col-12 mb-3">
+              <div className="row no-gutters mb-1">
+                <div className="col-auto mr-2">
+                  <Checkbox
+                    size={25}
+                    checked={invitation.permissions === "owner"}
+                    setChecked={(checked) => {
+                      setInvitation((inv) =>
+                        Object.assign({}, inv, {
+                          permissions: checked ? "owner" : "",
+                        })
+                      );
+                    }}
+                  ></Checkbox>
+                </div>
+                <div className="col-auto">Owner</div>
               </div>
-            </Popover>
+              <div className="row no-gutters">
+                <div className="col-auto mr-2">
+                  <Checkbox
+                    size={25}
+                    checked={invitation.permissions === "client"}
+                    setChecked={(checked) => {
+                      setInvitation((inv) =>
+                        Object.assign({}, inv, {
+                          permissions: checked ? "client" : "",
+                        })
+                      );
+                    }}
+                  ></Checkbox>
+                </div>
+                <div className="col-auto">Client</div>
+              </div>
+            </div>
+            <div className="col-12">
+              {problem === "no permissions selected" ? (
+                <label style={{ color: "red" }}>permissions required</label>
+              ) : problem === "wrong email" ? (
+                <label style={{ color: "red" }}>email required</label>
+              ) : problem === "no project selected" ? (
+                <label style={{ color: "red" }}>permissions required</label>
+              ) : (
+                ""
+              )}
+            </div>
+
             <div
-              className="btn-pro mb-1 w-100"
-              onClick={() => sendInvitation(invitation, user)}
+              className="btn-pro mb-1 col-6"
+              onClick={() => {
+                if (!invitation.toWhom) {
+                  setProblem("wrong email");
+                } else {
+                  if (invitation.project.title === "Select project") {
+                    setProblem("no project selected");
+                  } else {
+                    if (invitation.permissions === "") {
+                      setProblem("no permissions selected");
+                    } else {
+                      sendInvitation(invitation, user);
+                      invitationMaker.current.click();
+                    }
+                  }
+                }
+              }}
             >
               Send
             </div>
             <div
-              className="btn w-100"
+              className="btn col-6"
               onClick={() => invitationMaker.current.click()}
             >
               Cancel
@@ -120,7 +194,7 @@ const People = ({ projects, user }) => {
       <Popover
         content={
           <div className="popover-inner">
-            {Object.values(projects).map((x) => (
+            {runningProjects.map((x) => (
               <div
                 className="popover-content-item"
                 onClick={() => {
@@ -134,14 +208,21 @@ const People = ({ projects, user }) => {
           </div>
         }
       >
-        <div className="col-auto btn" ref={peopleProjectChooser}>
-          {projectId !== -1 && projects[projectId]
-            ? `people of "${projects[projectId].title}"`
-            : "No projects"}
+        <div
+          className="col-auto btn d-flex align-items-center"
+          ref={peopleProjectChooser}
+        >
+          <div className="mr-2">
+            {projectId !== -1 && projects[projectId]
+              ? `people of "${projects[projectId].title}"`
+              : "No projects"}
+          </div>
+
+          <BsChevronDown fontSize="14px"></BsChevronDown>
         </div>
       </Popover>
       {Object.values(people).length > 0 ? (
-        <div className="col-12">
+        <div className="col-12 mt-2">
           {Object.values(people).map((x) => (
             <div className="row no-gutters p-3 align-items-center clickable-item basic-card mb-3 people-list-item">
               {x.status === "invited" && (

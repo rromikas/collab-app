@@ -2,13 +2,19 @@ import React, { useState, useRef, useEffect } from "react";
 import date from "date-and-time";
 import { BsJustify } from "react-icons/bs";
 import Popover from "../../utility/Popover";
-import store from "../../../store/store";
 import { uid } from "react-uid";
 import * as firebase from "../../../database/firebase";
 import uniqid from "uniqid";
 
+const sliceObject = (obj, property) => {
+  let newObj = { ...obj };
+  delete newObj[property];
+  return newObj;
+};
+
 const isToday = (someDate) => {
   const today = new Date();
+  someDate = new Date(someDate);
   return (
     someDate.getDate() == today.getDate() &&
     someDate.getMonth() == today.getMonth() &&
@@ -16,106 +22,13 @@ const isToday = (someDate) => {
   );
 };
 
-const chats = {
-  1: {
-    id: 1,
-    allSeen: false,
-    guest: {
-      name: "Kasparas",
-      userId: 1,
-      photo:
-        "https://images.pexels.com/photos/4354418/pexels-photo-4354418.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
-    },
-    owner: {
-      userId: 2,
-      name: "Laurynas",
-      photo:
-        "https://images.pexels.com/photos/4312101/pexels-photo-4312101.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
-    },
-
-    messages: [
-      {
-        status: "guest",
-        date: new Date(Date.now() - 4000000000),
-        text: "Hello, how are you?",
-        seenBy: [],
-      },
-      {
-        status: "owner",
-        date: new Date(Date.now() - 30000),
-        text: "Hello, I am fine, how are you?",
-        seenBy: [],
-      },
-      {
-        status: "guest",
-        date: new Date(Date.now() - 20000),
-        text: "I am fine. We are going to play footbal, will you join us?",
-        seenBy: [],
-      },
-      {
-        status: "owner",
-        date: new Date(Date.now() - 10000),
-        text: "Hello, how are you?",
-        seenBy: [],
-      },
-    ],
-  },
-
-  2: {
-    id: 2,
-    allSeen: true,
-    guest: {
-      userId: 3,
-      name: "Kreate",
-      photo:
-        "https://images.pexels.com/photos/2897883/pexels-photo-2897883.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
-    },
-    owner: {
-      userId: 4,
-      name: "Sioma",
-      photo:
-        "https://images.pexels.com/photos/2100063/pexels-photo-2100063.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
-    },
-
-    messages: [
-      {
-        status: "guest",
-        date: new Date(Date.now() - 40000),
-        text: "Hello, how are you?",
-        seenBy: [],
-      },
-      {
-        status: "owner",
-        date: new Date(Date.now() - 30000),
-        text: "Hello, I am fine, how are you?",
-        seenBy: [],
-      },
-      {
-        status: "guest",
-        date: new Date(Date.now() - 20000),
-        text: "I am fine. We are going to play footbal, will you join us?",
-        seenBy: [],
-      },
-      {
-        status: "owner",
-        date: new Date(Date.now() - 10000),
-        text: "Of course, when?",
-        seenBy: [],
-      },
-      {
-        status: "guest",
-        date: new Date(Date.now() - 5000),
-        text: "At 10 am in the camp now",
-        seenBy: [],
-      },
-      {
-        status: "owner",
-        date: new Date(Date.now() - 3000),
-        text: "xD",
-        seenBy: [],
-      },
-    ],
-  },
+const sendMessage = (message, projectId, chatId) => {
+  let updates = {};
+  let id = uniqid("message-");
+  updates[
+    `projects/${projectId}/messages/${chatId}/messages/${id}`
+  ] = Object.assign({}, message, { date: new Date(), id: id });
+  firebase.UpdateDatabase(updates);
 };
 
 const Messages = ({ projectId, user }) => {
@@ -126,9 +39,16 @@ const Messages = ({ projectId, user }) => {
 
   const [people, setPeople] = useState({});
   const [chats, setChats] = useState({});
+  const [newMessage, setNewMessage] = useState({
+    text: "",
+    seenBy: { [user.id]: { id: user.id } },
+    userId: user.id,
+  });
   useEffect(() => {
     firebase.GetFromDatabase(`projects/${projectId}/people`).then((data) => {
-      setPeople(data);
+      if (data) {
+        setPeople(data);
+      }
     });
   }, []);
 
@@ -144,35 +64,69 @@ const Messages = ({ projectId, user }) => {
   }, []);
 
   useEffect(() => {
-    store.dispatch({ type: "SET_PAGE_TITLE", pageTitle: "Messages" });
-  }, []);
-
-  useEffect(() => {
-    let cid = Object.values(chats).filter(
-      (c) => c.persons.includes(chatPerson) && c.persons.includes(user.id)
-    )[0].id;
-
-    if (!cid) {
-      let newChatId = uniqid("chat-");
-      let updates = {};
-      updates[`projects/${projectId}/messages/${newChatId}`] = {
-        persons: [user.id, chatPerson],
-        messages: { AAAPlaceholder: { id: "AAAPlaceholder" } },
-      };
-      firebase.UpdateDatabase(updates);
+    let arr = Object.keys(sliceObject(chats, "AAAPlaceholder")).filter(
+      (c) => chatPerson in chats[c].persons && user.id in chats[c].persons
+    );
+    if (chatPerson) {
+      if (!arr.length) {
+        let newChatId = uniqid("chat-");
+        let updates = {};
+        updates[`projects/${projectId}/messages/${newChatId}`] = {
+          persons: {
+            [user.id]: {
+              id: user.id,
+              photo: user.photo,
+              username: user.username,
+            },
+            [chatPerson]: {
+              id: chatPerson,
+              photo: people[chatPerson].photo,
+              username: people[chatPerson].username,
+            },
+          },
+          messages: { AAAPlaceholder: { id: "AAAPlaceholder" } },
+        };
+        firebase.UpdateDatabase(updates);
+        setChatId(newChatId);
+      } else {
+        setChatId(arr[0]);
+      }
     }
-    messagesEnd.current.scrollIntoView({ behavior: "smooth" });
+
+    messagesEnd.current.scrollIntoView();
   }, [chatPerson]);
 
   return (
-    <div className="row no-gutters px-2 px-sm-3 px-md-4">
-      <div className="row no-gutters collab-chat">
-        <div className="col-lg-4 d-lg-block d-none bg-light">
-          {Object.values(chats).map((x) => (
+    <div className="row no-gutters">
+      <div className="col-lg-4 d-lg-block d-none bg-light">
+        {Object.values(sliceObject(people, user.id)).map((x) => {
+          let chat = Object.values(sliceObject(chats, "AAAPlaceholder")).filter(
+            (y) => user.id in y.persons && x.id in y.persons
+          );
+          let lastMessage =
+            chat.length && Object.keys(chat[0].messages).length > 0
+              ? chat[0].messages[
+                  Object.keys(chat[0].messages)[
+                    Object.keys(chat[0].messages).length - 1
+                  ]
+                ]
+              : {
+                  date: 0,
+                  text: "start a chat",
+                  userId: x.id,
+                  seenBy: {
+                    [user.id]: {
+                      id: user.id,
+                    },
+                  },
+                };
+
+          lastMessage.date = new Date(lastMessage.date);
+          return (
             <div
               key={uid(x)}
               className="row no-gutters border-bottom p-3 chat-preview"
-              onClick={() => setChatId(x.id)}
+              onClick={() => setChatPerson(x.id)}
             >
               <div
                 className="col-auto mr-2"
@@ -182,45 +136,64 @@ const Messages = ({ projectId, user }) => {
                   borderRadius: "50%",
                   backgroundPosition: "center",
                   backgroundSize: "cover",
-                  backgroundImage: `url(${x.guest.photo})`,
+                  backgroundImage: `url(${x.photo})`,
                 }}
               ></div>
               <div className="col">
-                <div className="row no-gutters">{x.guest.name}</div>
+                <div className="row no-gutters">{x.username}</div>
                 <div
                   className={`row no-gutters chat-preview-message${
-                    x.allSeen ? "" : "-unread"
+                    user.id in lastMessage.seenBy ? "" : "-unread"
                   }`}
                 >
-                  {x.messages[x.messages.length - 1].userId === user.id
-                    ? "you: "
-                    : ""}
-                  {x.messages[x.messages.length - 1].text}
+                  {lastMessage.userId === user.id ? "you: " : ""}
+                  {lastMessage.text}
                 </div>
               </div>
               <div className="chat-time">
-                {isToday(x.messages[x.messages.length - 1].date)
-                  ? date.format(
-                      x.messages[x.messages.length - 1].date,
-                      "hh:mm A"
-                    )
-                  : date.format(
-                      x.messages[x.messages.length - 1].date,
-                      "hh:mm A MMM DD YYYY"
-                    )}
+                {lastMessage.date !== 0
+                  ? isToday(lastMessage.date)
+                    ? date.format(lastMessage.date, "hh:mm A")
+                    : date.format(lastMessage.date, "hh:mm A MMM DD YYYY")
+                  : ""}
               </div>
             </div>
-          ))}
-        </div>
-        <div className="col-lg-8 col-12 bg-white border-left">
-          <div className="row no-gutters">
-            <div className="col-12 border-bottom mb-2 px-4 py-3">
-              <div className="row no-gutters align-items-center">
-                <div className="col-auto d-block d-lg-none mr-3 hoverable-gray">
-                  <Popover
-                    content={
-                      <div className="container p-2">
-                        {Object.values(people).map((x) => (
+          );
+        })}
+      </div>
+      <div className="col-lg-8 col-12 bg-white border-left">
+        <div className="row no-gutters">
+          <div className="col-12 border-bottom mb-2 px-4 py-3">
+            <div className="row no-gutters align-items-center">
+              <div className="col-auto d-block d-lg-none mr-3 hoverable-gray">
+                <Popover
+                  content={
+                    <div className="container p-2">
+                      {Object.values(people).map((x) => {
+                        let chat = Object.values(
+                          sliceObject(chats, "AAAPlaceholder")
+                        ).filter(
+                          (y) => user.id in y.persons && x.id in y.persons
+                        );
+                        let lastMessage =
+                          chat.length &&
+                          Object.keys(chat[0].messages).length > 0
+                            ? chat[0].messages[
+                                Object.keys(chat[0].messages)[
+                                  Object.keys(chat[0].messages).length - 1
+                                ]
+                              ]
+                            : {
+                                date: 0,
+                                text: "start a chat",
+                                userId: x.id,
+                                seenBy: {
+                                  [user.id]: {
+                                    id: user.id,
+                                  },
+                                },
+                              };
+                        return (
                           <div
                             key={uid(x)}
                             className="row no-gutters border-bottom p-3 chat-preview"
@@ -241,61 +214,63 @@ const Messages = ({ projectId, user }) => {
                               }}
                             ></div>
                             <div className="col">
-                              <div className="row no-gutters">
-                                {x.guest.name}
-                              </div>
+                              <div className="row no-gutters">{x.username}</div>
                               <div
                                 className={`row no-gutters chat-preview-message${
-                                  x.allSeen ? "" : "-unread"
+                                  user.id in lastMessage.seenBy ? "" : "-unread"
                                 }`}
                               >
-                                {x.messages[x.messages.length - 1].userId ===
-                                user.id
-                                  ? "you: "
-                                  : ""}
-                                {x.messages[x.messages.length - 1].text}
+                                {lastMessage.userId === user.id ? "you: " : ""}
+                                {lastMessage.text}
                               </div>
                             </div>
                             <div className="chat-time">
-                              {isToday(x.messages[x.messages.length - 1].date)
-                                ? date.format(
-                                    x.messages[x.messages.length - 1].date,
-                                    "hh:mm A"
-                                  )
-                                : date.format(
-                                    x.messages[x.messages.length - 1].date,
-                                    "hh:mm A MMM DD YYYY"
-                                  )}
+                              {lastMessage.date !== 0
+                                ? isToday(lastMessage.date)
+                                  ? date.format(lastMessage.date, "hh:mm A")
+                                  : date.format(
+                                      lastMessage.date,
+                                      "hh:mm A MMM DD YYYY"
+                                    )
+                                : ""}
                             </div>
                           </div>
-                        ))}
-                      </div>
-                    }
-                  >
-                    <div ref={chatPopover}>
-                      <BsJustify fontSize="24px"></BsJustify>
+                        );
+                      })}
                     </div>
-                  </Popover>
-                </div>
-                <div
-                  className="col-auto mr-2"
-                  style={{
-                    width: "50px",
-                    height: "50px",
-                    borderRadius: "50%",
-                    backgroundPosition: "center",
-                    backgroundSize: "cover",
-                    backgroundImage: `url(${chats[chatId].guest.photo})`,
-                  }}
-                ></div>
-                <div className="col-auto">{chats[chatId].guest.name}</div>
+                  }
+                >
+                  <div ref={chatPopover}>
+                    <BsJustify fontSize="24px"></BsJustify>
+                  </div>
+                </Popover>
               </div>
+              {people[chatPerson] && (
+                <React.Fragment>
+                  <div
+                    className="col-auto mr-2"
+                    style={{
+                      width: "50px",
+                      height: "50px",
+                      borderRadius: "50%",
+                      backgroundPosition: "center",
+                      backgroundSize: "cover",
+                      backgroundImage: `url(${people[chatPerson].photo})`,
+                    }}
+                  ></div>
+                  <div className="col-auto">{people[chatPerson].username}</div>
+                </React.Fragment>
+              )}
             </div>
-            <div
-              className="col-12 p-4"
-              style={{ height: "470px", overflow: "auto" }}
-            >
-              {chats[chatId].messages.map((x) => {
+          </div>
+          <div
+            className="col-12 p-4"
+            style={{ height: "430px", overflow: "auto" }}
+          >
+            {chats[chatId] &&
+              Object.values(
+                sliceObject(chats[chatId].messages, "AAAPlaceholder")
+              ).map((x) => {
                 return (
                   <div
                     key={uid(x)}
@@ -306,7 +281,7 @@ const Messages = ({ projectId, user }) => {
                     <div className="col-auto" style={{ maxWidth: "75%" }}>
                       <div
                         className={`mb-2 row no-gutters justify-content-${
-                          x.status === "guest" ? "start" : "end"
+                          x.userId === chatPerson ? "start" : "end"
                         }`}
                       >
                         <div
@@ -317,30 +292,31 @@ const Messages = ({ projectId, user }) => {
                             borderRadius: "50%",
                             backgroundPosition: "center",
                             backgroundSize: "cover",
-                            backgroundImage: `url(${
-                              chats[chatId][x.status].photo
-                            })`,
+                            backgroundImage: `url(${people[x.userId].photo})`,
                           }}
                         ></div>
                         <div className="col-auto">
                           <div className="row no-gutters">
-                            {chats[chatId][x.status].name}
+                            {people[x.userId].username}
                           </div>
                           <div className="row no-gutters chat-time">
-                            {isToday(x.date)
-                              ? date.format(x.date, "hh:mm A")
-                              : date.format(x.date, "ddd MMM DD YYYY")}
+                            {isToday(new Date(x.date))
+                              ? date.format(new Date(x.date), "hh:mm A")
+                              : date.format(
+                                  new Date(x.date),
+                                  "ddd MMM DD YYYY"
+                                )}
                           </div>
                         </div>
                       </div>
                       <div
                         className={`row no-gutters justify-content-${
-                          x.status === "guest" ? "start" : "end"
+                          x.userId === chatPerson ? "start" : "end"
                         }`}
                       >
                         <div
                           className={`px-3 col-auto message${
-                            x.status === "guest"
+                            x.userId === chatPerson
                               ? " guest-message"
                               : " own-message"
                           }`}
@@ -352,19 +328,34 @@ const Messages = ({ projectId, user }) => {
                   </div>
                 );
               })}
+            <div
+              style={{ float: "left", clear: "both" }}
+              ref={messagesEnd}
+            ></div>
+          </div>
+          <div className="col-12 p-4 collab-chat-write-message-box border-top">
+            <div className="row no-gutters">
               <div
-                style={{ float: "left", clear: "both" }}
-                ref={messagesEnd}
+                className="col-auto photo-circle-sm mr-2"
+                style={{ backgroundImage: `url(${user.photo})` }}
               ></div>
-            </div>
-            <div className="col-12 p-4 collab-chat-write-message-box border-top">
-              <div className="row no-gutters">
-                <input
-                  type="text"
-                  className="col mr-2"
-                  placeholder="write a message"
-                ></input>
-                <div className="btn-pro col-auto">Send</div>
+              <input
+                value={newMessage.text}
+                onChange={(e) => {
+                  e.persist();
+                  setNewMessage((m) =>
+                    Object.assign({}, m, { text: e.target.value })
+                  );
+                }}
+                type="text"
+                className="col mr-2"
+                placeholder="write a message"
+              ></input>
+              <div
+                className="btn-pro col-auto"
+                onClick={() => sendMessage(newMessage, projectId, chatId)}
+              >
+                Send
               </div>
             </div>
           </div>

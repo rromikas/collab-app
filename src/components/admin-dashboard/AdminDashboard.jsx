@@ -1,6 +1,6 @@
 import React from "react";
 import Calendars from "./calendars/Calendars";
-import Messages from "./messages/Messages";
+import MessagesParent from "./messages/MessagesParent";
 import Activity from "./activity/Activity";
 import People from "./people/People";
 import Projects from "./projects/Projects";
@@ -10,9 +10,16 @@ import NewProject from "./projects/NewProject";
 import ProjectDashboard from "../project-dashboard/ProjectDashboard";
 import EditProject from "./projects/EditProject";
 
+const sliceObject = (obj, property) => {
+  let newObj = { ...obj };
+  delete newObj[property];
+  return newObj;
+};
+
 const AdminDashboard = (props) => {
   const page = props.match.params.page;
   const user = props.user;
+  const projects = user.projects;
   const section = props.match.params.section;
   const projectId = props.match.params.projectId;
   return (
@@ -24,11 +31,11 @@ const AdminDashboard = (props) => {
         <div className="col">
           <Navbar></Navbar>
           {page === "people" ? (
-            <People user={user} projects={user.projects}></People>
+            <People user={user} projects={projects}></People>
           ) : page === "activity" ? (
-            <Activity projects={user.projects}></Activity>
+            <Activity projects={projects}></Activity>
           ) : page === "messages" ? (
-            <Messages messages={user.messages}></Messages>
+            <MessagesParent user={user}></MessagesParent>
           ) : page === "projects" ? (
             section === "edit" ? (
               <EditProject projectId={projectId} user={user}></EditProject>
@@ -39,10 +46,10 @@ const AdminDashboard = (props) => {
                 section={section ? section : "files"}
               ></ProjectDashboard>
             ) : (
-              <Projects projects={user.projects} userId={user.id}></Projects>
+              <Projects projects={projects} userId={user.id}></Projects>
             )
           ) : page === "calendar" ? (
-            <Calendars projects={user.projects}></Calendars>
+            <Calendars projects={projects}></Calendars>
           ) : page === "new-project" ? (
             <NewProject user={user}></NewProject>
           ) : (

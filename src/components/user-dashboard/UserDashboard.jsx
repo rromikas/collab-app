@@ -16,7 +16,6 @@ const UserDashboard = ({ user, ...rest }) => {
 
   useEffect(() => {
     firebase.on(`users/${userId}`, (data) => {
-      console.log("changed user dat");
       store.dispatch({ type: "SET_USER", user: data });
     });
 

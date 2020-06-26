@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Router, Switch, Route } from "react-router-dom";
 import history from "./history";
 import UserDashobard from "./components/user-dashboard/UserDashboard";
@@ -9,14 +9,8 @@ import * as firebase from "./database/firebase";
 import { uid } from "react-uid";
 import md5 from "md5";
 import date from "date-and-time";
+import Loader from "./components/utility/Loader";
 
-let time = date.format(new Date(), "hh-mm-ss");
-console.log(time);
-
-let a = /^([0-9]*)$/.test("11:11");
-let b = /[0-9]{1,}:[0-9]{1,}/.test("11:11");
-
-console.log(a, b);
 const accounts = {
   [md5("admin1@email.com")]: {
     photo:
@@ -26,15 +20,6 @@ const accounts = {
     username: "admin 1",
     password: "admin 1",
     accountType: "admin",
-    projects: {
-      AAAPlaceholder: {
-        id: "AAAPlaceholder",
-      },
-    },
-    notifications: {
-      seen: { AAAPlaceholder: { id: "AAAPlaceholder" } },
-      unseen: { AAAPlaceholder: { id: "AAAPlaceholder" } },
-    },
   },
   [md5("admin2@email.com")]: {
     photo:
@@ -44,15 +29,6 @@ const accounts = {
     username: "admin 2",
     password: "admin 2",
     accountType: "admin",
-    projects: {
-      AAAPlaceholder: {
-        id: "AAAPlaceholder",
-      },
-    },
-    notifications: {
-      seen: { AAAPlaceholder: { id: "AAAPlaceholder" } },
-      unseen: { AAAPlaceholder: { id: "AAAPlaceholder" } },
-    },
   },
   [md5("client1@email.com")]: {
     photo:
@@ -62,15 +38,6 @@ const accounts = {
     password: "client 1",
     accountType: "client",
     id: md5("client1@email.com"),
-    projects: {
-      AAAPlaceholder: {
-        id: "AAAPlaceholder",
-      },
-    },
-    notifications: {
-      seen: { AAAPlaceholder: { id: "AAAPlaceholder" } },
-      unseen: { AAAPlaceholder: { id: "AAAPlaceholder" } },
-    },
   },
   [md5("client2@email.com")]: {
     photo:
@@ -80,15 +47,6 @@ const accounts = {
     password: "client 2",
     accountType: "client",
     id: md5("client2@email.com"),
-    projects: {
-      AAAPlaceholder: {
-        id: "AAAPlaceholder",
-      },
-    },
-    notifications: {
-      seen: { AAAPlaceholder: { id: "AAAPlaceholder" } },
-      unseen: { AAAPlaceholder: { id: "AAAPlaceholder" } },
-    },
   },
 };
 
@@ -103,41 +61,55 @@ function createDemoUser() {
 // createDemoUser();
 
 const MainPage = () => {
+  const [loading, setLoading] = useState(false);
   return (
-    <div className="row no-gutters px-2 px-sm-3 px-md-4 py-3">
-      <div className="col-12">
-        {Object.values(accounts).map((x) => (
-          <div
-            key={uid(x)}
-            className="row no-gutters p-3 align-items-center basic-card mb-3"
-          >
+    <div
+      className="row no-gutters px-2 px-sm-3 px-md-4 py-3 mx-auto vh-100 align-items-center justify-content-center"
+      style={{ maxWidth: "500px" }}
+    >
+      {loading ? (
+        <Loader loading={loading} size={100}></Loader>
+      ) : (
+        <div className="col-12">
+          {Object.values(accounts).map((x) => (
             <div
-              className="col-auto mr-2 photo-circle-sm"
-              style={{
-                backgroundImage: `url(${x.photo})`,
-              }}
-            ></div>
-            <div className="col-auto mr-2">{x.email}</div>
-            <div
-              className="col-auto btn"
-              onClick={() =>
-                AuthenticateUser(x).then((data) => {
-                  console.log("AUTH DATA", data);
-                  if (data.error) {
-                  } else {
-                    store.dispatch({
-                      type: "SET_USER",
-                      user: data,
-                    });
-                  }
-                })
-              }
+              key={uid(x)}
+              className="row no-gutters p-3 basic-card mb-3 justify-content-between"
             >
-              Login
+              <div className="col-auto">
+                <div className="row no-gutters align-items-center">
+                  <div
+                    className="col-auto mr-2 photo-circle-sm"
+                    style={{
+                      backgroundImage: `url(${x.photo})`,
+                    }}
+                  ></div>
+                  <div className="col-auto mr-2">{x.email}</div>
+                </div>
+              </div>
+
+              <div
+                className="col-auto btn"
+                onClick={() => {
+                  setLoading(true);
+                  AuthenticateUser(x).then((data) => {
+                    setLoading(false);
+                    if (data.error) {
+                    } else {
+                      store.dispatch({
+                        type: "SET_USER",
+                        user: data,
+                      });
+                    }
+                  });
+                }}
+              >
+                Login
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

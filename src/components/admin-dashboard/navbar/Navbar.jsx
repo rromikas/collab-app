@@ -6,6 +6,7 @@ import Popover from "../../utility/Popover";
 import store from "../../../store/store";
 import { BsBell } from "react-icons/bs";
 import * as firebase from "../../../database/firebase";
+import { uid } from "react-uid";
 
 const answerToInvitation = (answer, invitation, user) => {
   let updates = {};
@@ -19,11 +20,14 @@ const answerToInvitation = (answer, invitation, user) => {
   } else {
     updates[`projects/${invitation.project.id}/people/${user.id}`] = {
       status: answer,
+      permissions: invitation.permissions,
       photo: user.photo,
       username: user.username,
       id: user.id,
       email: user.email,
     };
+    updates[`users/${user.id}/projects/${invitation.project.id}`] =
+      invitation.project;
   }
 
   firebase.UpdateDatabase(updates);
@@ -34,9 +38,12 @@ const Navbar = ({ pageTitle, user, backlink }) => {
   let notifications = { ...user.notifications };
   let unseen = notifications.unseen;
   let seen = notifications.seen;
-  delete unseen["AAAPlaceholder"];
-  delete seen["AAAPlaceholder"];
-
+  if (!unseen) {
+    unseen = {};
+  }
+  if (!seen) {
+    seen = {};
+  }
   return (
     <div className="row no-gutters justify-content-between px-2 px-md-3 px-lg-4">
       <div className="col-auto mb-2">
@@ -64,7 +71,10 @@ const Navbar = ({ pageTitle, user, backlink }) => {
               <div className="popover-inner">
                 <div className="popover-label border-bottom">Unseen</div>
                 {Object.values(unseen).map((x) => (
-                  <div className="notification-item d-flex border-bottom">
+                  <div
+                    className="notification-item d-flex border-bottom"
+                    key={uid(x)}
+                  >
                     <div
                       className="col-auto photo-circle-sm mr-2"
                       style={{ backgroundImage: `url(${x.photo})` }}
@@ -102,7 +112,7 @@ const Navbar = ({ pageTitle, user, backlink }) => {
                 ))}
                 <div className="popover-label border-bottom">Seen</div>
                 {Object.values(seen).map((x) => (
-                  <div className="notification-item d-flex">
+                  <div className="notification-item d-flex" key={uid(x)}>
                     <div
                       className="col-auto photo-circle-sm mr-2"
                       style={{ backgroundImage: `url(${x.photo})` }}
@@ -180,16 +190,17 @@ const Navbar = ({ pageTitle, user, backlink }) => {
               </div>
             }
           >
-            <div
-              ref={userPhoto}
-              className="col-auto mr-2 photo-circle-sm cursor-pointer"
-              style={{
-                backgroundImage: `url(${user.photo})`,
-              }}
-            ></div>
+            <div className="mr-2 navbar-icon cursor-pointer" ref={userPhoto}>
+              <div
+                className="photo-circle-sm"
+                style={{
+                  backgroundImage: `url(${user.photo})`,
+                }}
+              ></div>
+            </div>
           </Popover>
 
-          <div className="col">{user.email}</div>
+          <div className="col d-none d-md-block">{user.email}</div>
         </div>
       </div>
     </div>

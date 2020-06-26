@@ -1,13 +1,17 @@
 import React, { useRef, useEffect, useState } from "react";
-import { BsFolderPlus, BsFolder, BsFileEarmark } from "react-icons/bs";
+import {
+  BsFolderPlus,
+  BsFolder,
+  BsFileEarmark,
+  BsFileEarmarkPlus,
+} from "react-icons/bs";
 import * as firebase from "../../../database/firebase";
 import date from "date-and-time";
 import { BsChevronLeft } from "react-icons/bs";
 import Loader from "../../utility/Loader";
 
-const handleFileUpload = (e, projectId, user, setFiles) => {
+const handleFileUpload = (e, projectId, user, setFiles, setLoading, folder) => {
   let file = e.target.files[0];
-  console.log(file);
   var metadata = {
     customMetadata: {
       uploadedBy: user.username,
@@ -17,15 +21,20 @@ const handleFileUpload = (e, projectId, user, setFiles) => {
     if (file.size < 10000000) {
       if (file.name.length < 40) {
         firebase.UploadFile(
-          `${projectId}/${file.name}/${file.name}`,
+          `${projectId}/${folder ? folder : file.name}/${file.name}`,
           file,
           metadata,
           (res) => console.log(res),
           (err) => console.log("error uploading file", err),
           (final) => {
             let fileNames = final.fullPath.split("/");
-            let newFile = { name: fileNames[1] };
+            let newFile = {
+              name: fileNames[folder ? fileNames.length - 1 : 1],
+              uploadedBy: user.username,
+              timeCreated: date.format(new Date(), "MMM DD, YYYY"),
+            };
             setFiles((f) => f.concat(newFile));
+            setLoading(false);
           }
         );
       } else {
@@ -53,9 +62,7 @@ const Files = ({ projectId, user, setProject }) => {
       setLoading(true);
       async function fetchMyAPI() {
         let path = `${projectId}/${folder}`;
-        console.log("PATH", path);
         firebase.GetFiles(path).then(async (res) => {
-          console.log("ALL FILES", res);
           let newFiles = [];
           for (let i = 0; i < res.length; i++) {
             let newFile = {
@@ -65,7 +72,6 @@ const Files = ({ projectId, user, setProject }) => {
               timeCreated: "",
             };
             let metadata = await res[i].getMetadata();
-            console.log("metadata", metadata);
             newFile.uploadedBy = metadata.customMetadata.uploadedBy;
             newFile.timeCreated = date.format(
               new Date(metadata.timeCreated),
@@ -122,7 +128,7 @@ const Files = ({ projectId, user, setProject }) => {
             )}
           </div>
           <div className="row no-gutters">
-            {!folder && (
+            {!folder ? (
               <div className="col-auto p-4 file-card">
                 <BsFolderPlus
                   fontSize="80px"
@@ -135,9 +141,48 @@ const Files = ({ projectId, user, setProject }) => {
                   type="file"
                   style={{ display: "none" }}
                   ref={uploader}
-                  onChange={(e) =>
-                    handleFileUpload(e, projectId, user, setFiles)
-                  }
+                  onChange={(e) => {
+                    setLoading(true);
+                    handleFileUpload(
+                      e,
+                      projectId,
+                      user,
+                      setFiles,
+                      setLoading,
+                      folder
+                    );
+                  }}
+                ></input>
+              </div>
+            ) : (
+              <div className="col-auto p-4 file-card">
+                <div className="row no-gutters" style={{ opacity: 0 }}>
+                  placeholder
+                </div>
+                <div className="row no-gutters clickable-item justify-content-center">
+                  {" "}
+                  <BsFileEarmarkPlus
+                    fontSize="80px"
+                    onClick={() => {
+                      uploader.current.click();
+                    }}
+                  ></BsFileEarmarkPlus>
+                </div>
+                <input
+                  type="file"
+                  style={{ display: "none" }}
+                  ref={uploader}
+                  onChange={(e) => {
+                    setLoading(true);
+                    handleFileUpload(
+                      e,
+                      projectId,
+                      user,
+                      setFiles,
+                      setLoading,
+                      folder
+                    );
+                  }}
                 ></input>
               </div>
             )}

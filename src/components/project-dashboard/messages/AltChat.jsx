@@ -31,7 +31,7 @@ const sendMessage = (message, projectId, chatId) => {
 };
 
 const getLastMessage = (chats, userId1, userId2) => {
-  let chat = Object.values(chats).filter(
+  let chat = Object.values(sliceObject(chats, "AAAPlaceholder")).filter(
     (y) => userId1 in y.persons && userId2 in y.persons
   );
 
@@ -64,7 +64,7 @@ const getLastMessage = (chats, userId1, userId2) => {
   return lastMessage;
 };
 
-const Messages = ({ projectId, user }) => {
+const AltChat = ({ projectId, user }) => {
   const [chatId, setChatId] = useState(1);
   const [chatPerson, setChatPerson] = useState(0);
   const chatPopover = useRef(null);
@@ -89,7 +89,7 @@ const Messages = ({ projectId, user }) => {
     firebase.on(`projects/${projectId}/messages`, (data) => {
       if (data) {
         setChats(data);
-        messagesEnd.current.scrollIntoView();
+        messagesEnd.current.scrollIntoView({ behavior: "smooth" });
       }
     });
     return function cleanUp() {
@@ -144,11 +144,10 @@ const Messages = ({ projectId, user }) => {
   }, [chatPerson]);
 
   return (
-    <div className="row no-gutters border-top">
+    <div className="row no-gutters">
       <div
         className="col-lg-4 col-auto bg-white"
         onClick={() => {
-          console.log("ne  tenek ure reaiki");
           setChatPerson("none");
         }}
       >
@@ -202,7 +201,7 @@ const Messages = ({ projectId, user }) => {
       </div>
       <div className="col-lg-8 col bg-white border-left">
         <div className="row no-gutters">
-          <div className="col-12" style={{ height: "430px", overflow: "auto" }}>
+          <div className="col-12" style={{ height: "494px", overflow: "auto" }}>
             {chats[chatId] &&
             Object.keys(people).length &&
             chats[chatId].messages ? (
@@ -254,11 +253,14 @@ const Messages = ({ projectId, user }) => {
               ref={messagesEnd}
             ></div>
           </div>
-          <div className="col-12 p-4 collab-chat-write-message-box border-top">
+          <div
+            className="col-12 p-4 collab-chat-write-message-box border-top d-flex align-items-center"
+            style={{ height: "80px" }}
+          >
             {chatId === 1 ? (
               "Select chat"
             ) : (
-              <div className="row no-gutters">
+              <div className="row no-gutters w-100">
                 <div
                   className="col-auto photo-circle-sm mr-2"
                   style={{ backgroundImage: `url(${user.photo})` }}
@@ -296,4 +298,4 @@ const Messages = ({ projectId, user }) => {
   );
 };
 
-export default Messages;
+export default AltChat;

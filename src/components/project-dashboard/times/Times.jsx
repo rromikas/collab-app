@@ -3,19 +3,24 @@ import Popover from "../../utility/Popover";
 import date from "date-and-time";
 import uniqid from "uniqid";
 import * as firebase from "../../../database/firebase";
+import NoTimes from "../../../pictures/NoTimes";
+
+const formatNumber = (number) => {
+  var formattedNumber = ("0" + number).slice(-2);
+  return formattedNumber;
+};
 
 const calculateTotalTime = (times) => {
   let minutes = 0;
+
   Object.values(times).forEach((x) => {
     Object.values(x).forEach((y) => {
       minutes += y.minutes;
     });
   });
-  console.log("minutes", minutes);
   let h = Math.floor(minutes / 60);
-  console.log("h", h);
   let m = minutes - h * 60;
-  return `${h}:${m}`;
+  return `${formatNumber(h)}:${formatNumber(m)}`;
 };
 
 const addTimeRecord = (timeRecord, projectId, onError) => {
@@ -43,8 +48,7 @@ const addTimeRecord = (timeRecord, projectId, onError) => {
 };
 
 const Times = ({ user, projectId, times }) => {
-  let onlyTimes = { ...times };
-  delete onlyTimes["AAAPlaceholder"];
+  times = times ? times : {};
   const addTimeButton = useRef(null);
   const [timeRecord, setTimeRecord] = useState({
     time: "",
@@ -106,9 +110,7 @@ const Times = ({ user, projectId, times }) => {
               <div
                 className="btn-pro col-6 mr-1"
                 onClick={() => {
-                  addTimeRecord(timeRecord, projectId, (error) =>
-                    console.log(error)
-                  );
+                  addTimeRecord(timeRecord, projectId, (error) => {});
                   addTimeButton.current.click();
                 }}
               >
@@ -131,7 +133,7 @@ const Times = ({ user, projectId, times }) => {
       <div className="col-12 mb-2">
         <div className="row no-gutters border-top border-bottom align-items-center py-1">
           <div className="col-auto mr-2">Total time:</div>
-          <div className="col-auto">{calculateTotalTime(onlyTimes)}</div>
+          <div className="col-auto">{calculateTotalTime(times)}</div>
           <div className="col">
             <div className="row no-gutters justify-content-end">
               <div className="col-auto btn">Show details</div>
@@ -140,21 +142,32 @@ const Times = ({ user, projectId, times }) => {
         </div>
       </div>
 
-      <div className="col-12" style={{ height: "600px" }}>
-        {Object.keys(onlyTimes).map((x) => (
-          <div className="row no-gutters mb-3">
-            <div className="col-12 mb-1 time-record-date">{x}</div>
-            <div className="col-12">
-              {Object.values(onlyTimes[x]).map((y) => (
-                <div className="row no-gutters times-table-row">
-                  <div className="col-4 pr-2">{y.time}</div>
-                  <div className="col-4 pr-2">{y.creator}</div>
-                  <div className="col-4">{y.task}</div>
-                </div>
-              ))}
+      <div className="col-12">
+        {Object.keys(times).length ? (
+          Object.keys(times).map((x) => (
+            <div className="row no-gutters mb-3">
+              <div className="col-12 mb-1 time-record-date">{x}</div>
+              <div className="col-12">
+                {Object.values(times[x]).map((y) => (
+                  <div className="row no-gutters times-table-row">
+                    <div className="col-4 pr-2">{y.time}</div>
+                    <div className="col-4 pr-2">{y.creator}</div>
+                    <div className="col-4">{y.task}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))
+        ) : (
+          <div
+            className="row no-gutters justify-content-center align-items-center"
+            style={{ height: "440px" }}
+          >
+            <div className="col-lg-4 col-md-5 col-6">
+              <NoTimes></NoTimes>
             </div>
           </div>
-        ))}
+        )}
       </div>
     </div>
   );

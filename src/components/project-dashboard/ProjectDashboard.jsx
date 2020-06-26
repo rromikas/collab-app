@@ -6,14 +6,16 @@ import Calendar from "./calendar/Calendar";
 import Files from "./files/Files";
 import Messages from "./messages/Messages";
 import Times from "./times/Times";
+import AltChat from "./messages/AltChat";
 
 const ProjectDashboard = ({ projectId, user, section }) => {
   const [page, setPage] = useState("");
   const [project, setProject] = useState({
     events: {},
-    chats: {},
+    messages: {},
     times: {},
     files: {},
+    people: {},
   });
   useEffect(() => {
     store.dispatch({
@@ -52,8 +54,16 @@ const ProjectDashboard = ({ projectId, user, section }) => {
 
   return (
     <div className="row no-gutters px-2 px-sm-3 px-md-4">
-      <div className="col-12 collab-project bg-white">
-        <Navbar projectId={projectId} page={page} userId={user.id}></Navbar>
+      <div
+        className="col-12 collab-project bg-white"
+        style={{ height: "630px" }}
+      >
+        <Navbar
+          projectId={projectId}
+          page={page}
+          userId={user.id}
+          people={project.people}
+        ></Navbar>
         {page === "calendar" ? (
           <Calendar
             projectId={projectId}
@@ -72,7 +82,7 @@ const ProjectDashboard = ({ projectId, user, section }) => {
             setProject={setProject}
           ></Files>
         ) : page === "messages" ? (
-          <Messages></Messages>
+          <AltChat projectId={projectId} user={user}></AltChat>
         ) : page === "time" ? (
           <Times
             user={user}

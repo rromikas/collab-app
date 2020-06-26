@@ -17,7 +17,6 @@ const editProject = (project, user) => {
 };
 
 const EditProject = ({ user, projectId }) => {
-  console.log("rerender new roject");
   const [project, setProject] = useState({
     title: user.id !== "" ? user.projects[projectId].title : "",
     description: user.id !== "" ? user.projects[projectId].description : "",

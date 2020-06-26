@@ -15,7 +15,6 @@ import * as firebase from "../../../database/firebase";
 const localizer = momentLocalizer(moment); // or globalizeLocalizer
 
 const Calendar = ({ events, addEvent, projectId }) => {
-  console.log("proejct calendar evetns", events);
   let onlyEvents = { ...events };
   delete onlyEvents["AAAPlaceholder"];
 
@@ -128,7 +127,6 @@ const Calendar = ({ events, addEvent, projectId }) => {
                       updates[
                         `projects/${projectId}/events/${newEvent.id}`
                       ] = newEvent;
-                      console.log("NEW EVENT BEFORE FIREBASING", newEvent);
                       firebase.UpdateDatabase(updates);
                       setNewEvent((prev) =>
                         Object.assign({}, prev, {
@@ -204,7 +202,7 @@ const Calendar = ({ events, addEvent, projectId }) => {
       </div>
       <div className="col-12 d-none d-md-block">
         <div className="p-4 row no-gutters w-100">
-          <div style={{ height: "540px" }} className="col-12">
+          <div style={{ height: "520px" }} className="col-12">
             <CustomCalendar
               views={["month"]}
               localizer={localizer}
@@ -217,7 +215,6 @@ const Calendar = ({ events, addEvent, projectId }) => {
               endAccessor="end"
               selectable={true}
               onSelectEvent={(obj) => {
-                console.log(obj);
                 setNewEvent((prev) => {
                   let offset = container.current.getBoundingClientRect();
                   let startDate = new Date(obj.start);
