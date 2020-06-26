@@ -13,16 +13,19 @@ const answerToInvitation = (answer, invitation, user) => {
     `users/${user.id}/notifications/seen/${invitation.id}`
   ] = Object.assign({}, invitation, { answer: answer });
   updates[`users/${user.id}/notifications/unseen/${invitation.id}`] = [];
-  updates[`projects/${invitation.project.id}/people/${user.id}`] =
-    answer === "rejected"
-      ? []
-      : {
-          status: answer,
-          photo: user.photo,
-          username: user.username,
-          id: user.id,
-          email: user.email,
-        };
+
+  if (answer === "rejected") {
+    updates[`projects/${invitation.project.id}/people/${user.id}`] = [];
+  } else {
+    updates[`projects/${invitation.project.id}/people/${user.id}`] = {
+      status: answer,
+      photo: user.photo,
+      username: user.username,
+      id: user.id,
+      email: user.email,
+    };
+  }
+
   firebase.UpdateDatabase(updates);
 };
 

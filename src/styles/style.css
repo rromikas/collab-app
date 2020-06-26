@@ -648,4 +648,15 @@ input[type="text"]::placeholder {
   color: #373737;
   font-size: 14px;
 }
+
+.file-card {
+  border-radius: 0.5rem !important;
+  border: 1px solid transparent;
+  -webkit-transition: border 0.3s;
+  transition: border 0.3s;
+}
+
+.file-card:hover {
+  border: 1px solid #dadada;
+}
 /*# sourceMappingURL=style.css.map */

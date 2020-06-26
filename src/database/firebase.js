@@ -111,9 +111,22 @@ export const GetFiles = (path) => {
       .ref(path)
       .listAll()
       .then((res) => {
-        resolve(res.prefixes);
+        resolve(
+          res.prefixes.length > res.items.length ? res.prefixes : res.items
+        );
       });
   });
 };
+
+firebase
+  .storage()
+  .ref("project-kbv08wpd/folder_for_8_teorija.pdf")
+  .listAll()
+  .then((res) => {
+    console.log("Asdasfinqe", res);
+    console.log(
+      res.items[0].getMetadata().then((asd) => console.log("Asdads", asd))
+    );
+  });
 
 export const instance = firebase;

@@ -2,8 +2,10 @@ import React, { useRef, useEffect, useState } from "react";
 import { BsFolderPlus, BsFolder, BsFileEarmark } from "react-icons/bs";
 import * as firebase from "../../../database/firebase";
 import date from "date-and-time";
+import { BsChevronLeft } from "react-icons/bs";
+import Loader from "../../utility/Loader";
 
-const handleFileUpload = (e, projectId, user, files, setProject) => {
+const handleFileUpload = (e, projectId, user, setFiles) => {
   let file = e.target.files[0];
   console.log(file);
   var metadata = {
@@ -22,16 +24,8 @@ const handleFileUpload = (e, projectId, user, files, setProject) => {
           (err) => console.log("error uploading file", err),
           (final) => {
             let fileNames = final.fullPath.split("/");
-            let folderName = fileNames[1];
-            let fileName = fileNames[2];
-            let file = { folderName, fileName, donwloadUrl: final.downloadUrl };
-            let newFiles = { ...files };
-            console.log("NEW FILES TEMp", newFiles);
-            if (!newFiles[folderName]) {
-              newFiles[folderName] = {};
-            }
-            newFiles[folderName][fileName] = file;
-            setProject((p) => Object.assign({}, p, { files: newFiles }));
+            let newFile = { name: fileNames[1] };
+            setFiles((f) => f.concat(newFile));
           }
         );
       } else {
@@ -47,78 +41,148 @@ const Files = ({ projectId, user, setProject }) => {
   const uploader = useRef(null);
   const [folder, setFolder] = useState("");
   const [files, setFiles] = useState([]);
-
+  const [loading, setLoading] = useState(false);
   useEffect(() => {
-    firebase.GetFiles(projectId).then((res) => {
-      console.log("ALL FILES", res);
-      console.log(res[0].getMetadata());
-      setFiles(res);
-    });
-  }, [projectId]);
+    if (folder === "") {
+      setLoading(true);
+      firebase.GetFiles(projectId).then((res) => {
+        setFiles(res);
+        setLoading(false);
+      });
+    } else {
+      setLoading(true);
+      async function fetchMyAPI() {
+        let path = `${projectId}/${folder}`;
+        console.log("PATH", path);
+        firebase.GetFiles(path).then(async (res) => {
+          console.log("ALL FILES", res);
+          let newFiles = [];
+          for (let i = 0; i < res.length; i++) {
+            let newFile = {
+              name: res[i].name,
+              uploadedBy: "",
+              downloadUrl: "",
+              timeCreated: "",
+            };
+            let metadata = await res[i].getMetadata();
+            console.log("metadata", metadata);
+            newFile.uploadedBy = metadata.customMetadata.uploadedBy;
+            newFile.timeCreated = date.format(
+              new Date(metadata.timeCreated),
+              "MMM DD, YYYY"
+            );
+            let url = await res[i].getDownloadURL();
+            newFile.downloadUrl = url;
+            newFiles.push(newFile);
+          }
+          setFiles(newFiles);
+          setLoading(false);
+        });
+      }
+
+      fetchMyAPI();
+    }
+  }, [projectId, folder]);
+
   return (
     <div className="row no-gutters position-relative px-2 px-sm-3 px-md-4 py-3">
-      <div className="col-12">
-        <BsFolderPlus
-          fontSize="80px"
-          className="clickable-item"
-          onClick={() => {
-            uploader.current.click();
-          }}
-        ></BsFolderPlus>
-        <BsFolder fontSize="80px"></BsFolder>
-        <input
-          type="file"
-          style={{ display: "none" }}
-          ref={uploader}
-          onChange={(e) =>
-            handleFileUpload(e, projectId, user, files, setProject)
-          }
-        ></input>
-      </div>
-      <div className="col-12">
-        <div className="row no-gutters">
-          {folder === "" ? (
-            <div className="col-12">
-              <div className="row no-gutters">All folders</div>
-              <div className="row no-gutters">
-                {files.map((x) => (
-                  <div className="col-12">
-                    <div className="row no-gutters">
-                      <div className="col-auto mr-2">
-                        <BsFolder fontSize="80px"></BsFolder>
-                      </div>
-                      <div
-                        className="col"
-                        style={{ fontSize: "12px" }}
-                        onClick={() => setFolder(x.name)}
-                      >
-                        <div className="row no-gutters">{x.name}</div>
-                        <div className="row no-gutters">
-                          {Object.keys(x.getMetadata()).map((y) => y)}
-                        </div>
-                        <div className="row no-gutters"></div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ) : (
-            <div className="col-12">
-              <div className="row no-gutters">
-                {Object.keys(files[folder]).map((x) => (
-                  <div className="col-auto">
-                    <div className="row no-gutters">
-                      <BsFileEarmark fontSize="80px"></BsFileEarmark>
-                    </div>
-                    <div className="row no-gutters">{x.fileName}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+      {loading ? (
+        <div className="col-auto">
+          <Loader loading={loading} size={30}></Loader>
         </div>
-      </div>
+      ) : (
+        <div className="col-12">
+          <div
+            className="row no-gutters align-items-center mb-3"
+            style={{ fontSize: "21px" }}
+          >
+            {folder ? (
+              <React.Fragment>
+                <div
+                  className="col-auto mr-1 cursor-pointer"
+                  onClick={() => setFolder("")}
+                >
+                  <BsChevronLeft fontSize="12px"></BsChevronLeft>
+                </div>
+                <div
+                  className="col-auto mr-2 cursor-pointer"
+                  onClick={() => setFolder("")}
+                  style={{ fontSize: "14px" }}
+                >
+                  Folders /
+                </div>
+                <div className="col-auto mr-2">
+                  {folder.length > 13
+                    ? folder.substring(0, 13) + "..."
+                    : folder}
+                </div>
+              </React.Fragment>
+            ) : (
+              <div className="col-auto mr-2">All folders</div>
+            )}
+          </div>
+          <div className="row no-gutters">
+            {!folder && (
+              <div className="col-auto p-4 file-card">
+                <BsFolderPlus
+                  fontSize="80px"
+                  className="clickable-item"
+                  onClick={() => {
+                    uploader.current.click();
+                  }}
+                ></BsFolderPlus>
+                <input
+                  type="file"
+                  style={{ display: "none" }}
+                  ref={uploader}
+                  onChange={(e) =>
+                    handleFileUpload(e, projectId, user, setFiles)
+                  }
+                ></input>
+              </div>
+            )}
+
+            {files.map((x) => {
+              return (
+                <div className="col-auto p-4 file-card">
+                  <div className="row no-gutters">{x.timeCreated}</div>
+                  <div className="row no-gutters clickable-item justify-content-center">
+                    {folder ? (
+                      <BsFileEarmark
+                        fontSize="80px"
+                        onClick={() => {
+                          window.open(x.downloadUrl);
+                        }}
+                      ></BsFileEarmark>
+                    ) : (
+                      <BsFolder
+                        onClick={() => setFolder(x.name)}
+                        fontSize="80px"
+                      ></BsFolder>
+                    )}
+                  </div>
+                  <div className="row no-gutters" style={{ fontSize: "14px" }}>
+                    {x.name.length > 13
+                      ? x.name.substring(0, 13) + "..."
+                      : x.name}
+                  </div>
+                  {folder ? (
+                    <div
+                      className="row no-gutters w-100"
+                      style={{ fontSize: "14px" }}
+                    >
+                      <div className="mr-2">By:</div>
+                      <div className="text-primary">{x.uploadedBy}</div>
+                    </div>
+                  ) : (
+                    ""
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -539,3 +539,13 @@ input[type="text"]::placeholder {
   color: $color-theme-900;
   font-size: 14px;
 }
+
+.file-card {
+  border-radius: 0.5rem !important;
+  border: 1px solid transparent;
+  transition: border 0.3s;
+}
+
+.file-card:hover {
+  border: 1px solid $border-primary;
+}
