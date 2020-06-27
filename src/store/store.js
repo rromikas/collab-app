@@ -23,6 +23,18 @@ function userReducer(
   }
 }
 
+function sizeReducer(
+  state = { width: window.innerWidth, height: window.innerHeight },
+  action
+) {
+  switch (action.type) {
+    case "SET_SIZE":
+      return action.size;
+    default:
+      return state;
+  }
+}
+
 function pageTitleReducer(state = "Home", action) {
   switch (action.type) {
     case "SET_PAGE_TITLE":
@@ -45,6 +57,7 @@ const rootReducer = combineReducers({
   user: userReducer,
   pageTitle: pageTitleReducer,
   backlink: backlinkReducer,
+  size: sizeReducer,
 });
 
 const store = createStore(

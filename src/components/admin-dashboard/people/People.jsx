@@ -27,7 +27,11 @@ const sendInvitation = (invitation, user) => {
   firebase.UpdateDatabase(updates);
 };
 
-const People = ({ projects, user }) => {
+const People = ({ projects, user, size }) => {
+  const blockHeight =
+    size.width > 768
+      ? size.height - 48 - 24 - 62.4
+      : size.height - 62.4 - 56 - 48;
   const runningProjects = Object.values(projects).filter(
     (x) => x.status !== "Deleted"
   );
@@ -186,7 +190,7 @@ const People = ({ projects, user }) => {
           </div>
         }
       >
-        <div className="col-auto btn-pro mb-2 mr-2" ref={invitationMaker}>
+        <div className="col-auto btn-pro my-2 mr-2 ml-3" ref={invitationMaker}>
           Invite people
         </div>
       </Popover>
@@ -209,7 +213,7 @@ const People = ({ projects, user }) => {
         }
       >
         <div
-          className="col-auto btn d-flex align-items-center"
+          className="col-auto btn d-flex align-items-center my-2"
           ref={peopleProjectChooser}
         >
           <div className="mr-2">
@@ -221,43 +225,51 @@ const People = ({ projects, user }) => {
           <BsChevronDown fontSize="14px"></BsChevronDown>
         </div>
       </Popover>
-      {Object.values(people).length > 0 ? (
-        <div className="col-12 mt-2">
-          {Object.values(people).map((x) => (
-            <div className="row no-gutters p-3 align-items-center clickable-item basic-card mb-3 people-list-item">
-              {x.status === "invited" && (
-                <React.Fragment>
-                  <div className="col-auto mr-2">
-                    <BsFillReplyFill fontSize="18px"></BsFillReplyFill>
-                  </div>
-                  <div className="col-auto mr-2">Invitation sent to</div>
-                </React.Fragment>
-              )}
-              {x.photo && (
-                <div
-                  className="col-auto mr-2 photo-circle-sm"
-                  style={{
-                    backgroundImage: `url(${x.photo})`,
-                  }}
-                ></div>
-              )}
 
-              <div className="col-auto">{x.email}</div>
+      <div className="col-12">
+        <div
+          className="row no-gutters overflow-auto p-3"
+          style={{ height: `${blockHeight}px` }}
+        >
+          {Object.values(people).length > 0 ? (
+            <div className="col-12 mt-2">
+              {Object.values(people).map((x) => (
+                <div className="row no-gutters p-3 align-items-center clickable-item basic-card mb-3 people-list-item">
+                  {x.status === "invited" && (
+                    <React.Fragment>
+                      <div className="col-auto mr-2">
+                        <BsFillReplyFill fontSize="18px"></BsFillReplyFill>
+                      </div>
+                      <div className="col-auto mr-2">Invitation sent to</div>
+                    </React.Fragment>
+                  )}
+                  {x.photo && (
+                    <div
+                      className="col-auto mr-2 photo-circle-sm"
+                      style={{
+                        backgroundImage: `url(${x.photo})`,
+                      }}
+                    ></div>
+                  )}
+
+                  <div className="col-auto">{x.email}</div>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-      ) : (
-        <div className="col-12">
-          <div
-            className="row no-gutters align-items-center justify-content-center"
-            style={{ height: "600px" }}
-          >
-            <div className="col-12 col-sm-10 col-md-9 col-lg-7">
-              <NoPeople></NoPeople>
+          ) : (
+            <div className="col-12">
+              <div
+                className="row no-gutters align-items-center justify-content-center"
+                style={{ height: "600px" }}
+              >
+                <div className="col-12 col-sm-10 col-md-9 col-lg-7">
+                  <NoPeople></NoPeople>
+                </div>
+              </div>
             </div>
-          </div>
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 };

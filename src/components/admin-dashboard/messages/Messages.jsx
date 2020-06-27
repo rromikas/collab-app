@@ -64,7 +64,10 @@ const getLastMessage = (chats, userId1, userId2) => {
   return lastMessage;
 };
 
-const Messages = ({ projectId, user }) => {
+const Messages = ({ projectId, user, size }) => {
+  const chatHeight =
+    size.width > 768 ? size.height - 230.4 : size.height - 262.4;
+  console.log("SIZE", size);
   const [chatId, setChatId] = useState(1);
   const [chatPerson, setChatPerson] = useState(0);
   const chatPopover = useRef(null);
@@ -148,7 +151,6 @@ const Messages = ({ projectId, user }) => {
       <div
         className="col-lg-4 col-auto bg-white"
         onClick={() => {
-          console.log("ne  tenek ure reaiki");
           setChatPerson("none");
         }}
       >
@@ -201,14 +203,17 @@ const Messages = ({ projectId, user }) => {
         })}
       </div>
       <div className="col-lg-8 col bg-white border-left">
-        <div className="row no-gutters">
-          <div className="col-12" style={{ height: "430px", overflow: "auto" }}>
-            {chats[chatId] &&
-            Object.keys(people).length &&
-            chats[chatId].messages ? (
-              Object.values(chats[chatId].messages).map((x) => {
-                return (
-                  <div key={uid(x)} className={`row mb-2 no-gutters p-3`}>
+        <div
+          className="row no-gutters"
+          style={{ overflow: "auto", height: chatHeight }}
+        >
+          {chats[chatId] &&
+          Object.keys(people).length &&
+          chats[chatId].messages ? (
+            Object.values(chats[chatId].messages).map((x) => {
+              return (
+                <div key={uid(x)} className={`col-12 mb-2 p-3`}>
+                  <div className="row no-gutters">
                     <div
                       className="col-auto mr-2"
                       style={{
@@ -237,59 +242,56 @@ const Messages = ({ projectId, user }) => {
                       </div>
                     </div>
                   </div>
-                );
-              })
-            ) : (
+                </div>
+              );
+            })
+          ) : (
+            <div className="row w-100 h-100 no-gutters justify-content-center align-items-center">
+              <div className="col-6 col-lg-5">
+                <NoMessages></NoMessages>
+              </div>
+            </div>
+          )}
+          <div style={{ float: "left", clear: "both" }} ref={messagesEnd}></div>
+        </div>
+        <div
+          style={{ height: "80px" }}
+          className="row no-gutters collab-chat-write-message-box border-top align-items-center justify-content-center px-2"
+        >
+          {chatId === 1 ? (
+            "Select chat"
+          ) : (
+            <React.Fragment>
               <div
-                className="row no-gutters justify-content-center align-items-center"
-                style={{ height: "100%" }}
+                className="col-auto photo-circle-sm mr-2"
+                style={{ backgroundImage: `url(${user.photo})` }}
+              ></div>
+              <input
+                disabled={chatId === 1}
+                value={newMessage.text}
+                onChange={(e) => {
+                  e.persist();
+                  setNewMessage((m) =>
+                    Object.assign({}, m, { text: e.target.value })
+                  );
+                }}
+                type="text"
+                className="col mr-2"
+                placeholder="write a message"
+              ></input>
+              <div
+                disabled={chatId === 1}
+                className="btn-pro col-auto"
+                onClick={() => {
+                  if (chatId !== 1) {
+                    sendMessage(newMessage, projectId, chatId);
+                  }
+                }}
               >
-                <div className="col-6 col-lg-5">
-                  <NoMessages></NoMessages>
-                </div>
+                Send
               </div>
-            )}
-            <div
-              style={{ float: "left", clear: "both" }}
-              ref={messagesEnd}
-            ></div>
-          </div>
-          <div className="col-12 p-4 collab-chat-write-message-box border-top">
-            {chatId === 1 ? (
-              "Select chat"
-            ) : (
-              <div className="row no-gutters">
-                <div
-                  className="col-auto photo-circle-sm mr-2"
-                  style={{ backgroundImage: `url(${user.photo})` }}
-                ></div>
-                <input
-                  disabled={chatId === 1}
-                  value={newMessage.text}
-                  onChange={(e) => {
-                    e.persist();
-                    setNewMessage((m) =>
-                      Object.assign({}, m, { text: e.target.value })
-                    );
-                  }}
-                  type="text"
-                  className="col mr-2"
-                  placeholder="write a message"
-                ></input>
-                <div
-                  disabled={chatId === 1}
-                  className="btn-pro col-auto"
-                  onClick={() => {
-                    if (chatId !== 1) {
-                      sendMessage(newMessage, projectId, chatId);
-                    }
-                  }}
-                >
-                  Send
-                </div>
-              </div>
-            )}
-          </div>
+            </React.Fragment>
+          )}
         </div>
       </div>
     </div>

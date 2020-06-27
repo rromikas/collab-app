@@ -1,5 +1,5 @@
-import React from "react";
-import Calendars from "./calendars/Calendars";
+import React, { useState } from "react";
+import CalendarsParent from "./calendars/CalendarsParent";
 import MessagesParent from "./messages/MessagesParent";
 import Activity from "./activity/Activity";
 import People from "./people/People";
@@ -9,6 +9,8 @@ import Navbar from "./navbar/Navbar";
 import NewProject from "./projects/NewProject";
 import ProjectDashboard from "../project-dashboard/ProjectDashboard";
 import EditProject from "./projects/EditProject";
+import MobileNavbar from "../project-dashboard/navbar/MobileNavbar";
+import { connect } from "react-redux";
 
 const sliceObject = (obj, property) => {
   let newObj = { ...obj };
@@ -22,20 +24,26 @@ const AdminDashboard = (props) => {
   const projects = user.projects;
   const section = props.match.params.section;
   const projectId = props.match.params.projectId;
+  console.log("PROET ID", projectId);
+  const [people, setPeople] = useState({}); //needed for mobile dashboard
   return (
-    <div className="container-fluid p-2 p-md-3 p-lg-4">
-      <div className="row no-gutters">
-        <div className="col-auto">
+    <div className="container-fluid d-flex flex-column h-100 px-0">
+      <div className="row no-gutters flex-shrink-0">
+        <div className="col-12">
+          <Navbar></Navbar>
+        </div>
+      </div>
+      <div className="row no-gutters flex-fill overflow-hidden" onR>
+        <div className="col-auto mh-100">
           <LeftSideMenu userId={user.id}></LeftSideMenu>
         </div>
-        <div className="col">
-          <Navbar></Navbar>
+        <div className="col mh-100">
           {page === "people" ? (
-            <People user={user} projects={projects}></People>
+            <People user={user} projects={projects} size={props.size}></People>
           ) : page === "activity" ? (
             <Activity projects={projects}></Activity>
           ) : page === "messages" ? (
-            <MessagesParent user={user}></MessagesParent>
+            <MessagesParent user={user} size={props.size}></MessagesParent>
           ) : page === "projects" ? (
             section === "edit" ? (
               <EditProject projectId={projectId} user={user}></EditProject>
@@ -44,12 +52,18 @@ const AdminDashboard = (props) => {
                 projectId={projectId}
                 user={user}
                 section={section ? section : "files"}
+                setPeople={setPeople}
+                size={props.size}
               ></ProjectDashboard>
             ) : (
-              <Projects projects={projects} userId={user.id}></Projects>
+              <Projects
+                projects={projects}
+                userId={user.id}
+                size={props.size}
+              ></Projects>
             )
           ) : page === "calendar" ? (
-            <Calendars projects={projects}></Calendars>
+            <CalendarsParent user={user}></CalendarsParent>
           ) : page === "new-project" ? (
             <NewProject user={user}></NewProject>
           ) : (
@@ -57,8 +71,29 @@ const AdminDashboard = (props) => {
           )}
         </div>
       </div>
+      <div
+        className="row no-gutters d-flex d-md-none flex-shrink-0"
+        style={{ height: "56px" }}
+      >
+        <div className="col-12">
+          <MobileNavbar
+            page={page}
+            userId={user.id}
+            projectId={projectId}
+            people={people}
+            section={section}
+          ></MobileNavbar>
+        </div>
+      </div>
     </div>
   );
 };
 
-export default AdminDashboard;
+function mapStateToProps(state, ownProps) {
+  return {
+    size: state.size,
+    ownProps,
+  };
+}
+
+export default connect(mapStateToProps)(AdminDashboard);

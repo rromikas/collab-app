@@ -46,7 +46,11 @@ const handleFileUpload = (e, projectId, user, setFiles, setLoading, folder) => {
   }
 };
 
-const Files = ({ projectId, user, setProject }) => {
+const Files = ({ projectId, user, setProject, size }) => {
+  const listHeight =
+    size.width > 768
+      ? size.height - 24 - 62.4 - 56 - 65
+      : size.height - 47.2 - 62.4 - 56;
   const uploader = useRef(null);
   const [folder, setFolder] = useState("");
   const [files, setFiles] = useState([]);
@@ -91,7 +95,7 @@ const Files = ({ projectId, user, setProject }) => {
   }, [projectId, folder]);
 
   return (
-    <div className="row no-gutters position-relative px-2 px-sm-3 px-md-4 py-3">
+    <div className="row no-gutters position-relative px-2 py-2">
       {loading ? (
         <div className="col-auto">
           <Loader loading={loading} size={30}></Loader>
@@ -99,7 +103,7 @@ const Files = ({ projectId, user, setProject }) => {
       ) : (
         <div className="col-12">
           <div
-            className="row no-gutters align-items-center mb-3"
+            className="row no-gutters align-items-center px-2"
             style={{ fontSize: "21px" }}
           >
             {folder ? (
@@ -126,105 +130,116 @@ const Files = ({ projectId, user, setProject }) => {
             ) : (
               <div className="col-auto mr-2">All folders</div>
             )}
-          </div>
-          <div className="row no-gutters">
-            {!folder ? (
-              <div className="col-auto p-4 file-card">
+            <div className="col-auto p-2">
+              {!folder ? (
                 <BsFolderPlus
-                  fontSize="80px"
+                  fontSize="25px"
                   className="clickable-item"
                   onClick={() => {
                     uploader.current.click();
                   }}
                 ></BsFolderPlus>
-                <input
-                  type="file"
-                  style={{ display: "none" }}
-                  ref={uploader}
-                  onChange={(e) => {
-                    setLoading(true);
-                    handleFileUpload(
-                      e,
-                      projectId,
-                      user,
-                      setFiles,
-                      setLoading,
-                      folder
-                    );
+              ) : (
+                <BsFileEarmarkPlus
+                  fontSize="25px"
+                  className="clickable-item"
+                  onClick={() => {
+                    uploader.current.click();
                   }}
-                ></input>
-              </div>
-            ) : (
-              <div className="col-auto p-4 file-card">
-                <div className="row no-gutters" style={{ opacity: 0 }}>
-                  placeholder
-                </div>
-                <div className="row no-gutters clickable-item justify-content-center">
-                  {" "}
-                  <BsFileEarmarkPlus
-                    fontSize="80px"
-                    onClick={() => {
-                      uploader.current.click();
-                    }}
-                  ></BsFileEarmarkPlus>
-                </div>
-                <input
-                  type="file"
-                  style={{ display: "none" }}
-                  ref={uploader}
-                  onChange={(e) => {
-                    setLoading(true);
-                    handleFileUpload(
-                      e,
-                      projectId,
-                      user,
-                      setFiles,
-                      setLoading,
-                      folder
-                    );
-                  }}
-                ></input>
-              </div>
-            )}
+                ></BsFileEarmarkPlus>
+              )}
 
-            {files.map((x) => {
-              return (
-                <div className="col-auto p-4 file-card">
-                  <div className="row no-gutters">{x.timeCreated}</div>
-                  <div className="row no-gutters clickable-item justify-content-center">
-                    {folder ? (
-                      <BsFileEarmark
-                        fontSize="80px"
-                        onClick={() => {
-                          window.open(x.downloadUrl);
-                        }}
-                      ></BsFileEarmark>
-                    ) : (
-                      <BsFolder
-                        onClick={() => setFolder(x.name)}
-                        fontSize="80px"
-                      ></BsFolder>
-                    )}
-                  </div>
-                  <div className="row no-gutters" style={{ fontSize: "14px" }}>
-                    {x.name.length > 13
-                      ? x.name.substring(0, 13) + "..."
-                      : x.name}
-                  </div>
-                  {folder ? (
+              <input
+                type="file"
+                style={{ display: "none" }}
+                ref={uploader}
+                onChange={(e) => {
+                  setLoading(true);
+                  handleFileUpload(
+                    e,
+                    projectId,
+                    user,
+                    setFiles,
+                    setLoading,
+                    folder
+                  );
+                }}
+              ></input>
+            </div>
+          </div>
+          <div className="row no-gutters">
+            <div
+              className="col-12 overflow-auto"
+              style={{ height: `${listHeight}px` }}
+            >
+              <div className="row no-gutters">
+                {files.map((x) => {
+                  return (
                     <div
-                      className="row no-gutters w-100"
-                      style={{ fontSize: "14px" }}
+                      className="col-12 col-sm-4 col-lg-3 col-xl-2 file-card p-4 clickable-item"
+                      onClick={() => {
+                        if (folder) {
+                          window.open(x.downloadUrl);
+                        } else {
+                          setFolder(x.name);
+                        }
+                      }}
                     >
-                      <div className="mr-2">By:</div>
-                      <div className="text-primary">{x.uploadedBy}</div>
+                      <div className="row no-gutters align-items-center">
+                        <div className="col-auto col-sm-12">
+                          <div className="text-sm-center mr-2">
+                            {folder ? (
+                              <BsFileEarmark
+                                className="clickable-item"
+                                fontSize="calc(2.5em + 3vw)"
+                              ></BsFileEarmark>
+                            ) : (
+                              <BsFolder
+                                className="clickable-item"
+                                fontSize="calc(2.5em + 3vw)"
+                              ></BsFolder>
+                            )}
+                          </div>
+                        </div>
+                        <div className="col col-sm-12">
+                          <div className="row no-gutters">
+                            <div
+                              className="text-sm-center file-name-fixed mr-2 col-12"
+                              style={{ fontSize: "14px" }}
+                            >
+                              {x.name.length > 13
+                                ? x.name.substring(0, 13) + "..."
+                                : x.name}
+                            </div>
+                            {folder ? (
+                              <div
+                                className="justify-content-sm-center col-12 d-flex"
+                                style={{ fontSize: "14px" }}
+                              >
+                                <div className="mr-2">By:</div>
+                                <div className="text-primary">
+                                  {x.uploadedBy}
+                                </div>
+                              </div>
+                            ) : (
+                              ""
+                            )}
+                            {x.timeCreated && (
+                              <div
+                                className="text-sm-center col-12"
+                                style={{ fontSize: "14px" }}
+                              >
+                                {x.timeCreated}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                  ) : (
-                    ""
-                  )}
-                </div>
-              );
-            })}
+                  );
+                })}
+              </div>
+            </div>
           </div>
         </div>
       )}

@@ -21,7 +21,7 @@ const LeftSideMenu = ({ userId }) => {
   useEffect(() => {}, []);
 
   return (
-    <div className="row no-gutters pr-2 pr-md-3 pr-lg-4">
+    <div className="row no-gutters px-2 px-md-3 px-lg-4 d-none d-md-flex">
       <div className="col-12">
         {items.map((x) => (
           <div className="row no-gutters w-100" key={uid(x)}>

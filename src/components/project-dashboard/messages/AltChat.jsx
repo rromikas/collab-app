@@ -64,7 +64,9 @@ const getLastMessage = (chats, userId1, userId2) => {
   return lastMessage;
 };
 
-const AltChat = ({ projectId, user }) => {
+const AltChat = ({ projectId, user, size }) => {
+  const chatHeight =
+    size.width > 768 ? size.height - 222.4 : size.height - 198.4;
   const [chatId, setChatId] = useState(1);
   const [chatPerson, setChatPerson] = useState(0);
   const chatPopover = useRef(null);
@@ -201,7 +203,10 @@ const AltChat = ({ projectId, user }) => {
       </div>
       <div className="col-lg-8 col bg-white border-left">
         <div className="row no-gutters">
-          <div className="col-12" style={{ height: "494px", overflow: "auto" }}>
+          <div
+            className="col-12"
+            style={{ height: `${chatHeight}px`, overflow: "auto" }}
+          >
             {chats[chatId] &&
             Object.keys(people).length &&
             chats[chatId].messages ? (

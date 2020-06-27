@@ -1,3 +1,20 @@
+@import "../../node_modules/bootstrap/scss/bootstrap.scss";
+$grid-breakpoints: (
+  xs: 0,
+  sm: 567px,
+  md: 768px,
+  lg: 992px,
+  xl: 1200px,
+  xxl: 1900px,
+);
+
+$container-max-widths: (
+  sm: 567px,
+  md: 768px,
+  lg: 992px,
+  xl: 1200px,
+  xxl: 1900px,
+);
 $body-bg-main: #f4f5f7;
 $color-primary: #0a80ff;
 $color-primary-light: #0a80ffa4;
@@ -148,14 +165,14 @@ body {
 }
 
 .project-card {
-  box-shadow: 0 4px 30px 0 rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 15px 0 rgba(0, 0, 0, 0.1);
   border-radius: 0.5rem;
   cursor: pointer;
   transition: all 0.3s;
 }
 
 .project-card:hover {
-  box-shadow: 0 10px 45px 0 rgba(0, 0, 0, 0.2);
+  box-shadow: 0 10px 20px 0 rgba(0, 0, 0, 0.2);
 }
 
 .project-card .description {
@@ -220,11 +237,6 @@ body {
 
 .calendar-container {
   border-radius: 0.5rem;
-}
-
-.rbc-event.rbc-selected,
-.rbc-event {
-  background-color: $color-primary !important;
 }
 
 .collab-calendar {
@@ -387,7 +399,6 @@ h6,
 
 .collab-project {
   box-shadow: $shadow-primary;
-  border-radius: 0.5rem !important;
   overflow: hidden;
   color: $color-theme-700;
 }
@@ -479,7 +490,7 @@ input[type="text"]::placeholder {
 }
 
 .basic-card {
-  box-shadow: 0 4px 30px 0 rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 15px 0 rgba(0, 0, 0, 0.1);
   border-radius: 0.5rem !important;
   overflow: hidden;
   background: white;
@@ -488,7 +499,7 @@ input[type="text"]::placeholder {
 }
 
 .basic-card:hover {
-  box-shadow: 0 5px 25px 0 rgba(0, 0, 0, 0.2);
+  box-shadow: 0 5px 20px 0 rgba(0, 0, 0, 0.2);
 }
 
 .cursor-pointer {
@@ -586,4 +597,24 @@ input[type="text"]::placeholder {
 
 .checkbox-pro:hover {
   border: 2px solid $color-primary;
+}
+
+.file-name-fixed {
+  width: 120px !important;
+}
+
+.mobile-project-navbar {
+  width: 100%;
+  background: white;
+  box-shadow: 0 0px 6px 0 rgba(0, 0, 0, 0.15);
+}
+
+.project-card-corners {
+  border-radius: 0.5rem;
+}
+
+@media only screen and (max-width: 768px) {
+  .project-card-corners {
+    border-radius: 0;
+  }
 }

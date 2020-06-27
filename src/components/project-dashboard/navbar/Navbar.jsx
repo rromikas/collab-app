@@ -2,12 +2,12 @@ import React from "react";
 import { uid } from "react-uid";
 import history from "../../../history";
 
-const ownerItems = ["Files", "Messages", "Calendar", "Time", "Activity"];
+const ownerItems = ["Files", "Messages", "Calendar", "Time", "Requests"];
 const clientItems = ["Files", "Messages", "Calendar"];
 const Navbar = ({ projectId, page, userId, people }) => {
   const permissions = people[userId] ? people[userId].permissions : "client";
   return (
-    <div className="row no-gutters border-bottom">
+    <div className="row no-gutters border-bottom d-md-flex d-none">
       {(permissions === "owner" ? ownerItems : clientItems).map((x) => (
         <div
           onClick={() =>

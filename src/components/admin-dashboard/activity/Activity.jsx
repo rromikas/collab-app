@@ -11,7 +11,7 @@ const Activity = () => {
     store.dispatch({ type: "SET_PAGE_TITLE", pageTitle: "Activity" });
   }, []);
   return (
-    <div className="row no-gutters px-2 px-sm-3 px-md-4">
+    <div className="row no-gutters pl-4">
       <div className="col-12">
         <VerticalTimeline animate={false} layout="1-column">
           <VerticalTimelineElement

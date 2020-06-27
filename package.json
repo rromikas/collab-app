@@ -29,6 +29,7 @@
     "react-uid": "^2.3.0",
     "react-vertical-timeline-component": "^3.0.2",
     "redux": "^4.0.5",
+    "tui-calendar": "^1.12.13",
     "uniqid": "^5.2.0"
   },
   "scripts": {

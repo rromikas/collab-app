@@ -14,7 +14,11 @@ const deleteProject = (projectId, userId) => {
   firebase.UpdateDatabase(updates);
 };
 
-const Projects = ({ projects, userId }) => {
+const Projects = ({ projects, userId, size }) => {
+  const blockHeight =
+    size.width > 768
+      ? size.height - 62.4 - 48 - 24
+      : size.height - 48 - 56 - 62.4;
   useEffect(() => {
     store.dispatch({ type: "SET_PAGE_TITLE", pageTitle: "Projects" });
   }, []);
@@ -24,23 +28,25 @@ const Projects = ({ projects, userId }) => {
   );
 
   return (
-    <div className="row no-gutters px-2 px-md-3 px-lg-4">
+    <div className="row no-gutters px-2 px-md-3 px-lg-4 pb-md-2">
       <div
-        className="col-auto btn-pro mb-2"
+        className="col-auto btn-pro my-2 mx-3"
         onClick={() => history.push(`/${userId}/new-project`)}
       >
         Start a new project
       </div>
-      <div className="col-12">
+      <div
+        className="col-12 overflow-auto"
+        style={{ minWidth: "250px", height: `${blockHeight}px` }}
+      >
         {runningProjects.length > 0 ? (
-          <div className="row">
+          <div className="row no-gutters p-3">
             {runningProjects
               .filter((x) => x.status !== "Deleted")
               .map((x) => (
                 <div
                   key={uid(x)}
-                  className="col-lg-3 col-md-6 col-sm-12 px-3 py-2 py-md-3"
-                  style={{ minWidth: "250px" }}
+                  className="col-lg-4 col-xl-3 col-xxl-2 col-sm-6 col-12 pr-sm-3 pb-2 pb-sm-3"
                 >
                   <div className="row no-gutters bg-white p-4 project-card">
                     <div className="col-12">

@@ -45,7 +45,7 @@ const Navbar = ({ pageTitle, user, backlink }) => {
     seen = {};
   }
   return (
-    <div className="row no-gutters justify-content-between px-2 px-md-3 px-lg-4">
+    <div className="row no-gutters justify-content-between px-2 px-md-3 px-lg-4 py-2">
       <div className="col-auto mb-2">
         <div className="row no-gutters align-items-center">
           {backlink.title !== "" && (

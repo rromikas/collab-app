@@ -11,13 +11,11 @@ import "react-day-picker/lib/style.css";
 import { uid } from "react-uid";
 import uniqid from "uniqid";
 import * as firebase from "../../../database/firebase";
-
+import { Colors } from "../../utility/Colors";
 const localizer = momentLocalizer(moment); // or globalizeLocalizer
 
 const Calendar = ({ events, addEvent, projectId }) => {
-  let onlyEvents = { ...events };
-  delete onlyEvents["AAAPlaceholder"];
-
+  events = events ? events : {};
   const [newEvent, setNewEvent] = useState({
     start: new Date(Date.now()),
     end: new Date(Date.now()),
@@ -34,10 +32,7 @@ const Calendar = ({ events, addEvent, projectId }) => {
   const endDateRef = useRef(null);
 
   return (
-    <div
-      className="row no-gutters position-relative px-2 px-sm-3 px-md-4"
-      ref={container}
-    >
+    <div className="row no-gutters position-relative" ref={container}>
       <div
         className="position-absolute"
         style={{
@@ -116,7 +111,10 @@ const Calendar = ({ events, addEvent, projectId }) => {
               </div>
               <div className="popover-label text-left">Add a note...</div>
               <div>
-                <textarea className="note-textarea"></textarea>
+                <textarea
+                  className="note-textarea"
+                  style={{ height: "70px" }}
+                ></textarea>
               </div>
               <div className="d-flex">
                 <div
@@ -124,6 +122,7 @@ const Calendar = ({ events, addEvent, projectId }) => {
                   onClick={() => {
                     if (newEvent.title) {
                       let updates = {};
+
                       updates[
                         `projects/${projectId}/events/${newEvent.id}`
                       ] = newEvent;
@@ -163,11 +162,11 @@ const Calendar = ({ events, addEvent, projectId }) => {
           ></div>
         </Popover>
       </div>
-      <div className="col-12 d-md-none d-block">
+      <div className="col-12 d-none">
         <div className="row no-gutters">
           <div className="col-12 text-center">
             <DayPicker
-              selectedDays={Object.values(onlyEvents).map((x) => {
+              selectedDays={Object.values(events).map((x) => {
                 let after = new Date(new Date(x.start).getTime());
                 after.setDate(after.getDate() - 1);
                 let before = new Date(new Date(x.end).getTime());
@@ -185,7 +184,7 @@ const Calendar = ({ events, addEvent, projectId }) => {
             ></DayPicker>
           </div>
           <div className="col-12">
-            {Object.values(onlyEvents).map((x) => (
+            {Object.values(events).map((x) => (
               <div
                 key={uid(x)}
                 className="row no-gutters calendar-event-card p-3 mb-2"
@@ -200,20 +199,36 @@ const Calendar = ({ events, addEvent, projectId }) => {
           </div>
         </div>
       </div>
-      <div className="col-12 d-none d-md-block">
-        <div className="p-4 row no-gutters w-100">
+      <div className="col-12">
+        <div className="p-0 row no-gutters w-100">
           <div style={{ height: "520px" }} className="col-12">
             <CustomCalendar
+              toolbar={false}
               views={["month"]}
               localizer={localizer}
               events={
                 newEvent.open && newEvent.purpose === "Add new event"
-                  ? Object.values(onlyEvents).concat(newEvent)
-                  : Object.values(onlyEvents)
+                  ? Object.values(events).concat(newEvent)
+                  : Object.values(events)
               }
               startAccessor="start"
               endAccessor="end"
               selectable={true}
+              eventPropGetter={(event, start, end, isSelected) => {
+                console.log(event);
+                var style = {
+                  backgroundColor: event.color,
+                  borderRadius: "0px",
+                  opacity: 0.8,
+                  color: "white",
+                  border: "0px",
+                  display: "block",
+                };
+                console.log("STYLE", style);
+                return {
+                  style: style,
+                };
+              }}
               onSelectEvent={(obj) => {
                 setNewEvent((prev) => {
                   let offset = container.current.getBoundingClientRect();
@@ -250,6 +265,8 @@ const Calendar = ({ events, addEvent, projectId }) => {
                       top: obj?.box?.clientY - offset.top,
                     },
                     start: startDate,
+                    color:
+                      Colors[Math.floor(Math.random() * (Colors.length + 1))],
                     end: endDate,
                     title: "",
                     note: "",
@@ -269,26 +286,3 @@ const Calendar = ({ events, addEvent, projectId }) => {
 };
 
 export default Calendar;
-
-function handleCalendarClick(obj, purpose, setNewEvent) {}
-
-const eventukai = [
-  {
-    id: 1,
-    title: "Meeting",
-    start: new Date("Thu Jun 04 2020 12:00:00"),
-    end: new Date("Thu Jun 04 2020 12:30:00"),
-  },
-  {
-    id: 2,
-    title: "Football game",
-    start: new Date("Thu Jun 15 2020 12:00:00"),
-    end: new Date("Thu Jun 15 2020 12:30:00"),
-  },
-  {
-    id: 3,
-    title: "Football game",
-    start: new Date("Thu Jun 19 2020 12:00:00"),
-    end: new Date("Thu Jun 19 2020 12:30:00"),
-  },
-];

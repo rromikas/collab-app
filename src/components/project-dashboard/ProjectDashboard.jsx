@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "./navbar/Navbar";
+import MobileNavbar from "./navbar/MobileNavbar";
 import store from "../../store/store";
 import * as firebase from "../../database/firebase";
 import Calendar from "./calendar/Calendar";
@@ -7,8 +8,9 @@ import Files from "./files/Files";
 import Messages from "./messages/Messages";
 import Times from "./times/Times";
 import AltChat from "./messages/AltChat";
+import TuiCalendar from "./calendar/TuiCalendar";
 
-const ProjectDashboard = ({ projectId, user, section }) => {
+const ProjectDashboard = ({ projectId, user, section, setPeople, size }) => {
   const [page, setPage] = useState("");
   const [project, setProject] = useState({
     events: {},
@@ -41,6 +43,9 @@ const ProjectDashboard = ({ projectId, user, section }) => {
   useEffect(() => {
     firebase.on(`projects/${projectId}`, (data) => {
       setProject(data);
+      if (data.people) {
+        setPeople(data.people);
+      }
     });
 
     return function cleanUp() {
@@ -53,11 +58,8 @@ const ProjectDashboard = ({ projectId, user, section }) => {
   }, [section]);
 
   return (
-    <div className="row no-gutters px-2 px-sm-3 px-md-4">
-      <div
-        className="col-12 collab-project bg-white"
-        style={{ height: "630px" }}
-      >
+    <div className="row no-gutters px-0 py-0 pb-md-4 px-md-4 mh-100">
+      <div className="col-12 collab-project bg-white mh-100 project-card-corners">
         <Navbar
           projectId={projectId}
           page={page}
@@ -74,15 +76,17 @@ const ProjectDashboard = ({ projectId, user, section }) => {
               setProject((pr) => Object.assign({}, pr, { events: newEvents }));
             }}
           ></Calendar>
-        ) : page === "files" ? (
+        ) : // <TuiCalendar events={project.events}></TuiCalendar>
+        page === "files" ? (
           <Files
+            size={size}
             projectId={projectId}
             user={user}
             files={project.files}
             setProject={setProject}
           ></Files>
         ) : page === "messages" ? (
-          <AltChat projectId={projectId} user={user}></AltChat>
+          <AltChat projectId={projectId} user={user} size={size}></AltChat>
         ) : page === "time" ? (
           <Times
             user={user}
