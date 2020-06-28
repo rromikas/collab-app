@@ -30,8 +30,10 @@ const deleteEvent = (projectId, event) => {
   firebase.UpdateDatabase(updates);
 };
 
-const Calendar = ({ projectId, people }) => {
+const Calendar = ({ projectId, projects }) => {
   const [events, setEvents] = useState({});
+  const [people, setPeople] = useState({});
+  const [problem, setProblem] = useState("");
   const [newEvent, setNewEvent] = useState({
     start: new Date(Date.now()),
     end: new Date(Date.now()),
@@ -51,18 +53,46 @@ const Calendar = ({ projectId, people }) => {
   const endDateRef = useRef(null);
   const startTimeRef = useRef(null);
   const endTimeRef = useRef(null);
+  const projectChooser = useRef(null);
   const [calendarTime, setCalendarTime] = useState(new Date());
   useEffect(() => {
-    firebase.on(
-      `projects/${projectId}/events/${date.format(calendarTime, "MM-YYYY")}`,
-      (data) => {
-        setEvents(data ? data : {});
+    if (projectId === "all") {
+      async function fetchMyAPI() {
+        let allEvents = {};
+        let allPeople = {};
+        await Promise.all(
+          Object.values(projects).map(async (x) => {
+            let data = await firebase.GetFromDatabase(`projects/${x.id}`);
+            console.log("data", data);
+            let evts = data.events
+              ? data.events[date.format(calendarTime, "MM-YYYY")]
+              : null;
+            let ppl = data.people;
+            if (evts) {
+              allEvents = Object.assign({}, allEvents, evts);
+            }
+
+            if (ppl) {
+              allPeople = Object.assign({}, allPeople, ppl);
+            }
+          })
+        );
+        console.log("ALL events", allEvents);
+        setEvents(allEvents);
+        setPeople(allPeople);
       }
-    );
-    return function cleanUp() {
-      firebase.off(`projects/${projectId}/events/${calendarTime}`);
-    };
-  }, [calendarTime]);
+
+      fetchMyAPI();
+    } else {
+      firebase
+        .GetFromDatabase(
+          `projects/${projectId}/events/${date.format(calendarTime, "MM-YYYY")}`
+        )
+        .then((data) => {
+          setEvents(data ? data : {});
+        });
+    }
+  }, [calendarTime, projectId]);
   return (
     <div
       className="row no-gutters position-relative pb-4"
@@ -110,7 +140,7 @@ const Calendar = ({ projectId, people }) => {
 
               <div>{newEvent.purpose}</div>
               <div className="popover-label text-left">Title</div>
-              <div className="mb-1 text-left">
+              <div className="mb-2 text-left">
                 <input
                   type="text"
                   placeholder="Event title"
@@ -122,7 +152,36 @@ const Calendar = ({ projectId, people }) => {
                     );
                   }}
                 ></input>
-                <div className="text-left popover-label">required</div>
+              </div>
+              <div className="text-left mb-2">
+                <div className="popover-label">Project</div>
+                <Popover
+                  content={
+                    <div className="popover-inner">
+                      {Object.values(projects).map((x) => (
+                        <div
+                          className="popover-content-item"
+                          onClick={() => {
+                            setNewEvent((prev) =>
+                              Object.assign({}, prev, { projectId: x.id })
+                            );
+                            projectChooser.current.click();
+                          }}
+                        >
+                          {x.title}
+                        </div>
+                      ))}
+                    </div>
+                  }
+                >
+                  <div className="btn" ref={projectChooser}>
+                    {Object.values(projects).length === 0
+                      ? "No projects"
+                      : newEvent.projectId !== "all"
+                      ? projects[newEvent.projectId].title
+                      : "select"}
+                  </div>
+                </Popover>
               </div>
               <div className="popover-label text-left">Start</div>
               <div className="mb-1">
@@ -173,7 +232,7 @@ const Calendar = ({ projectId, people }) => {
                 </Popover>
               </div>
               <div className="popover-label text-left">End</div>
-              <div className="mb-1">
+              <div className="mb-2">
                 <Popover
                   content={
                     <DayPicker
@@ -221,7 +280,7 @@ const Calendar = ({ projectId, people }) => {
                 </Popover>
               </div>
               <div className="popover-label text-left">Associate with...</div>
-              <div>
+              <div className="mb-2">
                 {Object.values(people).map((x) => (
                   <div className="d-flex">
                     <Checkbox
@@ -240,7 +299,7 @@ const Calendar = ({ projectId, people }) => {
                 ))}
               </div>
               <div className="popover-label text-left">Add a note...</div>
-              <div>
+              <div className="mb-2">
                 <textarea
                   value={newEvent.note}
                   onChange={(e) => {
@@ -253,28 +312,44 @@ const Calendar = ({ projectId, people }) => {
                   style={{ height: "70px" }}
                 ></textarea>
               </div>
+              {problem && (
+                <div className="popover-label" style={{ color: "red" }}>
+                  {problem}
+                </div>
+              )}
 
               <div className="d-flex mx-auto" style={{ maxWidth: "210px" }}>
                 <div
                   className="btn-pro col-6 mr-1"
                   onClick={() => {
+                    console.log("TITLADLAS", newEvent.title);
                     if (newEvent.title) {
-                      let updates = {};
+                      if (newEvent.projectId !== "all") {
+                        let updates = {};
 
-                      updates[
-                        `projects/${projectId}/events/${date.format(
-                          newEvent.start,
-                          "MM-YYYY"
-                        )}/${newEvent.id}`
-                      ] = newEvent;
-                      firebase.UpdateDatabase(updates);
-                      setNewEvent((prev) =>
-                        Object.assign({}, prev, {
-                          id: uniqid("event-"),
-                          title: "",
-                          open: false,
-                        })
-                      );
+                        let d = date.format(newEvent.start, "MM-YYYY");
+
+                        updates[
+                          `projects/${newEvent.projectId}/events/${d}/${newEvent.id}`
+                        ] = newEvent;
+                        firebase.UpdateDatabase(updates);
+
+                        setEvents((ev) =>
+                          Object.assign({}, ev, { [newEvent.id]: newEvent })
+                        );
+                        setNewEvent((prev) =>
+                          Object.assign({}, prev, {
+                            id: uniqid("event-"),
+                            title: "",
+                            open: false,
+                          })
+                        );
+                        setProblem("");
+                      } else {
+                        setProblem("select project");
+                      }
+                    } else {
+                      setProblem("title required");
                     }
                   }}
                 >
@@ -343,7 +418,7 @@ const Calendar = ({ projectId, people }) => {
       <div className="col-12">
         <div className="row no-gutters">
           {Object.values(people).map((x) => (
-            <div className="col-auto px-3 py-2">
+            <div className="col-auto py-2 px-3">
               <div className="row no-gutters align-items-center">
                 <div className="col-auto mr-2">{x.username}</div>
                 <div
@@ -413,6 +488,7 @@ const Calendar = ({ projectId, people }) => {
                     note: obj.note ? obj.note : "",
                     purpose: "Edit event",
                     color: obj.color,
+                    projectId: obj.projectId,
                     associatedWith: obj.associatedWith,
                   });
                 });

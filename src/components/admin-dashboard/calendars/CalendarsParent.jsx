@@ -2,26 +2,33 @@ import React, { useState, useRef, useEffect } from "react";
 import Popover from "../../utility/Popover";
 import { BsChevronDown } from "react-icons/bs";
 import { uid } from "react-uid";
-import Calendars from "./Calendars";
+import Calendar from "./Calendar";
 import store from "../../../store/store";
 
-const CalendarsParent = ({ user }) => {
+const CalendarsParent = ({ user, projects }) => {
   const projectChooser = useRef(null);
-  const [projectId, setProjectId] = useState(
-    user.projects ? Object.keys(user.projects)[0] : 1
-  );
+  const [projectId, setProjectId] = useState("all");
   useEffect(() => {
     store.dispatch({ type: "SET_PAGE_TITLE", pageTitle: "Calendars" });
   }, []);
   return (
-    <div className="row no-gutters px-2 px-md-3 px-lg-4">
-      <div className="col-12 alt-chat overflow-hidden">
+    <div className="row no-gutters px-md-3 px-lg-4 pb-md-4">
+      <div className="col-12 alt-chat overflow-hidden project-card-corners">
         <div className="row no-gutters">
           <div className="col-12 p-3">
             <div className="row no-gutters">
               <Popover
                 content={
                   <div className="popover-inner">
+                    <div
+                      className="popover-content-item"
+                      onClick={() => {
+                        setProjectId("all");
+                        projectChooser.current.click();
+                      }}
+                    >
+                      All
+                    </div>
                     {Object.values(user.projects)
                       .filter((x) => x.status !== "Deleted")
                       .map((x) => (
@@ -44,9 +51,7 @@ const CalendarsParent = ({ user }) => {
                   ref={projectChooser}
                 >
                   <div className="mr-2">
-                    {user.projects[projectId]
-                      ? user.projects[projectId].title
-                      : "Select project"}
+                    {projectId === "all" ? "All" : projects[projectId].title}
                   </div>
                   <BsChevronDown fontSize="14px"></BsChevronDown>
                 </div>
@@ -54,7 +59,11 @@ const CalendarsParent = ({ user }) => {
             </div>
           </div>
           <div className="col-12">
-            <Calendars projectId={projectId} user={user}></Calendars>
+            <Calendar
+              projectId={projectId}
+              user={user}
+              projects={projects}
+            ></Calendar>
           </div>
         </div>
       </div>

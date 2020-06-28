@@ -7,7 +7,7 @@ import store from "../../../store/store";
 import { BsBell } from "react-icons/bs";
 import * as firebase from "../../../database/firebase";
 import { uid } from "react-uid";
-import { Colors } from "../../utility/Colors";
+import randomColor from "randomcolor";
 
 const answerToInvitation = (answer, invitation, user) => {
   let updates = {};
@@ -25,7 +25,7 @@ const answerToInvitation = (answer, invitation, user) => {
       photo: user.photo,
       username: user.username,
       id: user.id,
-      color: Colors[Math.floor(Math.random() * (Colors.length + 1))],
+      color: randomColor(),
       email: user.email,
     };
     updates[`users/${user.id}/projects/${invitation.project.id}`] =
@@ -47,7 +47,7 @@ const Navbar = ({ pageTitle, user, backlink }) => {
     seen = {};
   }
   return (
-    <div className="row no-gutters justify-content-between px-2 px-md-3 px-lg-4 py-2">
+    <div className="row no-gutters justify-content-between align-items-center px-3 px-lg-4 py-2 flex-nowrap">
       <div className="col-auto mb-2">
         <div className="row no-gutters align-items-center">
           {backlink.title !== "" && (
@@ -59,7 +59,7 @@ const Navbar = ({ pageTitle, user, backlink }) => {
               {backlink.title}
             </div>
           )}
-          <div className="col-auto h2 mb-0">{pageTitle}</div>
+          <div className="col-auto h2 mb-0 d-md-block d-none">{pageTitle}</div>
         </div>
       </div>
 

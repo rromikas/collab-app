@@ -7,10 +7,17 @@ import NoProjects from "../../../pictures/NoProjects";
 import * as firebase from "../../../database/firebase";
 import store from "../../../store/store";
 
-const deleteProject = (projectId, userId) => {
+const deleteProject = (projectId) => {
   let updates = {};
+  firebase.GetFromDatabase(`projects/${projectId}/people`).then((data) => {
+    if (data) {
+      Object.values(data).forEach((x) => {
+        updates[`users/${x.id}/projects/${projectId}/status`] = "Deleted";
+      });
+    }
+    firebase.UpdateDatabase(updates);
+  });
   updates[`projects/${projectId}/status`] = "Deleted";
-  updates[`users/${userId}/projects/${projectId}/status`] = "Deleted";
   firebase.UpdateDatabase(updates);
 };
 
@@ -64,7 +71,7 @@ const Projects = ({ projects, userId, size }) => {
                             <div style={{ fontWeight: "500" }} className="pr-1">
                               for
                             </div>
-                            <div>{x.for}</div>
+                            <div>{x.creator.username}</div>
                           </div>
                         </div>
                         <div className="col-auto">
@@ -106,7 +113,7 @@ const Projects = ({ projects, userId, size }) => {
                                   <hr></hr>
                                   <div
                                     className="popover-content-item"
-                                    onClick={() => deleteProject(x.id, userId)}
+                                    onClick={() => deleteProject(x.id)}
                                   >
                                     move to trash
                                   </div>

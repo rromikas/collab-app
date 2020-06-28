@@ -50,8 +50,8 @@ const handleFileUpload = (e, projectId, user, setFiles, setLoading, folder) => {
 const Files = ({ projectId, user, setProject, size }) => {
   const listHeight =
     size.width > 768
-      ? size.height - 24 - 62.4 - 56 - 65
-      : size.height - 47.2 - 62.4 - 56;
+      ? size.height - 24 - 62.4 - 56 - 79.2
+      : size.height - 79.2 - 62.4 - 56;
   const uploader = useRef(null);
   const [folder, setFolder] = useState("");
   const [files, setFiles] = useState([]);
@@ -96,7 +96,7 @@ const Files = ({ projectId, user, setProject, size }) => {
   }, [projectId, folder]);
 
   return (
-    <div className="row no-gutters position-relative px-2 h-100">
+    <div className="row no-gutters position-relative px-2">
       {loading ? (
         <div className="col-12 p-5">
           <Loader loading={loading} size={30}></Loader>
@@ -104,7 +104,7 @@ const Files = ({ projectId, user, setProject, size }) => {
       ) : (
         <div className="col-12">
           <div
-            className="row no-gutters align-items-center px-2"
+            className="row no-gutters align-items-center p-3"
             style={{ fontSize: "21px" }}
           >
             {folder ? (

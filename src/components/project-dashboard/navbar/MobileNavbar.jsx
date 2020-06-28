@@ -32,7 +32,7 @@ const generalItems = [
   { name: "Calendar", icon: <BsCalendar fontSize="24px"></BsCalendar> },
   { name: "Messages", icon: <BsChatDots fontSize="24px"></BsChatDots> },
   { name: "People", icon: <BsPeople fontSize="24px"></BsPeople> },
-  { name: "Activity", icon: <BsGraphUp fontSize="24px"></BsGraphUp> },
+  { name: "Requests", icon: <BsReply fontSize="24px"></BsReply> },
 ];
 
 const MobileNavbar = ({ projectId, section, page, userId, people }) => {

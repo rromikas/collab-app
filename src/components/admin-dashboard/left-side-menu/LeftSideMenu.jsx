@@ -5,6 +5,7 @@ import {
   BsChatDots,
   BsPeople,
   BsGraphUp,
+  BsReply,
 } from "react-icons/bs";
 import { uid } from "react-uid";
 import history from "../../../history";
@@ -15,7 +16,7 @@ const LeftSideMenu = ({ userId }) => {
     { name: "Calendar", icon: <BsCalendar fontSize="24px"></BsCalendar> },
     { name: "Messages", icon: <BsChatDots fontSize="24px"></BsChatDots> },
     { name: "People", icon: <BsPeople fontSize="24px"></BsPeople> },
-    { name: "Activity", icon: <BsGraphUp fontSize="24px"></BsGraphUp> },
+    { name: "Requests", icon: <BsReply fontSize="24px"></BsReply> },
   ];
 
   useEffect(() => {}, []);

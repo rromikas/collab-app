@@ -11290,7 +11290,6 @@ label {
   display: block;
   color: #8e8e8e;
   line-height: 13px;
-  margin-bottom: 0 !important;
 }
 
 textarea {
@@ -11393,10 +11392,6 @@ input[type="text"]::placeholder {
   cursor: pointer;
 }
 
-.people-list-item {
-  font-size: 14px;
-}
-
 .navbar-icon {
   border-radius: 50%;
   width: 40px !important;
@@ -11460,7 +11455,6 @@ input[type="text"]::placeholder {
 
 .alt-chat {
   background: white;
-  border-radius: 0.5rem !important;
   -webkit-box-shadow: 0 64px 64px 0 rgba(0, 0, 0, 0.06), 0 32px 32px 0 rgba(0, 0, 0, 0.03), 0 16px 16px 0 rgba(0, 0, 0, 0.02), 0 4px 4px 0 rgba(0, 0, 0, 0.02), 0 2px 2px 0 rgba(0, 0, 0, 0.02);
           box-shadow: 0 64px 64px 0 rgba(0, 0, 0, 0.06), 0 32px 32px 0 rgba(0, 0, 0, 0.03), 0 16px 16px 0 rgba(0, 0, 0, 0.02), 0 4px 4px 0 rgba(0, 0, 0, 0.02), 0 2px 2px 0 rgba(0, 0, 0, 0.02);
 }
@@ -11518,12 +11512,6 @@ input[type="text"]::placeholder {
 @media only screen and (max-width: 768px) {
   .project-card-corners {
     border-radius: 0;
-  }
-}
-
-@media only screen and (min-width: 1200px) {
-  .right-side {
-    max-width: 80vw !important;
   }
 }
 

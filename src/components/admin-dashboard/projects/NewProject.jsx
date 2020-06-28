@@ -3,7 +3,7 @@ import store from "../../../store/store";
 import history from "../../../history";
 import * as firebase from "../../../database/firebase";
 import uniqid from "uniqid";
-import { Colors } from "../../utility/Colors";
+import randomColor from "randomcolor";
 
 const createProject = (project) => {
   if (project.title !== "" && project.description !== "") {
@@ -29,7 +29,7 @@ const NewProject = ({ user }) => {
         username: user.username,
         email: user.email,
         permissions: "owner",
-        color: Colors[Math.floor(Math.random() * (Colors.length + 1))],
+        color: randomColor(),
       },
     },
 

@@ -106,8 +106,13 @@ const People = ({ projects, user, size }) => {
                   </div>
                 }
               >
-                <div className="btn mb-2 mx-auto" ref={projectChooser}>
-                  {invitation.project.title}
+                <div
+                  className="btn mb-2 mx-auto text-truncate"
+                  ref={projectChooser}
+                >
+                  {invitation.project.title.length > 20
+                    ? invitation.project.title.substring(0, 20) + "..."
+                    : invitation.project.title}
                 </div>
               </Popover>
             </div>
@@ -216,7 +221,7 @@ const People = ({ projects, user, size }) => {
           className="col-auto btn d-flex align-items-center my-2"
           ref={peopleProjectChooser}
         >
-          <div className="mr-2">
+          <div className="mr-2 text-truncate" style={{ maxWidth: "160px" }}>
             {projectId !== -1 && projects[projectId]
               ? `people of "${projects[projectId].title}"`
               : "No projects"}

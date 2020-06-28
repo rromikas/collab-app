@@ -18,7 +18,7 @@ const MessagesParent = ({ user, size }) => {
 
   return (
     <div className="row no-gutters p-0 py-0 pb-md-4 px-md-4">
-      <div className="col-12 alt-chat overflow-hidden">
+      <div className="col-12 alt-chat overflow-hidden project-card-corners">
         <div className="row no-gutters p-3">
           <Popover
             content={

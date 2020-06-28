@@ -103,7 +103,7 @@ const Times = ({ user, projectId, times }) => {
                 }}
                 style={{ height: "100px" }}
                 placeholder="Write description"
-                className="d-block"
+                className="d-block w-100"
               ></textarea>
             </div>
             <div className="d-flex">

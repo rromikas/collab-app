@@ -22,7 +22,13 @@ const sliceObject = (obj, property) => {
 const AdminDashboard = (props) => {
   const page = props.match.params.page;
   const user = props.user;
-  const projects = user.projects;
+  const projects = {};
+  Object.values(user.projects).forEach((x) => {
+    if (x.status !== "Deleted") {
+      projects[x.id] = x;
+    }
+  });
+  console.log("PROJECTKASJRIANS ADSI", projects);
   const section = props.match.params.section;
   const projectId = props.match.params.projectId;
   console.log("PROET ID", projectId);
@@ -41,9 +47,13 @@ const AdminDashboard = (props) => {
           </div>
         )}
 
-        <div className="col mh-100 overflow-auto mx-auto">
-          <div className="row no-gutters right-side mx-auto">
-            <div className="col-12">
+        <div className="col mh-100 overflow-auto">
+          <div className="row no-gutters">
+            <div
+              className={`col-12 col-xl-${
+                user.accountType === "client" ? "10" : "12"
+              } mx-auto`}
+            >
               {user.accountType === "admin" ? (
                 page === "people" ? (
                   <People
@@ -80,14 +90,17 @@ const AdminDashboard = (props) => {
                     ></Projects>
                   )
                 ) : page === "calendar" ? (
-                  <CalendarsParent user={user}></CalendarsParent>
+                  <CalendarsParent
+                    user={user}
+                    projects={projects}
+                  ></CalendarsParent>
                 ) : page === "new-project" ? (
                   <NewProject user={user}></NewProject>
                 ) : (
                   ""
                 )
               ) : page === "profile" || (page === "projects" && !projectId) ? (
-                <Profile user={user}></Profile>
+                <Profile user={user} projects={projects}></Profile>
               ) : page === "projects" && projectId ? (
                 <ProjectDashboard
                   projectId={projectId}

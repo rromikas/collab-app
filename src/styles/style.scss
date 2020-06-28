@@ -432,7 +432,6 @@ label {
   display: block;
   color: $color-600;
   line-height: 13px;
-  margin-bottom: 0 !important;
 }
 
 textarea {
@@ -503,10 +502,6 @@ input[type="text"]::placeholder {
   cursor: pointer;
 }
 
-.people-list-item {
-  font-size: 14px;
-}
-
 .navbar-icon {
   border-radius: 50%;
   width: 40px !important;
@@ -560,7 +555,6 @@ input[type="text"]::placeholder {
 }
 .alt-chat {
   background: white;
-  border-radius: 0.5rem !important;
   box-shadow: $shadow-primary;
 }
 
@@ -615,12 +609,6 @@ input[type="text"]::placeholder {
 @media only screen and (max-width: 768px) {
   .project-card-corners {
     border-radius: 0;
-  }
-}
-
-@media only screen and (min-width: 1200px) {
-  .right-side {
-    max-width: 80vw !important;
   }
 }
 
