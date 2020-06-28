@@ -22,7 +22,10 @@ const ProjectDashboard = ({ projectId, user, section, setPeople, size }) => {
   useEffect(() => {
     store.dispatch({
       type: "SET_BACKLINK",
-      backlink: { title: "Projects", path: `/${user.id}/projects` },
+      backlink: {
+        title: user.accountType === "admin" ? "Projects" : "Profile",
+        path: `/${user.id}/projects`,
+      },
     });
 
     firebase.GetFromDatabase(`projects/${projectId}`).then((data) => {
@@ -68,6 +71,7 @@ const ProjectDashboard = ({ projectId, user, section, setPeople, size }) => {
         ></Navbar>
         {page === "calendar" ? (
           <Calendar
+            people={project.people ? project.people : {}}
             projectId={projectId}
             events={project.events}
             addEvent={(ev) => {

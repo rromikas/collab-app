@@ -89,10 +89,8 @@ const AltChat = ({ projectId, user, size }) => {
 
   useEffect(() => {
     firebase.on(`projects/${projectId}/messages`, (data) => {
-      if (data) {
-        setChats(data);
-        messagesEnd.current.scrollIntoView({ behavior: "smooth" });
-      }
+      setChats(data ? data : {});
+      messagesEnd.current.scrollIntoView({ behavior: "smooth" });
     });
     return function cleanUp() {
       firebase.off(`projects/${projectId}/messages`);
@@ -169,8 +167,8 @@ const AltChat = ({ projectId, user, size }) => {
               <div
                 className="col-auto mr-lg-2"
                 style={{
-                  width: "40px",
-                  height: "40px",
+                  width: "50px",
+                  height: "50px",
                   borderRadius: "50%",
                   backgroundPosition: "center",
                   backgroundSize: "cover",
@@ -189,7 +187,7 @@ const AltChat = ({ projectId, user, size }) => {
                   </div>
                 </div>
                 <div
-                  className={`row no-gutters alt-chat-message${
+                  className={`text-truncate row no-gutters alt-chat-message${
                     user.id in lastMessage.seenBy ? "" : "-unread"
                   }`}
                 >
@@ -214,18 +212,13 @@ const AltChat = ({ projectId, user, size }) => {
                 return (
                   <div key={uid(x)} className={`row mb-2 no-gutters p-3`}>
                     <div
-                      className="col-auto mr-2"
+                      className="col-auto mr-2 bg-image square-50"
                       style={{
-                        width: "40px",
-                        height: "40px",
-                        borderRadius: "50%",
-                        backgroundPosition: "center",
-                        backgroundSize: "cover",
                         backgroundImage: `url(${people[x.userId].photo})`,
                       }}
                     ></div>
                     <div className="col">
-                      <div className="row no-gutters">
+                      <div className="row no-gutters align-items-center">
                         <div className="col-auto mr-2 alt-chat-author">
                           {people[x.userId].username}
                         </div>
@@ -237,6 +230,7 @@ const AltChat = ({ projectId, user, size }) => {
                       </div>
 
                       <div className="row no-gutters alt-chat-message">
+                        <div className="text-break"></div>
                         {x.text}
                       </div>
                     </div>
@@ -265,10 +259,12 @@ const AltChat = ({ projectId, user, size }) => {
             {chatId === 1 ? (
               "Select chat"
             ) : (
-              <div className="row no-gutters w-100">
+              <div className="row no-gutters w-100 align-items-center">
                 <div
-                  className="col-auto photo-circle-sm mr-2"
-                  style={{ backgroundImage: `url(${user.photo})` }}
+                  className="col-auto bg-image mr-2 square-50"
+                  style={{
+                    backgroundImage: `url(${user.photo})`,
+                  }}
                 ></div>
                 <input
                   disabled={chatId === 1}

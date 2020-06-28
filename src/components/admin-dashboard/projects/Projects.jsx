@@ -53,7 +53,7 @@ const Projects = ({ projects, userId, size }) => {
                       <div className="row no-gutters">
                         <div className="col pr-2">
                           <div
-                            className="row no-gutters title"
+                            className="row no-gutters title text-truncate cursor-pointer"
                             onClick={() =>
                               history.push(`/${userId}/projects/${x.id}/files`)
                             }
@@ -82,7 +82,7 @@ const Projects = ({ projects, userId, size }) => {
                             >
                               <BsStarFill
                                 fontSize="20px"
-                                className="hoverable-gray"
+                                className="clickable-item"
                               ></BsStarFill>
                             </Popover>
                           </div>
@@ -115,7 +115,7 @@ const Projects = ({ projects, userId, size }) => {
                             >
                               <BsThreeDots
                                 fontSize="20px"
-                                className="hoverable-gray"
+                                className="clickable-item"
                               ></BsThreeDots>
                             </Popover>
                           </div>
@@ -123,7 +123,8 @@ const Projects = ({ projects, userId, size }) => {
                       </div>
                     </div>
                     <div
-                      className="col-12 description"
+                      className="text-wrap text-truncate col-12 description cursor-pointer"
+                      style={{ height: "104px" }}
                       onClick={() =>
                         history.push(`/${userId}/projects/${x.id}/files`)
                       }

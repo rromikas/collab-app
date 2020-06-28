@@ -9,6 +9,7 @@ import * as firebase from "../../../database/firebase";
 import date from "date-and-time";
 import { BsChevronLeft } from "react-icons/bs";
 import Loader from "../../utility/Loader";
+import * as sizes from "../../../size";
 
 const handleFileUpload = (e, projectId, user, setFiles, setLoading, folder) => {
   let file = e.target.files[0];
@@ -95,9 +96,9 @@ const Files = ({ projectId, user, setProject, size }) => {
   }, [projectId, folder]);
 
   return (
-    <div className="row no-gutters position-relative px-2 py-2">
+    <div className="row no-gutters position-relative px-2 h-100">
       {loading ? (
-        <div className="col-auto">
+        <div className="col-12 p-5">
           <Loader loading={loading} size={30}></Loader>
         </div>
       ) : (

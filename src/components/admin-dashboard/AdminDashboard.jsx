@@ -11,6 +11,7 @@ import ProjectDashboard from "../project-dashboard/ProjectDashboard";
 import EditProject from "./projects/EditProject";
 import MobileNavbar from "../project-dashboard/navbar/MobileNavbar";
 import { connect } from "react-redux";
+import Profile from "../profile/Profile";
 
 const sliceObject = (obj, property) => {
   let newObj = { ...obj };
@@ -33,42 +34,73 @@ const AdminDashboard = (props) => {
           <Navbar></Navbar>
         </div>
       </div>
-      <div className="row no-gutters flex-fill overflow-hidden" onR>
-        <div className="col-auto mh-100">
-          <LeftSideMenu userId={user.id}></LeftSideMenu>
-        </div>
-        <div className="col mh-100">
-          {page === "people" ? (
-            <People user={user} projects={projects} size={props.size}></People>
-          ) : page === "activity" ? (
-            <Activity projects={projects}></Activity>
-          ) : page === "messages" ? (
-            <MessagesParent user={user} size={props.size}></MessagesParent>
-          ) : page === "projects" ? (
-            section === "edit" ? (
-              <EditProject projectId={projectId} user={user}></EditProject>
-            ) : projectId ? (
-              <ProjectDashboard
-                projectId={projectId}
-                user={user}
-                section={section ? section : "files"}
-                setPeople={setPeople}
-                size={props.size}
-              ></ProjectDashboard>
-            ) : (
-              <Projects
-                projects={projects}
-                userId={user.id}
-                size={props.size}
-              ></Projects>
-            )
-          ) : page === "calendar" ? (
-            <CalendarsParent user={user}></CalendarsParent>
-          ) : page === "new-project" ? (
-            <NewProject user={user}></NewProject>
-          ) : (
-            ""
-          )}
+      <div className="row no-gutters flex-fill overflow-hidden">
+        {user.accountType === "admin" && (
+          <div className="col-auto mh-100">
+            <LeftSideMenu userId={user.id}></LeftSideMenu>
+          </div>
+        )}
+
+        <div className="col mh-100 overflow-auto mx-auto">
+          <div className="row no-gutters right-side mx-auto">
+            <div className="col-12">
+              {user.accountType === "admin" ? (
+                page === "people" ? (
+                  <People
+                    user={user}
+                    projects={projects}
+                    size={props.size}
+                  ></People>
+                ) : page === "activity" ? (
+                  <Activity projects={projects}></Activity>
+                ) : page === "messages" ? (
+                  <MessagesParent
+                    user={user}
+                    size={props.size}
+                  ></MessagesParent>
+                ) : page === "projects" ? (
+                  section === "edit" ? (
+                    <EditProject
+                      projectId={projectId}
+                      user={user}
+                    ></EditProject>
+                  ) : projectId ? (
+                    <ProjectDashboard
+                      projectId={projectId}
+                      user={user}
+                      section={section ? section : "files"}
+                      setPeople={setPeople}
+                      size={props.size}
+                    ></ProjectDashboard>
+                  ) : (
+                    <Projects
+                      projects={projects}
+                      userId={user.id}
+                      size={props.size}
+                    ></Projects>
+                  )
+                ) : page === "calendar" ? (
+                  <CalendarsParent user={user}></CalendarsParent>
+                ) : page === "new-project" ? (
+                  <NewProject user={user}></NewProject>
+                ) : (
+                  ""
+                )
+              ) : page === "profile" || (page === "projects" && !projectId) ? (
+                <Profile user={user}></Profile>
+              ) : page === "projects" && projectId ? (
+                <ProjectDashboard
+                  projectId={projectId}
+                  user={user}
+                  section={section ? section : "files"}
+                  setPeople={setPeople}
+                  size={props.size}
+                ></ProjectDashboard>
+              ) : (
+                ""
+              )}
+            </div>
+          </div>
         </div>
       </div>
       <div

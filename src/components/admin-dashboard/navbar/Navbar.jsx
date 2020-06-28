@@ -7,6 +7,7 @@ import store from "../../../store/store";
 import { BsBell } from "react-icons/bs";
 import * as firebase from "../../../database/firebase";
 import { uid } from "react-uid";
+import { Colors } from "../../utility/Colors";
 
 const answerToInvitation = (answer, invitation, user) => {
   let updates = {};
@@ -24,6 +25,7 @@ const answerToInvitation = (answer, invitation, user) => {
       photo: user.photo,
       username: user.username,
       id: user.id,
+      color: Colors[Math.floor(Math.random() * (Colors.length + 1))],
       email: user.email,
     };
     updates[`users/${user.id}/projects/${invitation.project.id}`] =

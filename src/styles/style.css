@@ -10985,7 +10985,7 @@ body {
   -webkit-box-shadow: 0 4px 15px 0 rgba(0, 0, 0, 0.1);
           box-shadow: 0 4px 15px 0 rgba(0, 0, 0, 0.1);
   border-radius: 0.5rem;
-  cursor: pointer;
+  color: #575757;
   -webkit-transition: all 0.3s;
   transition: all 0.3s;
 }
@@ -11021,6 +11021,7 @@ body {
 
 .popover-inner {
   font-size: 14px;
+  color: #737373;
 }
 
 .popover-inner .popover-content-item {
@@ -11094,19 +11095,10 @@ h1, h2, h3, h4, h5, h6,
   font-weight: 500 !important;
 }
 
-.calendar-event-card {
-  -webkit-box-shadow: 0 4px 30px 0 rgba(0, 0, 0, 0.1);
-          box-shadow: 0 4px 30px 0 rgba(0, 0, 0, 0.1);
-  border-radius: 0.5rem;
-  cursor: pointer;
-  -webkit-transition: all 0.3s;
-  transition: all 0.3s;
-  background: white;
-}
-
-.calendar-event-card:hover {
-  -webkit-box-shadow: 0 10px 45px 0 rgba(0, 0, 0, 0.2);
-          box-shadow: 0 10px 45px 0 rgba(0, 0, 0, 0.2);
+.calendar-event-date {
+  font-size: 13px;
+  font-weight: 500;
+  color: #8e8e8e;
 }
 
 .vertical-timeline-element-content {
@@ -11156,7 +11148,7 @@ h1, h2, h3, h4, h5, h6,
 }
 
 .chat-time {
-  font-size: 12px;
+  font-size: 14px;
   color: #8e8e8e;
 }
 
@@ -11293,11 +11285,12 @@ input[type="text"]:focus {
 
 label {
   font-size: 13px;
-  font-weight: bold;
+  font-weight: 700;
   line-height: 21px;
   display: block;
-  color: #737373;
+  color: #8e8e8e;
   line-height: 13px;
+  margin-bottom: 0 !important;
 }
 
 textarea {
@@ -11473,19 +11466,21 @@ input[type="text"]::placeholder {
 }
 
 .alt-chat-message {
-  font-size: 14px;
+  font-size: 16px;
   color: #737373;
   font-weight: 500;
+  word-break: break-word;
 }
 
 .alt-chat-message-unread {
-  font-size: 14px;
+  font-size: 16px;
   color: #737373;
   font-weight: 700;
+  word-break: break-word;
 }
 
 .alt-chat-author {
-  font-size: 14px;
+  font-size: 16px;
   color: #373737;
 }
 
@@ -11524,5 +11519,43 @@ input[type="text"]::placeholder {
   .project-card-corners {
     border-radius: 0;
   }
+}
+
+@media only screen and (min-width: 1200px) {
+  .right-side {
+    max-width: 80vw !important;
+  }
+}
+
+.user-select-none {
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+}
+
+.img-uploader {
+  position: absolute;
+  bottom: 0;
+  height: 25%;
+  -webkit-transition: height 0.4s ease-in-out;
+  transition: height 0.4s ease-in-out;
+}
+
+.img-uploader:hover {
+  height: 45%;
+  -webkit-transition: height 0.3s ease-in-out;
+  transition: height 0.3s ease-in-out;
+}
+
+.bg-image {
+  background-size: cover !important;
+  background-position: center !important;
+  border-radius: 50%;
+}
+
+.square-50 {
+  width: 50px !important;
+  height: 50px !important;
 }
 /*# sourceMappingURL=style.css.map */
