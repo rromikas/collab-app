@@ -11,10 +11,12 @@ firebase
     // Handle Errors here.
     var errorCode = error.code;
     var errorMessage = error.message;
+    console.log("errro authenticating firebase: ", errorMessage);
     // ...
   });
 firebase.auth().onAuthStateChanged(function (user) {
   if (user) {
+    console.log("USER authenticated from firebase: ", user);
     console.log("authenitcated firebase");
   } else {
     console.log("firebase authentication failed");

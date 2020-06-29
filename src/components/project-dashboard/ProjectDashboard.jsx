@@ -9,9 +9,18 @@ import Messages from "./messages/Messages";
 import Times from "./times/Times";
 import AltChat from "./messages/AltChat";
 import TuiCalendar from "./calendar/TuiCalendar";
+import Requests from "./requests/Requests";
+import NewRequest from "./requests/NewRequest";
 
-const ProjectDashboard = ({ projectId, user, section, setPeople, size }) => {
-  const [page, setPage] = useState("");
+const ProjectDashboard = ({
+  projectId,
+  user,
+  section,
+  subsection,
+  setPeople,
+  size,
+}) => {
+  console.log("section and subsection", section, subsection);
   const [project, setProject] = useState({
     events: {},
     messages: {},
@@ -56,20 +65,16 @@ const ProjectDashboard = ({ projectId, user, section, setPeople, size }) => {
     };
   }, [projectId]);
 
-  useEffect(() => {
-    setPage(section);
-  }, [section]);
-
   return (
     <div className="row no-gutters px-0 py-0 pb-md-4 px-md-4 mh-100">
       <div className="col-12 collab-project bg-white mh-100 project-card-corners">
         <Navbar
           projectId={projectId}
-          page={page}
+          page={section}
           userId={user.id}
           people={project.people}
         ></Navbar>
-        {page === "calendar" ? (
+        {section === "calendar" ? (
           <Calendar
             people={project.people ? project.people : {}}
             projectId={projectId}
@@ -81,7 +86,7 @@ const ProjectDashboard = ({ projectId, user, section, setPeople, size }) => {
             }}
           ></Calendar>
         ) : // <TuiCalendar events={project.events}></TuiCalendar>
-        page === "files" ? (
+        section === "files" ? (
           <Files
             size={size}
             projectId={projectId}
@@ -89,14 +94,20 @@ const ProjectDashboard = ({ projectId, user, section, setPeople, size }) => {
             files={project.files}
             setProject={setProject}
           ></Files>
-        ) : page === "messages" ? (
+        ) : section === "messages" ? (
           <AltChat projectId={projectId} user={user} size={size}></AltChat>
-        ) : page === "time" ? (
+        ) : section === "time" ? (
           <Times
             user={user}
             projectId={projectId}
             times={project.times}
           ></Times>
+        ) : section === "requests" ? (
+          subsection === "new" ? (
+            <NewRequest projectId={projectId} user={user}></NewRequest>
+          ) : (
+            <Requests user={user} projectId={projectId}></Requests>
+          )
         ) : (
           ""
         )}

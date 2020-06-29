@@ -146,6 +146,10 @@ function App({ user }) {
       <Switch>
         <Route exact path="/" component={MainPage}></Route>
         <Route
+          path="/:userId/:page/:projectId/:section/:subsection"
+          component={UserDashobard}
+        ></Route>
+        <Route
           path="/:userId/:page/:projectId/:section"
           component={UserDashobard}
         ></Route>

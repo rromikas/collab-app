@@ -30,6 +30,8 @@ const AdminDashboard = (props) => {
   });
   console.log("PROJECTKASJRIANS ADSI", projects);
   const section = props.match.params.section;
+  const subsection = props.match.params.subsection;
+  console.log("SUBSCETION", subsection);
   const projectId = props.match.params.projectId;
   console.log("PROET ID", projectId);
   const [people, setPeople] = useState({}); //needed for mobile dashboard
@@ -79,6 +81,7 @@ const AdminDashboard = (props) => {
                       projectId={projectId}
                       user={user}
                       section={section ? section : "files"}
+                      subsection={subsection}
                       setPeople={setPeople}
                       size={props.size}
                     ></ProjectDashboard>
@@ -106,6 +109,7 @@ const AdminDashboard = (props) => {
                   projectId={projectId}
                   user={user}
                   section={section ? section : "files"}
+                  subsection={subsection}
                   setPeople={setPeople}
                   size={props.size}
                 ></ProjectDashboard>
