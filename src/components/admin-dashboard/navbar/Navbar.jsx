@@ -11,10 +11,6 @@ import randomColor from "randomcolor";
 
 const answerToInvitation = (answer, invitation, user) => {
   let updates = {};
-  updates[
-    `users/${user.id}/notifications/seen/${invitation.id}`
-  ] = Object.assign({}, invitation, { answer: answer });
-  updates[`users/${user.id}/notifications/unseen/${invitation.id}`] = [];
 
   if (answer === "rejected") {
     updates[`projects/${invitation.project.id}/people/${user.id}`] = [];
@@ -69,6 +65,14 @@ const Navbar = ({ pageTitle, user, backlink }) => {
           style={{ lineHeight: "38px", alignItems: "center" }}
         >
           <Popover
+            onHide={() => {
+              let updates = {};
+              Object.values(unseen).forEach((x) => {
+                updates[`users/${user.id}/notifications/unseen/${x.id}`] = [];
+                updates[`users/${user.id}/notifications/seen/${x.id}`] = x;
+              });
+              firebase.UpdateDatabase(updates);
+            }}
             content={
               <div className="popover-inner">
                 <div className="popover-label border-bottom">Unseen</div>
@@ -100,6 +104,21 @@ const Navbar = ({ pageTitle, user, backlink }) => {
                             }
                           >
                             Reject
+                          </div>
+                        </div>
+                      )}
+
+                      {x.type === "request" && (
+                        <div className="row no-gutters">
+                          <div
+                            className="col-auto btn-pro"
+                            onClick={() =>
+                              history.push(
+                                `/${user.id}/projects/${x.projectId}/requests/${x.requestId}`
+                              )
+                            }
+                          >
+                            View more
                           </div>
                         </div>
                       )}

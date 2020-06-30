@@ -7,7 +7,7 @@ import randomColor from "randomcolor";
 import { BsChevronLeft } from "react-icons/bs";
 import date from "date-and-time";
 
-const NewRequest = ({ user, projectId }) => {
+const NewRequest = ({ user, projectId, people }) => {
   const [request, setRequest] = useState({
     title: "",
     description: "",
@@ -16,6 +16,7 @@ const NewRequest = ({ user, projectId }) => {
     date: new Date(Date.now()).toString(),
     creator: { username: user.username, photo: user.photo, id: user.id },
     status: "pending",
+    discussion: {},
   });
 
   const [problem, setProblem] = useState("");
@@ -109,6 +110,21 @@ const NewRequest = ({ user, projectId }) => {
                   updates[
                     `projects/${projectId}/requests/${request.id}`
                   ] = request;
+                  Object.values(people).forEach((p) => {
+                    if (p.id !== user.id) {
+                      updates[
+                        `users/${p.id}/notifications/unseen/${request.id}`
+                      ] = {
+                        photo: request.creator.photo,
+                        text: `${request.creator.username} created new request`,
+                        type: "request",
+                        requestId: request.id,
+                        projectId: request.projectId,
+                        id: request.id,
+                        date: new Date(Date.now()),
+                      };
+                    }
+                  });
                   firebase.UpdateDatabase(updates);
                   history.goBack();
                 } else {

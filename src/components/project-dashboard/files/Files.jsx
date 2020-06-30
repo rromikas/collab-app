@@ -9,7 +9,8 @@ import * as firebase from "../../../database/firebase";
 import date from "date-and-time";
 import { BsChevronLeft } from "react-icons/bs";
 import Loader from "../../utility/Loader";
-import * as sizes from "../../../size";
+import NoFiles from "../../../pictures/NoFiles";
+import NoMessages from "../../../pictures/NoMessages";
 
 const handleFileUpload = (e, projectId, user, setFiles, setLoading, folder) => {
   let file = e.target.files[0];
@@ -174,71 +175,92 @@ const Files = ({ projectId, user, setProject, size }) => {
               style={{ height: `${listHeight}px` }}
             >
               <div className="row no-gutters">
-                {files.map((x) => {
-                  return (
-                    <div
-                      className="col-12 col-sm-4 col-lg-3 col-xl-2 file-card p-4 clickable-item"
-                      onClick={() => {
-                        if (folder) {
-                          window.open(x.downloadUrl);
-                        } else {
-                          setFolder(x.name);
-                        }
-                      }}
-                    >
-                      <div className="row no-gutters align-items-center">
-                        <div className="col-auto col-sm-12">
-                          <div className="text-sm-center mr-2">
-                            {folder ? (
-                              <BsFileEarmark
-                                className="clickable-item"
-                                fontSize="calc(2.5em + 3vw)"
-                              ></BsFileEarmark>
-                            ) : (
-                              <BsFolder
-                                className="clickable-item"
-                                fontSize="calc(2.5em + 3vw)"
-                              ></BsFolder>
-                            )}
-                          </div>
-                        </div>
-                        <div className="col col-sm-12">
-                          <div className="row no-gutters">
-                            <div
-                              className="text-sm-center file-name-fixed mr-2 col-12"
-                              style={{ fontSize: "14px" }}
-                            >
-                              {x.name.length > 13
-                                ? x.name.substring(0, 13) + "..."
-                                : x.name}
+                {files.length ? (
+                  files.map((x) => {
+                    return (
+                      <div
+                        className="col-12 col-sm-4 col-lg-3 col-xl-2 file-card p-4 clickable-item"
+                        onClick={() => {
+                          if (folder) {
+                            window.open(x.downloadUrl);
+                          } else {
+                            setFolder(x.name);
+                          }
+                        }}
+                      >
+                        <div className="row no-gutters align-items-center">
+                          <div className="col-auto col-sm-12">
+                            <div className="text-sm-center mr-2">
+                              {folder ? (
+                                <BsFileEarmark
+                                  className="clickable-item"
+                                  fontSize="calc(2.5em + 3vw)"
+                                ></BsFileEarmark>
+                              ) : (
+                                <BsFolder
+                                  className="clickable-item"
+                                  fontSize="calc(2.5em + 3vw)"
+                                ></BsFolder>
+                              )}
                             </div>
-                            {folder ? (
+                          </div>
+                          <div className="col col-sm-12">
+                            <div className="row no-gutters">
                               <div
-                                className="justify-content-sm-center col-12 d-flex"
+                                className="text-sm-center file-name-fixed mr-2 col-12"
                                 style={{ fontSize: "14px" }}
                               >
-                                <div className="mr-2">By:</div>
-                                <div className="text-primary">
-                                  {x.uploadedBy}
+                                {x.name.length > 13
+                                  ? x.name.substring(0, 13) + "..."
+                                  : x.name}
+                              </div>
+                              {folder ? (
+                                <div
+                                  className="justify-content-sm-center col-12 d-flex"
+                                  style={{ fontSize: "14px" }}
+                                >
+                                  <div className="mr-2">By:</div>
+                                  <div className="text-primary">
+                                    {x.uploadedBy}
+                                  </div>
                                 </div>
-                              </div>
-                            ) : (
-                              ""
-                            )}
-                            {x.timeCreated && (
-                              <div
-                                className="text-sm-center col-12"
-                                style={{ fontSize: "14px" }}
-                              >
-                                {x.timeCreated}
-                              </div>
-                            )}
+                              ) : (
+                                ""
+                              )}
+                              {x.timeCreated && (
+                                <div
+                                  className="text-sm-center col-12"
+                                  style={{ fontSize: "14px" }}
+                                >
+                                  {x.timeCreated}
+                                </div>
+                              )}
+                            </div>
                           </div>
                         </div>
                       </div>
+                    );
+                  })
+                ) : (
+                  <div
+                    className="col-lg-4 col-5 mx-auto"
+                    style={{
+                      position: "absolute",
+                      left: 0,
+                      right: 0,
+                      top: 0,
+                      bottom: 0,
+                      margin: "auto",
+                    }}
+                  >
+                    <div
+                      className="h-100 row no-gutters align-items-center"
+                      style={{ transform: "translate(-20px, -79px)" }}
+                    >
+                      <NoFiles></NoFiles>
                     </div>
-                  );
-                })}
+                  </div>
+                )}
               </div>
             </div>
           </div>

@@ -1,16 +1,14 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "./navbar/Navbar";
-import MobileNavbar from "./navbar/MobileNavbar";
 import store from "../../store/store";
 import * as firebase from "../../database/firebase";
 import Calendar from "./calendar/Calendar";
 import Files from "./files/Files";
-import Messages from "./messages/Messages";
 import Times from "./times/Times";
 import AltChat from "./messages/AltChat";
-import TuiCalendar from "./calendar/TuiCalendar";
 import Requests from "./requests/Requests";
 import NewRequest from "./requests/NewRequest";
+import Request from "./requests/Request";
 
 const ProjectDashboard = ({
   projectId,
@@ -72,7 +70,7 @@ const ProjectDashboard = ({
           projectId={projectId}
           page={section}
           userId={user.id}
-          people={project.people}
+          people={project.people ? project.people : {}}
         ></Navbar>
         {section === "calendar" ? (
           <Calendar
@@ -102,10 +100,23 @@ const ProjectDashboard = ({
             user={user}
             projectId={projectId}
             times={project.times}
+            people={project.people ? project.people : {}}
           ></Times>
         ) : section === "requests" ? (
-          subsection === "new" ? (
-            <NewRequest projectId={projectId} user={user}></NewRequest>
+          subsection ? (
+            subsection === "new" ? (
+              <NewRequest
+                projectId={projectId}
+                user={user}
+                people={project.people ? project.people : {}}
+              ></NewRequest>
+            ) : (
+              <Request
+                requestId={subsection}
+                projectId={projectId}
+                user={user}
+              ></Request>
+            )
           ) : (
             <Requests user={user} projectId={projectId} size={size}></Requests>
           )

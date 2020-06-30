@@ -23,6 +23,20 @@ const calculateTotalTime = (times) => {
   return `${formatNumber(h)}:${formatNumber(m)}`;
 };
 
+const calculatePersonalTime = (times, username) => {
+  let minutes = 0;
+  Object.values(times).forEach((x) => {
+    Object.values(x).forEach((y) => {
+      if (y.creator === username) {
+        minutes += y.minutes;
+      }
+    });
+  });
+  let h = Math.floor(minutes / 60);
+  let m = minutes - h * 60;
+  return `${formatNumber(h)}:${formatNumber(m)}`;
+};
+
 const addTimeRecord = (timeRecord, projectId, onError) => {
   let dateObj = new Date();
   let key = date.format(dateObj, "YYYY-MM-DD");
@@ -47,7 +61,7 @@ const addTimeRecord = (timeRecord, projectId, onError) => {
   firebase.UpdateDatabase(updates);
 };
 
-const Times = ({ user, projectId, times, size }) => {
+const Times = ({ user, projectId, times, size, people }) => {
   times = times ? times : {};
   const containerMinHeight =
     size.width > 768 ? size.height - 56 - 62.4 - 24 : size.height - 56 - 56;
@@ -60,7 +74,7 @@ const Times = ({ user, projectId, times, size }) => {
   });
   return (
     <div
-      className="row no-gutters position-relative px-2 px-sm-3 px-md-4 py-3"
+      className="row no-gutters position-relative px-3 px-md-4 py-3"
       style={{ minHeight: `${containerMinHeight}px` }}
     >
       <div className="col-12">
@@ -139,16 +153,21 @@ const Times = ({ user, projectId, times, size }) => {
           </Popover>
         </div>
         <div className="row no-gutters">
-          <div className="col-12 mb-2">
-            <div className="row no-gutters border-top border-bottom align-items-center py-1">
+          <div className="col-12 border-top border-bottom py-3 mb-3">
+            <div className="row no-gutters align-items-center total-time">
               <div className="col-auto mr-2">Total time:</div>
               <div className="col-auto">{calculateTotalTime(times)}</div>
-              <div className="col">
-                <div className="row no-gutters justify-content-end">
-                  <div className="col-auto btn">Show details</div>
-                </div>
-              </div>
             </div>
+            {Object.values(people)
+              .filter((x) => x.permissions === "owner")
+              .map((x) => (
+                <div className="row no-gutters align-items-center">
+                  <div className="col-auto mr-2">{x.username}:</div>
+                  <div className="col-auto">
+                    {calculatePersonalTime(times, x.username)}
+                  </div>
+                </div>
+              ))}
           </div>
         </div>
 

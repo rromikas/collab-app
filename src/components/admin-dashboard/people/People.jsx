@@ -8,6 +8,7 @@ import { BsFillReplyFill } from "react-icons/bs";
 import uniqid from "uniqid";
 import Checkbox from "../../utility/Checkbox";
 import { BsChevronDown } from "react-icons/bs";
+import { uid } from "react-uid";
 
 const sendInvitation = (invitation, user) => {
   let id = uniqid("invitation-");
@@ -41,9 +42,7 @@ const People = ({ projects, user, size }) => {
     permissions: "",
     project: { title: "Select project", description: "", id: "" },
   });
-  const [projectId, setProjectId] = useState(
-    runningProjects.length > 0 ? runningProjects[0].id : -1
-  );
+  const [projectId, setProjectId] = useState("all");
   const [problem, setProblem] = useState("");
   const projectChooser = useRef(null);
   const peopleProjectChooser = useRef(null);
@@ -54,14 +53,31 @@ const People = ({ projects, user, size }) => {
   }, []);
 
   useEffect(() => {
-    if (projectId !== -1) {
+    if (projectId !== "all") {
       firebase.on(`projects/${projectId}/people`, (data) => {
-        data = data ? data : {};
-        setPeople(data);
+        let allPeople = {};
+        allPeople[projectId] = data ? data : {};
+        setPeople(allPeople);
       });
+    } else {
+      async function fetchPeople() {
+        let allPeople = { 1: { [user.id]: user } };
+        await Promise.all(
+          Object.values(projects).map(async (x) => {
+            let data = await firebase.GetFromDatabase(
+              `projects/${x.id}/people`
+            );
+            delete data[user.id];
+            allPeople[x.id] = data;
+          })
+        );
+
+        setPeople(allPeople);
+      }
+      fetchPeople();
     }
     return function cleanUp() {
-      if (projectId !== -1) {
+      if (projectId !== "all") {
         firebase.off(`projects/${projectId}/people`);
       }
     };
@@ -203,8 +219,18 @@ const People = ({ projects, user, size }) => {
       <Popover
         content={
           <div className="popover-inner">
+            <div
+              className="popover-content-item"
+              onClick={() => {
+                setProjectId("all");
+                peopleProjectChooser.current.click();
+              }}
+            >
+              All
+            </div>
             {runningProjects.map((x) => (
               <div
+                key={uid(x)}
                 className="popover-content-item"
                 onClick={() => {
                   setProjectId(x.id);
@@ -222,9 +248,7 @@ const People = ({ projects, user, size }) => {
           ref={peopleProjectChooser}
         >
           <div className="mr-2 text-truncate" style={{ maxWidth: "160px" }}>
-            {projectId !== -1 && projects[projectId]
-              ? `people of "${projects[projectId].title}"`
-              : "No projects"}
+            {projects[projectId] ? projects[projectId].title : projectId}
           </div>
 
           <BsChevronDown fontSize="14px"></BsChevronDown>
@@ -236,37 +260,36 @@ const People = ({ projects, user, size }) => {
           className="row no-gutters overflow-auto p-3"
           style={{ height: `${blockHeight}px` }}
         >
-          {Object.values(people).length > 0 ? (
+          {Object.keys(people).length > 0 ? (
             <div className="col-12 mt-2">
-              {Object.values(people).map((x) => (
-                <div className="row no-gutters p-3 align-items-center clickable-item basic-card mb-3 people-list-item">
-                  {x.status === "invited" && (
-                    <React.Fragment>
-                      <div className="col-auto mr-2">
-                        <BsFillReplyFill fontSize="18px"></BsFillReplyFill>
-                      </div>
-                      <div className="col-auto mr-2">Invitation sent to</div>
-                    </React.Fragment>
-                  )}
-                  {x.photo && (
-                    <div
-                      className="col-auto mr-2 photo-circle-sm"
-                      style={{
-                        backgroundImage: `url(${x.photo})`,
-                      }}
-                    ></div>
-                  )}
+              {Object.keys(people).map((x) =>
+                Object.values(people[x]).map((y) => (
+                  <div className="row no-gutters p-3 align-items-center clickable-item basic-card mb-3 people-list-item">
+                    {y.status === "invited" && (
+                      <React.Fragment>
+                        <div className="col-auto mr-2">
+                          <BsFillReplyFill fontSize="18px"></BsFillReplyFill>
+                        </div>
+                        <div className="col-auto mr-2">Invitation sent to</div>
+                      </React.Fragment>
+                    )}
+                    {y.photo && (
+                      <div
+                        className="col-auto mr-2 photo-circle-sm"
+                        style={{
+                          backgroundImage: `url(${y.photo})`,
+                        }}
+                      ></div>
+                    )}
 
-                  <div className="col-auto">{x.email}</div>
-                </div>
-              ))}
+                    <div className="col-auto">{y.email}</div>
+                  </div>
+                ))
+              )}
             </div>
           ) : (
             <div className="col-12">
-              <div
-                className="row no-gutters align-items-center justify-content-center"
-                style={{ height: "600px" }}
-              >
+              <div className="row no-gutters align-items-center justify-content-center h-100">
                 <div className="col-12 col-sm-10 col-md-9 col-lg-7">
                   <NoPeople></NoPeople>
                 </div>

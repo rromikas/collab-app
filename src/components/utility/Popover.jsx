@@ -10,6 +10,7 @@ const Popover = ({
   delay = 0,
   animation = "scale",
   open = undefined,
+  onHide = () => {},
   ...rest
 }) => {
   useEffect(() => {
@@ -22,6 +23,7 @@ const Popover = ({
   }, []);
   return (
     <Tooltip
+      onHide={onHide}
       delay={delay}
       hideDelay={0}
       html={content}

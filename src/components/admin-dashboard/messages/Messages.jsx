@@ -65,10 +65,12 @@ const Messages = ({ user, size, chat }) => {
           setMessages(data ? data : {});
         }
       );
-      return function cleanUp() {
-        firebase.off(`projects/${chat.projectId}/messages`);
-      };
     }
+    return function cleanUp() {
+      if (chat.projectId && chat.chatId) {
+        firebase.off(`projects/${chat.projectId}/messages`);
+      }
+    };
   }, [chat]);
 
   useEffect(() => {
@@ -111,9 +113,11 @@ const Messages = ({ user, size, chat }) => {
                           {people[x.userId] ? people[x.userId].username : ""}
                         </div>
                         <div className="col-auto alt-chat-date">
-                          {x.date && isToday(new Date(x.date))
-                            ? date.format(new Date(x.date), "hh:mm A")
-                            : date.format(new Date(x.date), "ddd MMM DD YYYY")}
+                          {x.date
+                            ? isToday(new Date(x.date))
+                              ? date.format(new Date(x.date), "hh:mm A")
+                              : date.format(new Date(x.date), "ddd MMM DD YYYY")
+                            : ""}
                         </div>
                       </div>
 

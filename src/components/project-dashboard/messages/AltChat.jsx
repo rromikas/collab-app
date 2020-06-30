@@ -182,9 +182,11 @@ const AltChat = ({ projectId, user, size }) => {
                           {people[x.userId].username}
                         </div>
                         <div className="col-auto alt-chat-date">
-                          {new Date(x.date) && isToday(new Date(x.date))
-                            ? date.format(new Date(x.date), "hh:mm A")
-                            : date.format(new Date(x.date), "ddd MMM DD YYYY")}
+                          {x.date
+                            ? isToday(new Date(x.date))
+                              ? date.format(new Date(x.date), "hh:mm A")
+                              : date.format(new Date(x.date), "ddd MMM DD YYYY")
+                            : ""}
                         </div>
                       </div>
 
