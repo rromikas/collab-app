@@ -108,6 +108,7 @@ const People = ({ projects, user, size }) => {
                   <div className="popover-inner">
                     {runningProjects.map((x) => (
                       <div
+                        key={uid(x)}
                         className="popover-content-item col-12"
                         onClick={() => {
                           setInvitation((inv) =>
@@ -264,7 +265,10 @@ const People = ({ projects, user, size }) => {
             <div className="col-12 mt-2">
               {Object.keys(people).map((x) =>
                 Object.values(people[x]).map((y) => (
-                  <div className="row no-gutters p-3 align-items-center clickable-item basic-card mb-3 people-list-item">
+                  <div
+                    key={uid(y)}
+                    className="row no-gutters p-3 align-items-center clickable-item basic-card mb-3 people-list-item"
+                  >
                     {y.status === "invited" && (
                       <React.Fragment>
                         <div className="col-auto mr-2">
