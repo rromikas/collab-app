@@ -16,7 +16,6 @@ firebase
   });
 firebase.auth().onAuthStateChanged(function (user) {
   if (user) {
-    console.log("USER authenticated from firebase: ", user);
     console.log("authenitcated firebase");
   } else {
     console.log("firebase authentication failed");

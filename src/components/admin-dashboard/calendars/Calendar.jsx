@@ -282,7 +282,7 @@ const Calendar = ({ projectId, projects }) => {
               <div className="popover-label text-left">Associate with...</div>
               <div className="mb-2">
                 {Object.values(people).map((x) => (
-                  <div className="d-flex">
+                  <div className="d-flex mb-1">
                     <Checkbox
                       size={25}
                       setChecked={(checked) => {

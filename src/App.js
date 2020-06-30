@@ -50,6 +50,14 @@ const accounts = {
   },
 };
 
+function deleteDatabase() {
+  let updates = {};
+  updates["projects"] = [];
+  updates["users"] = [];
+  firebase.UpdateDatabase(updates);
+}
+
+// deleteDatabase();
 function createDemoUser() {
   let updates = {};
   Object.keys(accounts).forEach((x) => {

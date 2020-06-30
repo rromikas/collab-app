@@ -159,7 +159,7 @@ const People = ({ projects, user, size }) => {
               ) : problem === "wrong email" ? (
                 <label style={{ color: "red" }}>email required</label>
               ) : problem === "no project selected" ? (
-                <label style={{ color: "red" }}>permissions required</label>
+                <label style={{ color: "red" }}>select project</label>
               ) : (
                 ""
               )}

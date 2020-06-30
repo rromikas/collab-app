@@ -5,7 +5,9 @@ import * as firebase from "../../../database/firebase";
 import date from "date-and-time";
 import { BsX, BsCheck, BsReply, BsFillReplyFill } from "react-icons/bs";
 
-const Requests = ({ projectId, user }) => {
+const Requests = ({ projectId, user, size }) => {
+  const containerMinHeight =
+    size.width > 768 ? size.height - 62.4 - 24 - 56 : size.height - 56 - 56;
   const [requests, setRequests] = useState({});
   useEffect(() => {
     firebase.on(`projects/${projectId}/requests`, (data) => {
@@ -16,7 +18,10 @@ const Requests = ({ projectId, user }) => {
     };
   }, []);
   return (
-    <div className="row no-gutters">
+    <div
+      className="row no-gutters"
+      style={{ minHeight: `${containerMinHeight}px` }}
+    >
       <div className="col-12">
         <div className="row no-gutters">
           <div

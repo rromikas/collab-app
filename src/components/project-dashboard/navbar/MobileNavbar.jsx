@@ -36,7 +36,6 @@ const generalItems = [
 ];
 
 const MobileNavbar = ({ projectId, section, page, userId, people }) => {
-  console.log("people userid", people, userId);
   const permissions = people[userId] ? people[userId].permissions : "client";
   return (
     <div className="row no-gutters border-bottom mobile-project-navbar">

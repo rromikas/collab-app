@@ -27,46 +27,14 @@ const sendMessage = (message, projectId, chatId) => {
   updates[
     `projects/${projectId}/messages/${chatId}/messages/${id}`
   ] = Object.assign({}, message, { date: new Date(), id: id });
+  updates[
+    `projects/${projectId}/messages/${chatId}/lastMessage`
+  ] = Object.assign({}, message, { date: new Date(), id: id });
   firebase.UpdateDatabase(updates);
 };
 
-const getLastMessage = (chats, userId1, userId2) => {
-  let chat = Object.values(sliceObject(chats, "AAAPlaceholder")).filter(
-    (y) => userId1 in y.persons && userId2 in y.persons
-  );
-
-  let lastMessage =
-    chat.length && chat[0].messages && Object.keys(chat[0].messages).length > 0
-      ? {
-          ...chat[0].messages[
-            Object.keys(chat[0].messages)[
-              Object.keys(chat[0].messages).length - 1
-            ]
-          ],
-        }
-      : {
-          id: "placeholder",
-          date: new Date(),
-          text: "start a chat",
-          userId: userId1,
-          seenBy: {
-            [userId1]: {
-              id: userId1,
-            },
-          },
-        };
-
-  lastMessage.date = new Date(lastMessage.date);
-  lastMessage.text =
-    lastMessage.text.length > 20
-      ? lastMessage.text.substring(0, 20) + "..."
-      : lastMessage.text;
-  return lastMessage;
-};
-
 const AltChat = ({ projectId, user, size }) => {
-  const chatHeight =
-    size.width > 768 ? size.height - 222.4 : size.height - 198.4;
+  const chatHeight = size.width > 768 ? size.height - 222.4 : size.height - 192;
   const [chatId, setChatId] = useState(1);
   const [chatPerson, setChatPerson] = useState(0);
   const chatPopover = useRef(null);
@@ -99,48 +67,22 @@ const AltChat = ({ projectId, user, size }) => {
 
   useEffect(() => {
     messagesEnd.current.scrollIntoView();
-    let lastMessage = getLastMessage(chats, user.id, chatPerson);
-    if (lastMessage.id !== "placeholder") {
+    let lastMessage = chats[chatId] ? chats[chatId].lastMessage : "";
+    if (lastMessage) {
       let updates = {};
       updates[
-        `projects/${projectId}/messages/${chatId}/messages/${lastMessage.id}/seenBy/${user.id}`
+        `projects/${projectId}/messages/${chatId}/lastMessage/seenBy/${user.id}`
       ] = { id: user.id };
       firebase.UpdateDatabase(updates);
     }
   }, [chatId]);
 
   useEffect(() => {
-    if (chatPerson !== "none") {
-      let arr = Object.keys(chats).filter(
-        (c) => chatPerson in chats[c].persons && user.id in chats[c].persons
-      );
-      if (chatPerson) {
-        if (!arr.length) {
-          let newChatId = uniqid("chat-");
-          let updates = {};
-          updates[`projects/${projectId}/messages/${newChatId}`] = {
-            persons: {
-              [user.id]: {
-                id: user.id,
-                photo: user.photo,
-                username: user.username,
-              },
-              [chatPerson]: {
-                id: chatPerson,
-                photo: people[chatPerson].photo,
-                username: people[chatPerson].username,
-              },
-            },
-          };
-          firebase.UpdateDatabase(updates);
-          setChatId(newChatId);
-        } else {
-          setChatId(arr[0]);
-        }
-      }
-    } else {
-      setChatId(1);
-    }
+    let newChatId =
+      chatPerson < user.id
+        ? `${chatPerson}${user.id}`
+        : `${user.id}${chatPerson}`;
+    setChatId(newChatId);
   }, [chatPerson]);
 
   return (
@@ -148,11 +90,24 @@ const AltChat = ({ projectId, user, size }) => {
       <div
         className="col-lg-4 col-auto bg-white"
         onClick={() => {
-          setChatPerson("none");
+          setChatId(1);
         }}
       >
         {Object.values(sliceObject(people, user.id)).map((x) => {
-          let lastMessage = getLastMessage(chats, user.id, x.id);
+          let actualChatId =
+            user.id < x.id ? `${user.id}${x.id}` : `${x.id}${user.id}`;
+          console.log("ACTU ID", actualChatId);
+          let lastMessage = chats[actualChatId]
+            ? chats[actualChatId].lastMessage
+            : null;
+          if (!lastMessage) {
+            lastMessage = {
+              date: 0,
+              text: "start a chat",
+              seenBy: { [user.id]: { id: user.id } },
+            };
+          }
+          console.log("LAST MESSAGE", lastMessage);
           return (
             <div
               key={uid(x)}
@@ -179,10 +134,13 @@ const AltChat = ({ projectId, user, size }) => {
                 <div className="row no-gutters justify-content-between">
                   <div className="col-auto alt-chat-author">{x.username}</div>
                   <div className="col-auto chat-time d-lg-block d-none">
-                    {lastMessage.date !== 0
+                    {lastMessage.date && lastMessage.date !== 0
                       ? isToday(lastMessage.date)
-                        ? date.format(lastMessage.date, "hh:mm A")
-                        : date.format(lastMessage.date, "hh:mm A MMM DD YYYY")
+                        ? date.format(new Date(lastMessage.date), "hh:mm A")
+                        : date.format(
+                            new Date(lastMessage.date),
+                            "hh:mm A MMM DD YYYY"
+                          )
                       : ""}
                   </div>
                 </div>
@@ -209,6 +167,7 @@ const AltChat = ({ projectId, user, size }) => {
             Object.keys(people).length &&
             chats[chatId].messages ? (
               Object.values(chats[chatId].messages).map((x) => {
+                console.log("TA NESAMONIGA DATA", x.date);
                 return (
                   <div key={uid(x)} className={`row mb-2 no-gutters p-3`}>
                     <div
@@ -223,7 +182,7 @@ const AltChat = ({ projectId, user, size }) => {
                           {people[x.userId].username}
                         </div>
                         <div className="col-auto alt-chat-date">
-                          {isToday(new Date(x.date))
+                          {new Date(x.date) && isToday(new Date(x.date))
                             ? date.format(new Date(x.date), "hh:mm A")
                             : date.format(new Date(x.date), "ddd MMM DD YYYY")}
                         </div>

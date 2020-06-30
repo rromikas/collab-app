@@ -81,14 +81,14 @@ const EditProject = ({ user, projectId }) => {
         <div className="row no-gutters">
           <div
             className="col-auto btn-pro mr-2"
-            onClick={() => editProject(project, user)}
+            onClick={() => {
+              editProject(project, user);
+              history.goBack();
+            }}
           >
             Save changes
           </div>
-          <div
-            className="col-auto btn"
-            onClick={() => history.push(`/${user.id}/projects`)}
-          >
+          <div className="col-auto btn" onClick={() => history.goBack()}>
             Cancel
           </div>
         </div>

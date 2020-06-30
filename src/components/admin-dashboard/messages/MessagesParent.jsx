@@ -4,13 +4,14 @@ import Popover from "../../utility/Popover";
 import store from "../../../store/store";
 import { BsChevronDown } from "react-icons/bs";
 import { uid } from "react-uid";
+import ChatPreviews from "./ChatPreviews";
 
 const MessagesParent = ({ user, size }) => {
-  const [projectId, setProjectId] = useState(
-    user.projects ? Object.keys(user.projects)[0] : 1
-  );
+  const [view, setView] = useState("all");
 
   const projectChooser = useRef(null);
+
+  const [chat, setChat] = useState({ projectId: -1, chatId: -1 });
 
   useEffect(() => {
     store.dispatch({ type: "SET_PAGE_TITLE", pageTitle: "Messages" });
@@ -23,6 +24,15 @@ const MessagesParent = ({ user, size }) => {
           <Popover
             content={
               <div className="popover-inner">
+                <div
+                  className="popover-content-item"
+                  onClick={() => {
+                    setView("all");
+                    projectChooser.current.click();
+                  }}
+                >
+                  All
+                </div>
                 {Object.values(user.projects)
                   .filter((x) => x.status !== "Deleted")
                   .map((x) => (
@@ -30,7 +40,7 @@ const MessagesParent = ({ user, size }) => {
                       key={uid(x)}
                       className="popover-content-item"
                       onClick={() => {
-                        setProjectId(x.id);
+                        setView(x.id);
                         projectChooser.current.click();
                       }}
                     >
@@ -45,15 +55,32 @@ const MessagesParent = ({ user, size }) => {
               ref={projectChooser}
             >
               <div className="mr-2">
-                {user.projects[projectId]
-                  ? user.projects[projectId].title
-                  : "Select project"}
+                {user.projects[view] ? user.projects[view].title : "All"}
               </div>
               <BsChevronDown fontSize="14px"></BsChevronDown>
             </div>
           </Popover>
         </div>
-        <Messages projectId={projectId} user={user} size={size}></Messages>
+        <div className="row no-gutters border-top">
+          <div
+            className="col-lg-4 col-auto bg-white"
+            onClick={() => {
+              setChat((prev) =>
+                Object.assign({}, prev, { projectId: -1, chatId: -1 })
+              );
+            }}
+          >
+            <ChatPreviews
+              user={user}
+              view={view}
+              setChat={setChat}
+              chat={chat}
+            ></ChatPreviews>
+          </div>
+          <div className="col-lg-8 col bg-white border-left">
+            <Messages chat={chat} user={user} size={size}></Messages>
+          </div>
+        </div>
       </div>
     </div>
   );

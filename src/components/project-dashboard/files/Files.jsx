@@ -51,7 +51,7 @@ const Files = ({ projectId, user, setProject, size }) => {
   const listHeight =
     size.width > 768
       ? size.height - 24 - 62.4 - 56 - 79.2
-      : size.height - 79.2 - 62.4 - 56;
+      : size.height - 79.2 - 56 - 56;
   const uploader = useRef(null);
   const [folder, setFolder] = useState("");
   const [files, setFiles] = useState([]);

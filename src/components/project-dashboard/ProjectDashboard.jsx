@@ -98,6 +98,7 @@ const ProjectDashboard = ({
           <AltChat projectId={projectId} user={user} size={size}></AltChat>
         ) : section === "time" ? (
           <Times
+            size={size}
             user={user}
             projectId={projectId}
             times={project.times}
@@ -106,7 +107,7 @@ const ProjectDashboard = ({
           subsection === "new" ? (
             <NewRequest projectId={projectId} user={user}></NewRequest>
           ) : (
-            <Requests user={user} projectId={projectId}></Requests>
+            <Requests user={user} projectId={projectId} size={size}></Requests>
           )
         ) : (
           ""

@@ -22,6 +22,7 @@ const NewProject = ({ user }) => {
     id: uniqid("project-"),
     starred: false,
     date: new Date(Date.now()).toString(),
+    members: [],
     people: {
       [user.id]: {
         id: user.id,
