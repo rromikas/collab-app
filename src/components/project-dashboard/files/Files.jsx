@@ -2,43 +2,40 @@ import React, { useRef, useEffect, useState } from "react";
 import {
   BsFolderPlus,
   BsFolder,
-  BsFileEarmark,
   BsFileEarmarkPlus,
+  BsChevronDown,
 } from "react-icons/bs";
 import * as firebase from "../../../database/firebase";
 import date from "date-and-time";
 import { BsChevronLeft } from "react-icons/bs";
 import Loader from "../../utility/Loader";
 import NoFiles from "../../../pictures/NoFiles";
-import NoMessages from "../../../pictures/NoMessages";
+import Popover from "../../utility/Popover";
+import { CreateFolder } from "../../../database/api";
+import Dropbox from "./Dropbox";
+import GoogleDrive from "./GoogleDrive";
+import { FaLaptop } from "react-icons/fa";
+import md5 from "md5";
+import prettyFileIcons from "pretty-file-icons";
+import { Icons } from "../../../pictures/file-icons/index";
+import mime from "mime-types";
+const getMetadata = (metadata, path, filename) => {
+  let myMetadata = { ...metadata };
+  path.forEach((x) => {
+    myMetadata = myMetadata[x];
+  });
+  myMetadata = myMetadata[filename]
+    ? myMetadata[filename].metadata
+    : { uploadedBy: "", previewLink: "", date: new Date() };
+  return myMetadata;
+};
 
-const handleFileUpload = (e, projectId, user, setFiles, setLoading, folder) => {
+const handleFileUpload = (e, path, user, projectId, onFinish = () => {}) => {
   let file = e.target.files[0];
-  var metadata = {
-    customMetadata: {
-      uploadedBy: user.username,
-    },
-  };
   if (file) {
     if (file.size < 10000000) {
       if (file.name.length < 40) {
-        firebase.UploadFile(
-          `${projectId}/${folder ? folder : file.name}/${file.name}`,
-          file,
-          metadata,
-          (res) => console.log(res),
-          (err) => console.log("error uploading file", err),
-          (final) => {
-            let fileNames = final.fullPath.split("/");
-            let newFile = {
-              name: fileNames[folder ? fileNames.length - 1 : 1],
-              uploadedBy: user.username,
-              timeCreated: date.format(new Date(), "MMM DD, YYYY"),
-            };
-            setFiles((f) => f.concat(newFile));
-            setLoading(false);
-          }
-        );
+        firebase.UploadFile(path, file, user.username, onFinish, projectId);
       } else {
         alert("file name is too long");
       }
@@ -48,53 +45,40 @@ const handleFileUpload = (e, projectId, user, setFiles, setLoading, folder) => {
   }
 };
 
-const Files = ({ projectId, user, setProject, size }) => {
+const Files = ({ projectId, user, setProject, size, metadata }) => {
   const listHeight =
     size.width > 768
       ? size.height - 24 - 62.4 - 56 - 79.2
       : size.height - 79.2 - 56 - 56;
   const uploader = useRef(null);
-  const [folder, setFolder] = useState("");
-  const [files, setFiles] = useState([]);
+  const folderMaker = useRef(null);
+  const fileUploadMaker = useRef(null);
+  const sortMaker = useRef(null);
+  const [fileSystem, setFileSystem] = useState({ prefixes: [], items: [] });
   const [loading, setLoading] = useState(false);
+  const [path, setPath] = useState([projectId]);
+  const [newFolder, setNewFolder] = useState("");
+  const [tick, setTick] = useState(false);
+  const [filter, setFilter] = useState("date");
   useEffect(() => {
-    if (folder === "") {
-      setLoading(true);
-      firebase.GetFiles(projectId).then((res) => {
-        setFiles(res);
-        setLoading(false);
-      });
-    } else {
-      setLoading(true);
-      async function fetchMyAPI() {
-        let path = `${projectId}/${folder}`;
-        firebase.GetFiles(path).then(async (res) => {
-          let newFiles = [];
-          for (let i = 0; i < res.length; i++) {
-            let newFile = {
-              name: res[i].name,
-              uploadedBy: "",
-              downloadUrl: "",
-              timeCreated: "",
-            };
-            let metadata = await res[i].getMetadata();
-            newFile.uploadedBy = metadata.customMetadata.uploadedBy;
-            newFile.timeCreated = date.format(
-              new Date(metadata.timeCreated),
-              "MMM DD, YYYY"
-            );
-            let url = await res[i].getDownloadURL();
-            newFile.downloadUrl = url;
-            newFiles.push(newFile);
-          }
-          setFiles(newFiles);
-          setLoading(false);
+    let pathString = path.reduce(
+      (a, b) => a.toString() + "/" + b.toString(),
+      ""
+    );
+    firebase.GetFiles(pathString).then((res) => {
+      let items = [];
+      if (Object.values(metadata).length) {
+        res.items.forEach((x) => {
+          let hashedName = md5(x.name);
+          let fileMetadata = getMetadata(metadata, path, hashedName);
+          let item = Object.assign({}, fileMetadata, { name: x.name });
+          items.push(item);
         });
       }
 
-      fetchMyAPI();
-    }
-  }, [projectId, folder]);
+      setFileSystem({ prefixes: res.prefixes, items: items });
+    });
+  }, [path, tick, metadata]);
 
   return (
     <div className="row no-gutters position-relative px-2">
@@ -105,103 +89,271 @@ const Files = ({ projectId, user, setProject, size }) => {
       ) : (
         <div className="col-12">
           <div
-            className="row no-gutters align-items-center p-3"
+            className="row no-gutters align-items-center p-3 justify-content-between"
             style={{ fontSize: "21px" }}
           >
-            {folder ? (
-              <React.Fragment>
-                <div
-                  className="col-auto mr-1 cursor-pointer"
-                  onClick={() => setFolder("")}
-                >
-                  <BsChevronLeft fontSize="12px"></BsChevronLeft>
-                </div>
-                <div
-                  className="col-auto mr-2 cursor-pointer"
-                  onClick={() => setFolder("")}
-                  style={{ fontSize: "14px" }}
-                >
-                  Folders /
-                </div>
-                <div className="col-auto mr-2">
-                  {folder.length > 13
-                    ? folder.substring(0, 13) + "..."
-                    : folder}
-                </div>
-              </React.Fragment>
-            ) : (
-              <div className="col-auto mr-2">All folders</div>
-            )}
-            <div className="col-auto p-2">
-              {!folder ? (
-                <BsFolderPlus
-                  fontSize="25px"
-                  className="clickable-item"
-                  onClick={() => {
-                    uploader.current.click();
-                  }}
-                ></BsFolderPlus>
-              ) : (
-                <BsFileEarmarkPlus
-                  fontSize="25px"
-                  className="clickable-item"
-                  onClick={() => {
-                    uploader.current.click();
-                  }}
-                ></BsFileEarmarkPlus>
-              )}
-
-              <input
-                type="file"
-                style={{ display: "none" }}
-                ref={uploader}
-                onChange={(e) => {
-                  setLoading(true);
-                  handleFileUpload(
-                    e,
-                    projectId,
-                    user,
-                    setFiles,
-                    setLoading,
-                    folder
-                  );
-                }}
-              ></input>
-            </div>
-          </div>
-          <div className="row no-gutters">
-            <div
-              className="col-12 overflow-auto"
-              style={{ height: `${listHeight}px` }}
-            >
+            <div className="col-auto">
               <div className="row no-gutters">
-                {files.length ? (
-                  files.map((x) => {
+                <Popover
+                  content={
+                    <div className="popover-inner">
+                      <div className="popover-label">name</div>
+                      <div className="mb-2">
+                        <input
+                          type="text"
+                          className="w-100"
+                          value={newFolder}
+                          onChange={(e) => {
+                            e.persist();
+                            setNewFolder(e.target.value);
+                          }}
+                        ></input>
+                      </div>
+                      <div
+                        className="d-flex mx-auto justify-content-center"
+                        style={{ maxWidth: "250px" }}
+                      >
+                        <div
+                          className="col-auto btn-pro mr-1"
+                          onClick={() => {
+                            firebase.CreateFolder(
+                              path.reduce(
+                                (a, b) => a.toString() + "/" + b.toString(),
+                                ""
+                              ) +
+                                "/" +
+                                newFolder.toString(),
+                              user,
+                              projectId,
+                              () => setTick(!tick)
+                            );
+                            folderMaker.current.click();
+                            setNewFolder("");
+                          }}
+                        >
+                          Create
+                        </div>
+                        <div
+                          className="col-auto btn"
+                          onClick={() => folderMaker.current.click()}
+                        >
+                          Cancel
+                        </div>
+                      </div>
+                    </div>
+                  }
+                >
+                  <div className="col-auto mr-2 btn-pro" ref={folderMaker}>
+                    <BsFolderPlus
+                      fontSize="20px"
+                      color="white"
+                      className="mr-2"
+                    ></BsFolderPlus>
+                    Add Folder
+                  </div>
+                </Popover>
+                <Popover
+                  content={
+                    <div className="popover-inner">
+                      <div
+                        className="popover-content-item"
+                        onClick={() => uploader.current.click()}
+                      >
+                        <FaLaptop className="mr-2"></FaLaptop>Local files
+                        <input
+                          className="d-none"
+                          type="file"
+                          ref={uploader}
+                          onChange={(e) =>
+                            handleFileUpload(
+                              e,
+                              path.reduce(
+                                (a, b) => a.toString() + "/" + b.toString(),
+                                ""
+                              ),
+                              user,
+                              projectId,
+                              () => {
+                                setTick(!tick);
+                                fileUploadMaker.current.click();
+                              }
+                            )
+                          }
+                        ></input>
+                      </div>
+                      <div className="popover-content-item">
+                        <Dropbox
+                          path={path.reduce(
+                            (a, b) => a.toString() + "/" + b.toString(),
+                            ""
+                          )}
+                          user={user}
+                          projectId={projectId}
+                          onFinish={() => {
+                            setTick(!tick);
+                            fileUploadMaker.current.click();
+                          }}
+                        ></Dropbox>
+                      </div>
+                      <div className="popover-content-item">
+                        <GoogleDrive
+                          path={path.reduce(
+                            (a, b) => a.toString() + "/" + b.toString(),
+                            ""
+                          )}
+                          user={user}
+                          projectId={projectId}
+                          onFinish={() => {
+                            setTick(!tick);
+                            fileUploadMaker.current.click();
+                          }}
+                        ></GoogleDrive>
+                      </div>
+                    </div>
+                  }
+                >
+                  <div className="col-auto mr-2 btn-pro" ref={fileUploadMaker}>
+                    <BsFileEarmarkPlus
+                      color="white"
+                      fontSize="20px"
+                      className="mr-2"
+                    ></BsFileEarmarkPlus>
+                    Add File
+                  </div>
+                </Popover>
+              </div>
+            </div>
+            <Popover
+              content={
+                <div className="popover-inner">
+                  <div
+                    className="popover-content-item"
+                    onClick={() => {
+                      setFilter("date");
+                      sortMaker.current.click();
+                    }}
+                  >
+                    Date modified
+                  </div>
+                  <div
+                    className="popover-content-item"
+                    onClick={() => {
+                      setFilter("name");
+                      sortMaker.current.click();
+                    }}
+                  >
+                    Name
+                  </div>
+                </div>
+              }
+            >
+              <div
+                className="col-auto btn d-flex align-items-center"
+                ref={sortMaker}
+              >
+                <div className="mr-2">Sort by: {filter}</div>
+                <BsChevronDown fontSize="14px"></BsChevronDown>
+              </div>
+            </Popover>
+          </div>
+          <div className="row no-gutters px-3">
+            {path.map((x, i) => (
+              <div className="col-auto">
+                <div className="row no-gutters">
+                  <div
+                    className="col-auto mr-1 btn-link cursor-pointer"
+                    onClick={() =>
+                      setPath((p) => {
+                        let arr = [...p];
+                        arr = arr.slice(0, i + 1);
+                        return arr;
+                      })
+                    }
+                  >
+                    {x !== projectId ? x : "home"}
+                  </div>
+                  <div className="col-auto mr-1">/</div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div
+            className="row no-gutters p-3"
+            style={{ minHeight: `${listHeight}px` }}
+          >
+            <div className="col-12">
+              <div className="row no-gutters">
+                {fileSystem.prefixes.map((x) => {
+                  return (
+                    <div
+                      className="col-12 col-sm-4 col-lg-3 col-xl-2 file-card p-3 clickable-item"
+                      onClick={() => setPath((p) => p.concat([x.name]))}
+                    >
+                      <div className="row no-gutters align-items-center">
+                        <div className="col-auto col-sm-12">
+                          <div className="text-sm-center mr-2">
+                            <BsFolder
+                              className="clickable-item"
+                              fontSize="50px"
+                            ></BsFolder>
+                          </div>
+                        </div>
+                        <div className="col col-sm-12">
+                          <div className="row no-gutters">
+                            <div
+                              className="text-sm-center file-name-fixed mr-2 col-12"
+                              style={{ fontSize: "14px" }}
+                            >
+                              {x.name.length > 13
+                                ? x.name.substring(0, 13) + "..."
+                                : x.name}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+                {fileSystem.items
+                  .filter((x) => x.name !== "placeholder-rare-name")
+                  .sort((a, b) =>
+                    a[filter] > b[filter]
+                      ? filter === "date"
+                        ? -1
+                        : 1
+                      : a[filter] < b[filter]
+                      ? filter === "date"
+                        ? 1
+                        : -1
+                      : 0
+                  )
+                  .map((x) => {
                     return (
                       <div
-                        className="col-12 col-sm-4 col-lg-3 col-xl-2 file-card p-4 clickable-item"
-                        onClick={() => {
-                          if (folder) {
-                            window.open(x.downloadUrl);
+                        className="col-12 col-sm-4 col-lg-3 col-xl-2 file-card p-3 clickable-item"
+                        onClick={async () => {
+                          if (x.fileProvider === "local files") {
+                            let url = await x.getDownloadURL();
+                            window.open(url);
                           } else {
-                            setFolder(x.name);
+                            window.open(x.previewLink);
                           }
                         }}
                       >
                         <div className="row no-gutters align-items-center">
                           <div className="col-auto col-sm-12">
                             <div className="text-sm-center mr-2">
-                              {folder ? (
-                                <BsFileEarmark
-                                  className="clickable-item"
-                                  fontSize="calc(2.5em + 3vw)"
-                                ></BsFileEarmark>
-                              ) : (
-                                <BsFolder
-                                  className="clickable-item"
-                                  fontSize="calc(2.5em + 3vw)"
-                                ></BsFolder>
-                              )}
+                              <img
+                                style={{ width: "50px" }}
+                                className="image-fluid"
+                                src={
+                                  x.fileProvider === "google drive"
+                                    ? Icons[mime.extension(x.mimeType)]
+                                      ? Icons[mime.extension(x.mimeType)]
+                                      : Icons["unknown"]
+                                    : Icons[mime.extension(mime.lookup(x.name))]
+                                }
+                              ></img>
                             </div>
                           </div>
                           <div className="col col-sm-12">
@@ -214,53 +366,41 @@ const Files = ({ projectId, user, setProject, size }) => {
                                   ? x.name.substring(0, 13) + "..."
                                   : x.name}
                               </div>
-                              {folder ? (
-                                <div
-                                  className="justify-content-sm-center col-12 d-flex"
-                                  style={{ fontSize: "14px" }}
-                                >
-                                  <div className="mr-2">By:</div>
-                                  <div className="text-primary">
-                                    {x.uploadedBy}
-                                  </div>
-                                </div>
-                              ) : (
-                                ""
-                              )}
-                              {x.timeCreated && (
-                                <div
-                                  className="text-sm-center col-12"
-                                  style={{ fontSize: "14px" }}
-                                >
-                                  {x.timeCreated}
-                                </div>
-                              )}
+                            </div>
+                            <div className="row no-gutters">
+                              <div
+                                className="text-sm-center file-name-fixed mr-2 col-12"
+                                style={{ fontSize: "14px" }}
+                              >
+                                by {x.uploadedBy}
+                              </div>
+                            </div>
+                            <div className="row no-gutters">
+                              <div
+                                className="text-sm-center file-name-fixed mr-2 col-12"
+                                style={{ fontSize: "14px" }}
+                              >
+                                {date.format(new Date(x.date), "DD MMM, YYYY")}
+                              </div>
                             </div>
                           </div>
                         </div>
                       </div>
                     );
-                  })
-                ) : (
+                  })}
+              </div>
+              <div className="row no-gutters h-100 justify-content-center align-items-center">
+                <div className="col-lg-4 col-5">
                   <div
-                    className="col-lg-4 col-5 mx-auto"
-                    style={{
-                      position: "absolute",
-                      left: 0,
-                      right: 0,
-                      top: 0,
-                      bottom: 0,
-                      margin: "auto",
-                    }}
+                    className="row no-gutters"
+                    style={{ transform: `translate(-20px, -79px)` }}
                   >
-                    <div
-                      className="h-100 row no-gutters align-items-center"
-                      style={{ transform: "translate(-20px, -79px)" }}
-                    >
-                      <NoFiles></NoFiles>
-                    </div>
+                    {!fileSystem.items.filter(
+                      (x) => x.name !== "placeholder-rare-name"
+                    ).length &&
+                      !fileSystem.prefixes.length && <NoFiles></NoFiles>}
                   </div>
-                )}
+                </div>
               </div>
             </div>
           </div>

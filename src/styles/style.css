@@ -10921,6 +10921,51 @@ body {
   color: #8e8e8e !important;
 }
 
+.calendar-btn {
+  border: 2px solid #dadada !important;
+  line-height: 28px !important;
+  color: #737373 !important;
+  font-weight: 500 !important;
+  height: 32px !important;
+  padding: 0 16px !important;
+  font-size: 14px !important;
+  -webkit-transition: all 0.3s;
+  transition: all 0.3s;
+  cursor: pointer;
+}
+
+.calendar-btn:hover {
+  border: 2px solid #0a80ff !important;
+  text-decoration: none !important;
+  color: #8e8e8e !important;
+}
+
+.calendar-btn-left {
+  border-radius: 30px 0 0 30px;
+}
+
+.calendar-btn-right {
+  border-radius: 0 30px 30px 0;
+}
+
+.calendar-btn-center {
+  border-top: 2px solid #dadada !important;
+  border-bottom: 2px solid #dadada !important;
+  line-height: 28px !important;
+  color: #737373 !important;
+  font-weight: 500 !important;
+  height: 32px !important;
+  padding: 0 16px !important;
+  font-size: 14px !important;
+}
+
+.calendar-toolbar {
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+}
+
 .menu-item {
   height: 47px;
   line-height: 47px;

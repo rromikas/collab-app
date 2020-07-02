@@ -2,7 +2,14 @@ import React from "react";
 import { uid } from "react-uid";
 import history from "../../../history";
 
-const ownerItems = ["Files", "Messages", "Calendar", "Time", "Requests"];
+const ownerItems = [
+  "Files",
+  "Notes",
+  "Messages",
+  "Calendar",
+  "Time",
+  "Requests",
+];
 const clientItems = ["Files", "Messages", "Calendar", "Requests"];
 const Navbar = ({ projectId, page, userId, people }) => {
   const permissions = people[userId] ? people[userId].permissions : "client";

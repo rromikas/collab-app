@@ -9,6 +9,7 @@ import AltChat from "./messages/AltChat";
 import Requests from "./requests/Requests";
 import NewRequest from "./requests/NewRequest";
 import Request from "./requests/Request";
+import Notes from "./notes/Notes";
 
 const ProjectDashboard = ({
   projectId,
@@ -89,9 +90,16 @@ const ProjectDashboard = ({
             size={size}
             projectId={projectId}
             user={user}
-            files={project.files}
             setProject={setProject}
+            metadata={project.files ? project.files : {}}
           ></Files>
+        ) : section === "notes" ? (
+          <Notes
+            size={size}
+            notes={project.notes ? project.notes : {}}
+            projectId={projectId}
+            user={user}
+          ></Notes>
         ) : section === "messages" ? (
           <AltChat projectId={projectId} user={user} size={size}></AltChat>
         ) : section === "time" ? (

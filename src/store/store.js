@@ -53,11 +53,20 @@ function backlinkReducer(state = { title: "", path: "" }, action) {
   }
 }
 
+function calendarDateReducer(state = new Date(), action) {
+  switch (action.type) {
+    case "SET_CALENDAR_DATE":
+      return action.calendarDate;
+    default:
+      return state;
+  }
+}
 const rootReducer = combineReducers({
   user: userReducer,
   pageTitle: pageTitleReducer,
   backlink: backlinkReducer,
   size: sizeReducer,
+  calendarDate: calendarDateReducer,
 });
 
 const store = createStore(

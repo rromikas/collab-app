@@ -78,11 +78,13 @@ const AltChat = ({ projectId, user, size }) => {
   }, [chatId]);
 
   useEffect(() => {
-    let newChatId =
-      chatPerson < user.id
-        ? `${chatPerson}${user.id}`
-        : `${user.id}${chatPerson}`;
-    setChatId(newChatId);
+    if (chatPerson) {
+      let newChatId =
+        chatPerson < user.id
+          ? `${chatPerson}${user.id}`
+          : `${user.id}${chatPerson}`;
+      setChatId(newChatId);
+    }
   }, [chatPerson]);
 
   return (
@@ -230,6 +232,16 @@ const AltChat = ({ projectId, user, size }) => {
                 <input
                   disabled={chatId === 1}
                   value={newMessage.text}
+                  onKeyUp={(e) => {
+                    if (e.keyCode === 13) {
+                      if (chatId !== 1) {
+                        sendMessage(newMessage, projectId, chatId);
+                        setNewMessage((m) =>
+                          Object.assign({}, m, { text: "" })
+                        );
+                      }
+                    }
+                  }}
                   onChange={(e) => {
                     e.persist();
                     setNewMessage((m) =>
@@ -246,6 +258,7 @@ const AltChat = ({ projectId, user, size }) => {
                   onClick={() => {
                     if (chatId !== 1) {
                       sendMessage(newMessage, projectId, chatId);
+                      setNewMessage((m) => Object.assign({}, m, { text: "" }));
                     }
                   }}
                 >

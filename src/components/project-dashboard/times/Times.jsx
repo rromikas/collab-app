@@ -6,8 +6,11 @@ import * as firebase from "../../../database/firebase";
 import NoTimes from "../../../pictures/NoTimes";
 
 const formatNumber = (number) => {
-  var formattedNumber = ("0" + number).slice(-2);
-  return formattedNumber;
+  let word = number.toString();
+  while (word.length < 2) {
+    word = "0" + word;
+  }
+  return word;
 };
 
 const calculateTotalTime = (times) => {
@@ -27,11 +30,13 @@ const calculatePersonalTime = (times, username) => {
   let minutes = 0;
   Object.values(times).forEach((x) => {
     Object.values(x).forEach((y) => {
+      console.log("Y", y.minutes, y.creator);
       if (y.creator === username) {
         minutes += y.minutes;
       }
     });
   });
+  console.log("minutes", minutes);
   let h = Math.floor(minutes / 60);
   let m = minutes - h * 60;
   return `${formatNumber(h)}:${formatNumber(m)}`;
@@ -62,16 +67,17 @@ const addTimeRecord = (timeRecord, projectId, onError) => {
 };
 
 const Times = ({ user, projectId, times, size, people }) => {
-  times = times ? times : {};
-  const containerMinHeight =
-    size.width > 768 ? size.height - 56 - 62.4 - 24 : size.height - 56 - 56;
-  const addTimeButton = useRef(null);
-  const [timeRecord, setTimeRecord] = useState({
+  const initialTimeRecord = {
     time: "",
     creator: user.username,
     task: "",
     description: "",
-  });
+  };
+  times = times ? times : {};
+  const containerMinHeight =
+    size.width > 768 ? size.height - 56 - 62.4 - 24 : size.height - 56 - 56;
+  const addTimeButton = useRef(null);
+  const [timeRecord, setTimeRecord] = useState(initialTimeRecord);
   return (
     <div
       className="row no-gutters position-relative px-3 px-md-4 py-3"
@@ -132,6 +138,7 @@ const Times = ({ user, projectId, times, size, people }) => {
                     className="btn-pro col-6 mr-1"
                     onClick={() => {
                       addTimeRecord(timeRecord, projectId, (error) => {});
+                      setTimeRecord(initialTimeRecord);
                       addTimeButton.current.click();
                     }}
                   >

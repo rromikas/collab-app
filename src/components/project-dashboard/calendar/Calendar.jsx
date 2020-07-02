@@ -18,6 +18,7 @@ import TimePicker from "react-time-picker";
 import { BsTrash } from "react-icons/bs";
 import CustomToolbar from "./CustomToolbar";
 import randomColor from "randomcolor";
+import { AddOrEditCalendarEvent } from "../../../database/api";
 const localizer = momentLocalizer(moment); // or globalizeLocalizer
 
 const deleteEvent = (projectId, event) => {
@@ -223,7 +224,7 @@ const Calendar = ({ projectId, people }) => {
               <div className="popover-label text-left">Associate with...</div>
               <div>
                 {Object.values(people).map((x) => (
-                  <div className="d-flex">
+                  <div className="d-flex mb-1">
                     <Checkbox
                       size={25}
                       setChecked={(checked) => {
@@ -259,15 +260,7 @@ const Calendar = ({ projectId, people }) => {
                   className="btn-pro col-6 mr-1"
                   onClick={() => {
                     if (newEvent.title) {
-                      let updates = {};
-
-                      updates[
-                        `projects/${projectId}/events/${date.format(
-                          newEvent.start,
-                          "MM-YYYY"
-                        )}/${newEvent.id}`
-                      ] = newEvent;
-                      firebase.UpdateDatabase(updates);
+                      AddOrEditCalendarEvent(projectId, newEvent);
                       setNewEvent((prev) =>
                         Object.assign({}, prev, {
                           id: uniqid("event-"),
@@ -341,6 +334,14 @@ const Calendar = ({ projectId, people }) => {
         </div>
       </div>
       <div className="col-12">
+        <div className="row no-gutters justify-content-between">
+          <div id="my-toolbar" className="col-auto calendar-toolbar m-3"></div>
+          <div
+            id="my-datebox"
+            className="col-auto m-3 d-none d-sm-block"
+            style={{ width: "145px", textAlign: "right" }}
+          ></div>
+        </div>
         <div className="row no-gutters">
           {Object.values(people).map((x) => (
             <div className="col-auto px-3 py-2">

@@ -5,6 +5,7 @@ import * as firebase from "../../../database/firebase";
 import uniqid from "uniqid";
 import NoMessages from "../../../pictures/NoMessages";
 import ChatsPreview from "./ChatPreviews";
+import { SendMessage, MarkMessageAsSeen } from "../../../database/api";
 
 const sliceObject = (obj, property) => {
   let newObj = { ...obj };
@@ -20,18 +21,6 @@ const isToday = (someDate) => {
     someDate.getMonth() == today.getMonth() &&
     someDate.getFullYear() == today.getFullYear()
   );
-};
-
-const sendMessage = (message, projectId, chatId) => {
-  let updates = {};
-  let id = uniqid("message-");
-  updates[
-    `projects/${projectId}/messages/${chatId}/messages/${id}`
-  ] = Object.assign({}, message, { date: new Date(), id: id });
-  updates[
-    `projects/${projectId}/messages/${chatId}/lastMessage`
-  ] = Object.assign({}, message, { date: new Date(), id: id });
-  firebase.UpdateDatabase(updates);
 };
 
 const Messages = ({ user, size, chat }) => {
@@ -76,11 +65,7 @@ const Messages = ({ user, size, chat }) => {
   useEffect(() => {
     let lastMessage = messages.lastMessage;
     if (lastMessage) {
-      let updates = {};
-      updates[
-        `projects/${chat.projectId}/messages/${chat.chatId}/lastMessage/seenBy/${user.id}`
-      ] = { id: user.id };
-      firebase.UpdateDatabase(updates);
+      MarkMessageAsSeen(chat, user);
     }
     if (messagesEnd.current) {
       messagesEnd.current.scrollIntoView();
@@ -172,7 +157,7 @@ const Messages = ({ user, size, chat }) => {
               className="btn-pro col-auto"
               onClick={() => {
                 if (chat.chatId !== -1) {
-                  sendMessage(newMessage, chat.projectId, chat.chatId);
+                  SendMessage(newMessage, chat.projectId, chat.chatId);
                 }
               }}
             >

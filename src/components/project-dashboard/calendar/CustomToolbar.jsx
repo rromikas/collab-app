@@ -1,12 +1,17 @@
-import React from "react";
+import React, { useEffect } from "react";
+import ReactDOM from "react-dom";
 import date from "date-and-time";
 import { BsChevronRight, BsChevronLeft } from "react-icons/bs";
 
-const CustomToolbar = ({ toolbar, setCalendarTime }) => {
-  console.log("toolbar", toolbar);
+const DateBox = ({ toolbar }) => {
+  return date.format(toolbar.date, "MMMM YYYY");
+};
+
+const MyToolbar = ({ toolbar, setCalendarTime }) => {
   return (
-    <div className="d-flex user-select-none py-2 px-3">
+    <div className="row no-gutters">
       <div
+        className="col-auto calendar-btn calendar-btn-left"
         onClick={() => {
           let mDate = toolbar.date;
           let newDate = new Date(mDate.getFullYear(), mDate.getMonth() - 1, 1);
@@ -14,13 +19,16 @@ const CustomToolbar = ({ toolbar, setCalendarTime }) => {
           setCalendarTime(newDate);
         }}
       >
-        <BsChevronLeft
-          fontSize="20px"
-          className="clickable-item"
-        ></BsChevronLeft>
+        <BsChevronLeft fontSize="14px"></BsChevronLeft>
       </div>
-      <div className="px-3">{date.format(toolbar.date, "MM-YYYY")}</div>
       <div
+        className="col-auto calendar-btn-center"
+        style={{ width: "110px", textAlign: "center" }}
+      >
+        {date.format(toolbar.date, "MMM YYYY")}
+      </div>
+      <div
+        className="col-auto calendar-btn calendar-btn-right"
         onClick={() => {
           let mDate = toolbar.date;
           let newDate = new Date(mDate.getFullYear(), mDate.getMonth() + 1, 1);
@@ -28,13 +36,27 @@ const CustomToolbar = ({ toolbar, setCalendarTime }) => {
           setCalendarTime(newDate);
         }}
       >
-        <BsChevronRight
-          fontSize="20px"
-          className="clickable-item"
-        ></BsChevronRight>
+        <BsChevronRight fontSize="14px"></BsChevronRight>
       </div>
     </div>
   );
+};
+
+const CustomToolbar = ({ toolbar, setCalendarTime }) => {
+  useEffect(() => {
+    ReactDOM.render(
+      <MyToolbar
+        toolbar={toolbar}
+        setCalendarTime={setCalendarTime}
+      ></MyToolbar>,
+      document.getElementById("my-toolbar")
+    );
+    ReactDOM.render(
+      <DateBox toolbar={toolbar}></DateBox>,
+      document.getElementById("my-datebox")
+    );
+  });
+  return <div></div>;
 };
 
 export default CustomToolbar;

@@ -8,28 +8,10 @@ import { BsBell } from "react-icons/bs";
 import * as firebase from "../../../database/firebase";
 import { uid } from "react-uid";
 import randomColor from "randomcolor";
-
-const answerToInvitation = (answer, invitation, user) => {
-  let updates = {};
-
-  if (answer === "rejected") {
-    updates[`projects/${invitation.project.id}/people/${user.id}`] = [];
-  } else {
-    updates[`projects/${invitation.project.id}/people/${user.id}`] = {
-      status: answer,
-      permissions: invitation.permissions,
-      photo: user.photo,
-      username: user.username,
-      id: user.id,
-      color: randomColor(),
-      email: user.email,
-    };
-    updates[`users/${user.id}/projects/${invitation.project.id}`] =
-      invitation.project;
-  }
-
-  firebase.UpdateDatabase(updates);
-};
+import {
+  MarkNotificationsAsChecked,
+  AnswerToInvitation,
+} from "../../../database/api";
 
 const Navbar = ({ pageTitle, user, backlink }) => {
   const userPhoto = useRef(null);
@@ -65,14 +47,7 @@ const Navbar = ({ pageTitle, user, backlink }) => {
           style={{ lineHeight: "38px", alignItems: "center" }}
         >
           <Popover
-            onHide={() => {
-              let updates = {};
-              Object.values(unseen).forEach((x) => {
-                updates[`users/${user.id}/notifications/unseen/${x.id}`] = [];
-                updates[`users/${user.id}/notifications/seen/${x.id}`] = x;
-              });
-              firebase.UpdateDatabase(updates);
-            }}
+            onHide={() => MarkNotificationsAsChecked(user)}
             content={
               <div className="popover-inner">
                 <div className="popover-label border-bottom">Unseen</div>
@@ -92,7 +67,7 @@ const Navbar = ({ pageTitle, user, backlink }) => {
                           <div
                             className="btn-pro mr-2"
                             onClick={() =>
-                              answerToInvitation("Accepted", x, user)
+                              AnswerToInvitation("Accepted", x, user)
                             }
                           >
                             Accept
@@ -100,7 +75,7 @@ const Navbar = ({ pageTitle, user, backlink }) => {
                           <div
                             className="btn"
                             onClick={() =>
-                              answerToInvitation("Rejected", x, user)
+                              AnswerToInvitation("Rejected", x, user)
                             }
                           >
                             Reject

@@ -177,7 +177,9 @@ const Request = ({ projectId, requestId, user }) => {
                         {x.user.username}
                       </div>
                       <div className="col-auto alt-chat-date">
-                        {date.format(new Date(x.date), "DD MMM, YYYY")}
+                        {x.date
+                          ? date.format(new Date(x.date), "DD MMM, YYYY")
+                          : ""}
                       </div>
                     </div>
                     <div className="row no-gutters">{x.message}</div>
@@ -195,6 +197,25 @@ const Request = ({ projectId, requestId, user }) => {
               <div className="col">
                 <div className="row no-gutters">
                   <input
+                    onKeyUp={(e) => {
+                      if (e.keyCode === 13) {
+                        let updates = {};
+                        updates[
+                          `projects/${projectId}/requests/${requestId}/discussion/${uniqid(
+                            "message-"
+                          )}`
+                        ] = {
+                          message: newMessage,
+                          date: new Date(),
+                          user: {
+                            photo: user.photo,
+                            username: user.username,
+                          },
+                        };
+                        firebase.UpdateDatabase(updates);
+                        setNewMessage("");
+                      }
+                    }}
                     className="col mr-2"
                     type="text"
                     value={newMessage}
@@ -220,6 +241,7 @@ const Request = ({ projectId, requestId, user }) => {
                         },
                       };
                       firebase.UpdateDatabase(updates);
+                      setNewMessage("");
                     }}
                   >
                     Send

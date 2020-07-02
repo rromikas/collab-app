@@ -14,6 +14,7 @@ import {
 
 const ownerItems = [
   { icon: BsFolder, link: "files" },
+  { icon: BsChatDots, link: "notes" },
   { icon: BsChatDots, link: "messages" },
   { icon: BsCalendar, link: "calendar" },
   { icon: BsClock, link: "time" },

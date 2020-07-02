@@ -77,7 +77,10 @@ const Requests = ({ projectId, user, size }) => {
             .map((x) => (
               <div className="col-xl-6 col-12">
                 <div className="row no-gutters m-3 basic-card p-4">
-                  <div className="col-lg-3 col-4 d-none d-sm-block">
+                  <div
+                    className="col-lg-3 col-4 d-none d-sm-block"
+                    style={{ maxWidth: "220px" }}
+                  >
                     <div
                       className="row no-gutters justify-content-end"
                       style={{
@@ -143,8 +146,36 @@ const Requests = ({ projectId, user, size }) => {
                       <div className="col-12">{x.title}</div>
                     </div>
                     <div className="row no-gutters">
+                      {user.accountType === "client" && (
+                        <React.Fragment>
+                          <div
+                            className="col-auto mr-2 mb-2 btn-pro"
+                            onClick={() => {
+                              let updates = {};
+                              updates[
+                                `projects/${projectId}/requests/${x.id}/status`
+                              ] = "reached";
+                              firebase.UpdateDatabase(updates);
+                            }}
+                          >
+                            Accept
+                          </div>
+                          <div
+                            className="col-auto mr-2 mb-2 btn"
+                            onClick={() => {
+                              let updates = {};
+                              updates[
+                                `projects/${projectId}/requests/${x.id}/status`
+                              ] = "not reached";
+                              firebase.UpdateDatabase(updates);
+                            }}
+                          >
+                            Reject
+                          </div>
+                        </React.Fragment>
+                      )}
                       <div
-                        className="col-auto btn"
+                        className="col-auto btn mb-2"
                         onClick={() =>
                           history.push(
                             `/${user.id}/projects/${projectId}/requests/${x.id}`

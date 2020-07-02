@@ -63,7 +63,6 @@ const Calendar = ({ projectId, projects }) => {
         await Promise.all(
           Object.values(projects).map(async (x) => {
             let data = await firebase.GetFromDatabase(`projects/${x.id}`);
-            console.log("data", data);
             let evts = data.events
               ? data.events[date.format(calendarTime, "MM-YYYY")]
               : null;
@@ -78,8 +77,8 @@ const Calendar = ({ projectId, projects }) => {
           })
         );
         console.log("ALL events", allEvents);
-        setEvents(allEvents);
-        setPeople(allPeople);
+        setEvents((prev) => Object.assign({}, prev, allEvents));
+        setPeople((prev) => Object.assign({}, prev, allPeople));
       }
 
       fetchMyAPI();
@@ -92,7 +91,47 @@ const Calendar = ({ projectId, projects }) => {
           setEvents(data ? data : {});
         });
     }
-  }, [calendarTime, projectId]);
+  }, [projectId]);
+
+  useEffect(() => {
+    if (projectId === "all") {
+      async function fetchMyAPI() {
+        let allEvents = {};
+        let allPeople = {};
+        await Promise.all(
+          Object.values(projects).map(async (x) => {
+            let data = await firebase.GetFromDatabase(`projects/${x.id}`);
+            let evts = data.events
+              ? data.events[date.format(calendarTime, "MM-YYYY")]
+              : null;
+            let ppl = data.people;
+            if (evts) {
+              allEvents = Object.assign({}, allEvents, evts);
+            }
+
+            if (ppl) {
+              allPeople = Object.assign({}, allPeople, ppl);
+            }
+          })
+        );
+        console.log("ALL events", allEvents);
+        setEvents((prev) => Object.assign({}, prev, allEvents));
+        setPeople((prev) => Object.assign({}, prev, allPeople));
+      }
+
+      fetchMyAPI();
+    } else {
+      firebase
+        .GetFromDatabase(
+          `projects/${projectId}/events/${date.format(calendarTime, "MM-YYYY")}`
+        )
+        .then((data) => {
+          let newEvs = data ? data : {};
+          setEvents((prev) => Object.assign({}, prev, newEvs));
+        });
+    }
+  }, [calendarTime]);
+
   return (
     <div
       className="row no-gutters position-relative pb-4"
@@ -446,7 +485,6 @@ const Calendar = ({ projectId, projects }) => {
                   ></CustomToolbar>
                 ),
               }}
-              views={["month"]}
               localizer={localizer}
               events={
                 newEvent.open && newEvent.purpose === "Add new event"
