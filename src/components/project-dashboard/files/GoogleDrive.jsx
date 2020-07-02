@@ -16,7 +16,7 @@ const GoogleDrive = ({ projectId, path, user, onFinish }) => {
       clientId={
         "517770655009-phkgmut015g7nofo2dcagjadg37oqcs2.apps.googleusercontent.com"
       }
-      developerKey={"AIzaSyA6TGZerXm3o6fLsMbA7Z_l3b3IxQq_mcg"}
+      developerKey={"AIzaSyAJkJjkHeFCTixrPQsuqDgTRu5tKK7pDPc"}
       scope={["https://www.googleapis.com/auth/drive.readonly"]}
       onChange={(data) => {
         if (data && data.docs) {
