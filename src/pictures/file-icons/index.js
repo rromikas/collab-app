@@ -86,6 +86,7 @@ export const Icons = {
   wav,
   wma,
   xls,
+  xlsx: xls,
   xml,
   webm: video,
   gsheet: xls,

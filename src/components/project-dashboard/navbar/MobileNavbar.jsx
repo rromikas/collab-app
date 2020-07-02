@@ -10,11 +10,12 @@ import {
   BsChatDots,
   BsPeople,
   BsGraphUp,
+  BsPencil,
 } from "react-icons/bs";
 
 const ownerItems = [
   { icon: BsFolder, link: "files" },
-  { icon: BsChatDots, link: "notes" },
+  { icon: BsPencil, link: "notes" },
   { icon: BsChatDots, link: "messages" },
   { icon: BsCalendar, link: "calendar" },
   { icon: BsClock, link: "time" },
@@ -33,7 +34,6 @@ const generalItems = [
   { name: "Calendar", icon: <BsCalendar fontSize="24px"></BsCalendar> },
   { name: "Messages", icon: <BsChatDots fontSize="24px"></BsChatDots> },
   { name: "People", icon: <BsPeople fontSize="24px"></BsPeople> },
-  { name: "Requests", icon: <BsReply fontSize="24px"></BsReply> },
 ];
 
 const MobileNavbar = ({ projectId, section, page, userId, people }) => {

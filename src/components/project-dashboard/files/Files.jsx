@@ -19,6 +19,7 @@ import md5 from "md5";
 import prettyFileIcons from "pretty-file-icons";
 import { Icons } from "../../../pictures/file-icons/index";
 import mime from "mime-types";
+
 const getMetadata = (metadata, path, filename) => {
   let myMetadata = { ...metadata };
   path.forEach((x) => {
@@ -32,6 +33,7 @@ const getMetadata = (metadata, path, filename) => {
 
 const handleFileUpload = (e, path, user, projectId, onFinish = () => {}) => {
   let file = e.target.files[0];
+  console.log("file simple upload", file);
   if (file) {
     if (file.size < 10000000) {
       if (file.name.length < 40) {
@@ -89,7 +91,7 @@ const Files = ({ projectId, user, setProject, size, metadata }) => {
       ) : (
         <div className="col-12">
           <div
-            className="row no-gutters align-items-center p-3 justify-content-between"
+            className="row no-gutters align-items-center p-3 justify-content-between flex-nowrap"
             style={{ fontSize: "21px" }}
           >
             <div className="col-auto">
@@ -143,13 +145,16 @@ const Files = ({ projectId, user, setProject, size, metadata }) => {
                     </div>
                   }
                 >
-                  <div className="col-auto mr-2 btn-pro" ref={folderMaker}>
+                  <div
+                    className="col-auto mr-2 btn-pro d-flex align-items-center"
+                    ref={folderMaker}
+                  >
                     <BsFolderPlus
                       fontSize="20px"
                       color="white"
-                      className="mr-2"
+                      className="mr-md-2"
                     ></BsFolderPlus>
-                    Add Folder
+                    <div className="d-none d-md-block">Add Folder</div>
                   </div>
                 </Popover>
                 <Popover
@@ -212,13 +217,16 @@ const Files = ({ projectId, user, setProject, size, metadata }) => {
                     </div>
                   }
                 >
-                  <div className="col-auto mr-2 btn-pro" ref={fileUploadMaker}>
+                  <div
+                    className="col-auto mr-2 btn-pro d-flex align-items-center"
+                    ref={fileUploadMaker}
+                  >
                     <BsFileEarmarkPlus
                       color="white"
                       fontSize="20px"
-                      className="mr-2"
+                      className="mr-md-2"
                     ></BsFileEarmarkPlus>
-                    Add File
+                    <div className="d-none d-md-block">Add file</div>
                   </div>
                 </Popover>
               </div>
@@ -244,6 +252,15 @@ const Files = ({ projectId, user, setProject, size, metadata }) => {
                   >
                     Name
                   </div>
+                  <div
+                    className="popover-content-item"
+                    onClick={() => {
+                      setFilter("uploadedBy");
+                      sortMaker.current.click();
+                    }}
+                  >
+                    Author
+                  </div>
                 </div>
               }
             >
@@ -251,7 +268,12 @@ const Files = ({ projectId, user, setProject, size, metadata }) => {
                 className="col-auto btn d-flex align-items-center"
                 ref={sortMaker}
               >
-                <div className="mr-2">Sort by: {filter}</div>
+                <div className="mr-2 d-flex">
+                  <div className="mr-md-2">Sort by</div>
+                  <div className="d-none d-md-block">
+                    {filter === "uploadedBy" ? "author" : filter}
+                  </div>
+                </div>
                 <BsChevronDown fontSize="14px"></BsChevronDown>
               </div>
             </Popover>
