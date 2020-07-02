@@ -323,12 +323,10 @@ const Files = ({ projectId, user, setProject, size, metadata }) => {
                         <div className="col col-sm-12">
                           <div className="row no-gutters">
                             <div
-                              className="text-sm-center file-name-fixed mr-2 col-12"
+                              className="text-sm-center file-name-fixed mr-2 col-12 text-truncate"
                               style={{ fontSize: "14px" }}
                             >
-                              {x.name.length > 13
-                                ? x.name.substring(0, 13) + "..."
-                                : x.name}
+                              {x.name}
                             </div>
                           </div>
                         </div>
@@ -381,12 +379,10 @@ const Files = ({ projectId, user, setProject, size, metadata }) => {
                           <div className="col col-sm-12">
                             <div className="row no-gutters">
                               <div
-                                className="text-sm-center file-name-fixed mr-2 col-12"
+                                className="text-sm-center file-name-fixed mr-2 col-12 text-truncate"
                                 style={{ fontSize: "14px" }}
                               >
-                                {x.name.length > 13
-                                  ? x.name.substring(0, 13) + "..."
-                                  : x.name}
+                                {x.name}
                               </div>
                             </div>
                             <div className="row no-gutters">

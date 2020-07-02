@@ -23,11 +23,12 @@ const AdminDashboard = (props) => {
   const page = props.match.params.page;
   const user = props.user;
   const projects = {};
-  Object.values(user.projects).forEach((x) => {
-    if (x.status !== "Deleted") {
-      projects[x.id] = x;
-    }
-  });
+  user.projects &&
+    Object.values(user.projects).forEach((x) => {
+      if (x.status !== "Deleted") {
+        projects[x.id] = x;
+      }
+    });
   const section = props.match.params.section;
   const subsection = props.match.params.subsection;
   const projectId = props.match.params.projectId;

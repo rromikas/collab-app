@@ -7,22 +7,21 @@ import * as firebase from "../../database/firebase";
 import store from "../../store/store";
 
 const UserDashboard = ({ user, ...rest }) => {
-  const userId = rest.match.params.userId;
   useEffect(() => {
-    if (!user.id === userId) {
+    if (!user.id) {
       history.push("/");
     }
-  }, [userId]);
+  }, [user.id]);
 
   useEffect(() => {
-    firebase.on(`users/${userId}`, (data) => {
+    firebase.on(`users/${user.id}`, (data) => {
       store.dispatch({ type: "SET_USER", user: data });
     });
 
     return function cleanUp() {
-      firebase.off(`users/${userId}`);
+      firebase.off(`users/${user.id}`);
     };
-  }, [userId]);
+  }, [user.id]);
 
   return user.accountType === "client" && true === false ? (
     <ClientDashboard {...rest}></ClientDashboard>

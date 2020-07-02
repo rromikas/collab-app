@@ -11333,8 +11333,9 @@ label {
   font-weight: 700;
   line-height: 21px;
   display: block;
-  color: #8e8e8e;
+  color: #b1afaf;
   line-height: 13px;
+  margin-bottom: 0;
 }
 
 textarea {
@@ -11610,5 +11611,29 @@ input[type="text"]::placeholder {
   font-size: 20px;
   color: #373737;
   font-weight: 600;
+}
+
+.profile-input {
+  border: 1px solid #dadada;
+  border-radius: 10px;
+  outline: none;
+  color: #737373;
+  font-size: 14px;
+  padding: 4px 10px 6px 8px !important;
+  height: 32px;
+  background-color: white;
+  -webkit-transition: all 0.3s ease;
+  transition: all 0.3s ease;
+}
+
+.profile-input:disabled {
+  opacity: 1;
+  border: none;
+  padding: 0px 10px 6px 0px !important;
+}
+
+.profile-input:hover {
+  outline: none;
+  border-color: #0a80ff;
 }
 /*# sourceMappingURL=style.css.map */

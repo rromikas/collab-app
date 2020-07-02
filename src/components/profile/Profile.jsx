@@ -4,8 +4,8 @@ import PhotoUploader from "./PhotoUploader";
 import history from "../../history";
 import store from "../../store/store";
 import date from "date-and-time";
-import Welcome from "../../pictures/Welcome";
-import Moonlight from "../../pictures/Moonlight";
+import * as firebase from "../../database/firebase";
+import { uid } from "react-uid";
 
 const Profile = ({ user, projects }) => {
   const hiddenUploader = useRef(null);
@@ -13,9 +13,29 @@ const Profile = ({ user, projects }) => {
     store.dispatch({ type: "SET_PAGE_TITLE", pageTitle: "Profile" });
   }, []);
 
+  const userDataShema = [
+    "name",
+    "surname",
+    "phone number",
+    "location",
+    "website",
+    "linkedin",
+  ];
+
+  const [userData, setUserData] = useState({
+    name: user.username,
+    surname: user.surname ? user.surname : "",
+    phone: user.phone ? user.phone : "",
+    location: user.location ? user.location : "",
+    website: user.website ? user.website : "",
+    linkedin: user.linkedin ? user.linkedin : "",
+  });
+
+  const [edit, setEdit] = useState(false);
+
   return (
     <div className="row no-gutters justify-content-center">
-      <div className="col-12 col-sm-5 col-md-4 col-lg-3 p-3">
+      <div className="col-12 col-sm-5 col-md-4 col-lg-3 p-3 position-relative">
         <div className="row no-gutters justify-content-center project-card p-4 bg-white">
           <div className="col-12">
             <div
@@ -50,41 +70,67 @@ const Profile = ({ user, projects }) => {
             </div>
           </div>
           <div className="col-12 mx-2 ml-md-3 mr-md-3">
-            <div className="text-center mt-3 h1" style={{ color: "white" }}>
-              {user.name}
+            <div className="text-center mt-3 h1">{user.username}</div>
+          </div>
+          <div className="col-12">
+            {Object.keys(userData)
+              .filter((x) => x !== "password")
+              .map((x) => (
+                <div className="row no-gutters" key={uid(x)}>
+                  <div className="col-12">
+                    <label>{x}</label>
+                    {/* <div style={{ minHeight: "20px" }}>{userData[x]}</div> */}
+                    <div className="w-100 text-center mb-2">
+                      <input
+                        disabled={!edit}
+                        value={userData[x]}
+                        onChange={(e) => {
+                          e.persist();
+                          setUserData((prev) =>
+                            Object.assign({}, prev, { [x]: e.target.value })
+                          );
+                        }}
+                        type="text"
+                        className="w-100 profile-input"
+                      ></input>
+                    </div>
+                  </div>
+                </div>
+              ))}
+          </div>
+          <div className="col-12">
+            <div className="row no-gutters justify-content-center">
+              <div
+                className="col-auto btn mx-1 mb-2"
+                onClick={() => {
+                  if (edit) {
+                    let updates = {};
+                    updates[`users/${user.id}`] = Object.assign(
+                      {},
+                      user,
+                      userData
+                    );
+                    firebase.UpdateDatabase(updates);
+                  }
+                  setEdit(!edit);
+                }}
+              >
+                {edit ? "Save" : "Edit profile"}
+              </div>
+              <div
+                className="col-auto mx-1 btn-pro"
+                onClick={() => {
+                  store.dispatch({
+                    type: "SET_USER",
+                    user: { email: "", id: "", photo: "", name: "" },
+                  });
+                  localStorage["secret_token"] = "";
+                  history.push("/");
+                }}
+              >
+                Logout
+              </div>
             </div>
-          </div>
-          <div className="col-12 text-center mb-2">
-            <input placeholder="name" type="text" className="w-100"></input>
-          </div>
-          <div className="col-12 text-center mb-2">
-            <input placeholder="surname" type="text" className="w-100"></input>
-          </div>
-          <div className="col-12 text-center mb-2">
-            <input
-              placeholder="phone number"
-              type="text"
-              className="w-100"
-            ></input>
-          </div>
-          <div className="col-12 text-center mb-2">
-            <input placeholder="location" type="text" className="w-100"></input>
-          </div>
-          <div className="col-12 text-center mb-2">
-            <input placeholder="website" type="text" className="w-100"></input>
-          </div>
-          <div
-            className="mt-3 col-auto mx-auto btn-pro"
-            onClick={() => {
-              store.dispatch({
-                type: "SET_USER",
-                user: { email: "", _id: "", photo: "", name: "" },
-              });
-              localStorage["secret_token"] = "";
-              history.push("/");
-            }}
-          >
-            Logout
           </div>
         </div>
       </div>
@@ -128,7 +174,11 @@ const Profile = ({ user, projects }) => {
           ))}
         </div>
       ) : (
-        ""
+        <div className="col-12 col-md-8 p-3">
+          <div className="row no-gutters project-card p-4 bg-white">
+            No projects so far
+          </div>
+        </div>
       )}
     </div>
   );
