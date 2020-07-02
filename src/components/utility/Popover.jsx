@@ -1,8 +1,9 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import "react-tippy/dist/tippy.css";
 import { Tooltip } from "react-tippy";
 
 const Popover = ({
+  onOpen = () => {},
   position = "bottom",
   theme = "light",
   content,
@@ -21,8 +22,15 @@ const Popover = ({
       }
     };
   }, []);
+  const [wasShowed, setWasShowed] = useState(false);
   return (
     <Tooltip
+      onShow={() => {
+        if (!wasShowed) {
+          setWasShowed(true);
+          onOpen();
+        }
+      }}
       onHide={onHide}
       delay={delay}
       hideDelay={0}

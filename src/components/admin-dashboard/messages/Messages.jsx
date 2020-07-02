@@ -142,6 +142,16 @@ const Messages = ({ user, size, chat }) => {
             <input
               disabled={chat.chatId === -1}
               value={newMessage.text}
+              onKeyUp={(e) => {
+                if (e.keyCode === 13) {
+                  if (chat.chatId !== -1) {
+                    SendMessage(newMessage, chat.projectId, chat.chatId);
+                    setNewMessage((prev) =>
+                      Object.assign({}, prev, { text: "" })
+                    );
+                  }
+                }
+              }}
               onChange={(e) => {
                 e.persist();
                 setNewMessage((m) =>
@@ -158,6 +168,9 @@ const Messages = ({ user, size, chat }) => {
               onClick={() => {
                 if (chat.chatId !== -1) {
                   SendMessage(newMessage, chat.projectId, chat.chatId);
+                  setNewMessage((prev) =>
+                    Object.assign({}, prev, { text: "" })
+                  );
                 }
               }}
             >

@@ -15,15 +15,9 @@ import {
 
 const Navbar = ({ pageTitle, user, backlink }) => {
   const userPhoto = useRef(null);
-  let notifications = { ...user.notifications };
-  let unseen = notifications.unseen;
-  let seen = notifications.seen;
-  if (!unseen) {
-    unseen = {};
-  }
-  if (!seen) {
-    seen = {};
-  }
+  const bell = useRef(null);
+  let notifications = user.notifications ? user.notifications : {};
+
   return (
     <div className="row no-gutters justify-content-between align-items-center px-3 px-lg-4 py-2 flex-nowrap">
       <div className="col-auto mb-2">
@@ -49,92 +43,138 @@ const Navbar = ({ pageTitle, user, backlink }) => {
           <Popover
             onHide={() => MarkNotificationsAsChecked(user)}
             content={
-              <div className="popover-inner">
+              <div
+                className="popover-inner"
+                style={{ maxHeight: "400px", overflow: "auto" }}
+              >
                 <div className="popover-label border-bottom">Unseen</div>
-                {Object.values(unseen).map((x) => (
-                  <div
-                    className="notification-item d-flex border-bottom"
-                    key={uid(x)}
-                  >
+                {Object.values(notifications)
+                  .filter((x) => !x.seen)
+                  .reverse()
+                  .map((x) => (
                     <div
-                      className="col-auto photo-circle-sm mr-2"
-                      style={{ backgroundImage: `url(${x.photo})` }}
-                    ></div>
-                    <div className="col px-0">
-                      <div className="row no-gutters mb-2">{x.text}</div>
-                      {x.type === "invitation" && (
-                        <div className="row no-gutters w-100 mb-2">
-                          <div
-                            className="btn-pro mr-2"
-                            onClick={() =>
-                              AnswerToInvitation("Accepted", x, user)
-                            }
-                          >
-                            Accept
+                      className="notification-item d-flex border-bottom"
+                      key={uid(x)}
+                    >
+                      <div
+                        className="col-auto photo-circle-sm mr-2"
+                        style={{ backgroundImage: `url(${x.photo})` }}
+                      ></div>
+                      <div className="col px-0">
+                        <div className="row no-gutters mb-2">{x.text}</div>
+                        {x.type === "invitation" && (
+                          <div className="row no-gutters w-100 mb-2">
+                            <div
+                              className="btn-pro mr-2"
+                              onClick={() =>
+                                AnswerToInvitation("Accepted", x, user, x.id)
+                              }
+                            >
+                              Accept
+                            </div>
+                            <div
+                              className="btn"
+                              onClick={() =>
+                                AnswerToInvitation("Rejected", x, user, x.id)
+                              }
+                            >
+                              Reject
+                            </div>
                           </div>
-                          <div
-                            className="btn"
-                            onClick={() =>
-                              AnswerToInvitation("Rejected", x, user)
-                            }
-                          >
-                            Reject
-                          </div>
-                        </div>
-                      )}
+                        )}
 
-                      {x.type === "request" && (
-                        <div className="row no-gutters">
-                          <div
-                            className="col-auto btn-pro"
-                            onClick={() =>
-                              history.push(
-                                `/${user.id}/projects/${x.projectId}/requests/${x.requestId}`
-                              )
-                            }
-                          >
-                            View more
+                        {x.type === "request" && (
+                          <div className="row no-gutters">
+                            <div
+                              className="col-auto btn-pro"
+                              onClick={() => {
+                                history.push(
+                                  `/${user.id}/projects/${x.projectId}/requests/${x.requestId}`
+                                );
+                                bell.current.click();
+                              }}
+                            >
+                              View more
+                            </div>
                           </div>
-                        </div>
-                      )}
-                      <div
-                        className="row no-gutters"
-                        style={{ fontSize: "12px" }}
-                      >
-                        {new Date(x.date).toDateString()}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-                <div className="popover-label border-bottom">Seen</div>
-                {Object.values(seen).map((x) => (
-                  <div className="notification-item d-flex" key={uid(x)}>
-                    <div
-                      className="col-auto photo-circle-sm mr-2"
-                      style={{ backgroundImage: `url(${x.photo})` }}
-                    ></div>
-                    <div className="col">
-                      <div className="row no-gutters">{x.text}</div>
-                      {x.type === "invitation" && (
+                        )}
                         <div
-                          className={`row no-gutters${
-                            x.answer === "Accepted"
-                              ? " text-success"
-                              : " text-danger"
-                          }`}
+                          className="row no-gutters"
+                          style={{ fontSize: "12px" }}
                         >
-                          {x.answer}
+                          {new Date(x.date).toDateString()}
                         </div>
-                      )}
-                      <div
-                        className="row no-gutters"
-                        style={{ fontSize: "12px" }}
-                      >
-                        {new Date(x.date).toDateString()}
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                <div className="popover-label border-bottom">Seen</div>
+                {Object.values(notifications)
+                  .filter((x) => x.seen)
+                  .reverse()
+                  .map((x) => (
+                    <div
+                      className="notification-item d-flex border-bottom"
+                      key={uid(x)}
+                    >
+                      <div
+                        className="col-auto photo-circle-sm mr-2"
+                        style={{ backgroundImage: `url(${x.photo})` }}
+                      ></div>
+                      <div className="col px-0">
+                        <div className="row no-gutters mb-2">{x.text}</div>
+                        {x.status === "asked" ? (
+                          x.type === "invitation" && (
+                            <div className="row no-gutters w-100 mb-2">
+                              <div
+                                className="btn-pro mr-2"
+                                onClick={() =>
+                                  AnswerToInvitation("Accepted", x, user, x.id)
+                                }
+                              >
+                                Accept
+                              </div>
+                              <div
+                                className="btn"
+                                onClick={() =>
+                                  AnswerToInvitation("Rejected", x, user, x.id)
+                                }
+                              >
+                                Reject
+                              </div>
+                            </div>
+                          )
+                        ) : (
+                          <div
+                            className="badge badge-primary"
+                            style={{ fontSize: "14px" }}
+                          >
+                            {x.status}
+                          </div>
+                        )}
+
+                        {x.type === "request" && (
+                          <div className="row no-gutters">
+                            <div
+                              className="col-auto btn-pro"
+                              onClick={() => {
+                                history.push(
+                                  `/${user.id}/projects/${x.projectId}/requests/${x.requestId}`
+                                );
+                              }}
+                            >
+                              View more
+                            </div>
+                          </div>
+                        )}
+                        <div
+                          className="row no-gutters"
+                          style={{ fontSize: "12px" }}
+                        >
+                          {new Date(x.date).toDateString()}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
               </div>
             }
           >
@@ -152,7 +192,7 @@ const Navbar = ({ pageTitle, user, backlink }) => {
                   fontSize: "12px",
                 }}
               >
-                {Object.keys(unseen).length}
+                {Object.values(notifications).filter((x) => !x.seen).length}
               </div>
               <BsBell fontSize="18px" strokeWidth="0.5px"></BsBell>
             </div>

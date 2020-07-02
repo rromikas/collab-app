@@ -22,7 +22,7 @@ const NewRequest = ({ user, projectId, people }) => {
   const [problem, setProblem] = useState("");
 
   return (
-    <div className="row no-gutters">
+    <div className="row no-gutters h-100">
       <div className="col-12 new-project p-4">
         <div
           className="row no-gutters align-items-center mb-3"
@@ -112,15 +112,17 @@ const NewRequest = ({ user, projectId, people }) => {
                   ] = request;
                   Object.values(people).forEach((p) => {
                     if (p.id !== user.id) {
+                      let notificationId = uniqid("notification-");
                       updates[
-                        `users/${p.id}/notifications/unseen/${request.id}`
+                        `users/${p.id}/notifications/${notificationId}`
                       ] = {
+                        seen: false,
                         photo: request.creator.photo,
                         text: `${request.creator.username} created new request`,
                         type: "request",
                         requestId: request.id,
                         projectId: request.projectId,
-                        id: request.id,
+                        id: notificationId,
                         date: new Date(Date.now()),
                       };
                     }

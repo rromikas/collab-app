@@ -37,7 +37,7 @@ const EditProject = ({ user, projectId }) => {
     };
   }, []);
   return (
-    <div className="row no-gutters px-2 px-md-3 px-lg-4">
+    <div className="row no-gutters px-2 px-md-3 px-lg-4 h-100 pb-0 pb-md-4">
       <div className="col-12 new-project p-4">
         <div className="row no-gutters">
           <label>Project name*</label>

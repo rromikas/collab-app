@@ -473,7 +473,6 @@ label {
   display: block;
   color: $color-500;
   line-height: 13px;
-  margin-bottom: 0;
 }
 
 textarea {
@@ -514,7 +513,7 @@ input[type="text"]::placeholder {
 
 .new-project {
   box-shadow: $shadow-primary;
-  border-radius: 0.5rem !important;
+  border-radius: 0.5rem;
   overflow: hidden;
   background: white;
 }
@@ -645,12 +644,12 @@ input[type="text"]::placeholder {
 }
 
 .project-card-corners {
-  border-radius: 0.5rem;
+  border-radius: 0.5rem !important;
 }
 
 @media only screen and (max-width: 768px) {
   .project-card-corners {
-    border-radius: 0;
+    border-radius: 0 !important;
   }
 }
 

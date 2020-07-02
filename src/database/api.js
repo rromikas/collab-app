@@ -6,15 +6,20 @@ import date from "date-and-time";
 export const MarkNotificationsAsChecked = (user) => {
   let updates = {};
   let notifications = user.notifications ? user.notifications : {};
-  let unseen = notifications.unseen ? notifications.unseen : {};
-  Object.values(unseen).forEach((x) => {
-    updates[`users/${user.id}/notifications/unseen/${x.id}`] = [];
-    updates[`users/${user.id}/notifications/seen/${x.id}`] = x;
-  });
+  Object.values(notifications)
+    .filter((x) => !x.seen)
+    .forEach((x) => {
+      updates[`users/${user.id}/notifications/${x.id}/seen`] = true;
+    });
   firebase.UpdateDatabase(updates);
 };
 
-export const AnswerToInvitation = (answer, invitation, user) => {
+export const AnswerToInvitation = (
+  answer,
+  invitation,
+  user,
+  notificationId
+) => {
   let updates = {};
 
   if (answer === "rejected") {
@@ -31,6 +36,7 @@ export const AnswerToInvitation = (answer, invitation, user) => {
     };
     updates[`users/${user.id}/projects/${invitation.project.id}`] =
       invitation.project;
+    updates[`users/${user.id}/notifications/${notificationId}/status`] = answer;
   }
 
   firebase.UpdateDatabase(updates);

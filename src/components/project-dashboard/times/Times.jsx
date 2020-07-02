@@ -178,7 +178,7 @@ const Times = ({ user, projectId, times, size, people }) => {
           </div>
         </div>
 
-        <div className="row no-gutters">
+        <div className="row no-gutters" style={{ minHeight: "60%" }}>
           <div className="col-12">
             {Object.keys(times).length ? (
               Object.keys(times).map((x) => (
@@ -198,7 +198,7 @@ const Times = ({ user, projectId, times, size, people }) => {
             ) : (
               <div
                 className="row no-gutters justify-content-center align-items-center"
-                style={{ height: "440px" }}
+                style={{ height: "100%" }}
               >
                 <div className="col-lg-4 col-md-5 col-6">
                   <NoTimes></NoTimes>

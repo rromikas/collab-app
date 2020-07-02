@@ -11,19 +11,21 @@ import { BsChevronDown } from "react-icons/bs";
 import { uid } from "react-uid";
 
 const sendInvitation = (invitation, user) => {
-  let id = uniqid("invitation-");
+  let id = uniqid("notification-");
   let updates = {};
   updates[
     `projects/${invitation.project.id}/people/${md5(invitation.toWhom)}`
   ] = { status: "invited", email: invitation.toWhom };
-  updates[`users/${md5(invitation.toWhom)}/notifications/unseen/${id}`] = {
+  updates[`users/${md5(invitation.toWhom)}/notifications/${id}`] = {
     permissions: invitation.permissions,
     photo: user.photo,
+    status: "asked",
     text: `${user.username} invited you to the project "${invitation.project.title}"`,
     type: "invitation",
     project: invitation.project,
     id: id,
     date: new Date(Date.now()),
+    seen: false,
   };
   firebase.UpdateDatabase(updates);
 };

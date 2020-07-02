@@ -65,7 +65,7 @@ const ProjectDashboard = ({
   }, [projectId]);
 
   return (
-    <div className="row no-gutters px-0 py-0 pb-md-4 px-md-4 mh-100">
+    <div className="row no-gutters px-0 py-0 pb-md-4 px-md-4 h-100">
       <div className="col-12 collab-project bg-white mh-100 project-card-corners">
         <Navbar
           projectId={projectId}

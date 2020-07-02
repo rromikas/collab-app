@@ -48,7 +48,7 @@ const AdminDashboard = (props) => {
         )}
 
         <div className="col mh-100 overflow-auto">
-          <div className="row no-gutters">
+          <div className="row no-gutters h-100">
             <div
               className={`col-12 col-xl-${
                 user.accountType === "client" ? "10" : "12"
