@@ -4,7 +4,6 @@ import { BsChevronDown } from "react-icons/bs";
 import { uid } from "react-uid";
 import Calendar from "./Calendar";
 import store from "../../../store/store";
-import MyToolbar from "./MyToolbar";
 
 const CalendarsParent = ({ user, projects }) => {
   const projectChooser = useRef(null);
@@ -30,7 +29,7 @@ const CalendarsParent = ({ user, projects }) => {
                     >
                       All
                     </div>
-                    {Object.values(user.projects)
+                    {Object.values(projects)
                       .filter((x) => x.status !== "Deleted")
                       .map((x) => (
                         <div

@@ -67,6 +67,7 @@ export const Icons = {
   json,
   mdf,
   mp2,
+  mpga: mp3,
   mp3,
   mp4,
   mxf,

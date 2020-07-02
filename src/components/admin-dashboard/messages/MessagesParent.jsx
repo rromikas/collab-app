@@ -5,6 +5,7 @@ import store from "../../../store/store";
 import { BsChevronDown } from "react-icons/bs";
 import { uid } from "react-uid";
 import ChatPreviews from "./ChatPreviews";
+import { object } from "firebase-functions/lib/providers/storage";
 
 const MessagesParent = ({ user, size }) => {
   const [view, setView] = useState("all");
@@ -12,6 +13,7 @@ const MessagesParent = ({ user, size }) => {
   const projectChooser = useRef(null);
 
   const [chat, setChat] = useState({ projectId: -1, chatId: -1 });
+  const projects = user.projects ? user.projects : {};
 
   useEffect(() => {
     store.dispatch({ type: "SET_PAGE_TITLE", pageTitle: "Messages" });
@@ -28,12 +30,11 @@ const MessagesParent = ({ user, size }) => {
                   className="popover-content-item"
                   onClick={() => {
                     setView("all");
-                    projectChooser.current.click();
                   }}
                 >
                   All
                 </div>
-                {Object.values(user.projects)
+                {Object.values(projects)
                   .filter((x) => x.status !== "Deleted")
                   .map((x) => (
                     <div
@@ -41,6 +42,9 @@ const MessagesParent = ({ user, size }) => {
                       className="popover-content-item"
                       onClick={() => {
                         setView(x.id);
+                        setChat((prev) =>
+                          Object.assign({}, prev, { chatId: "" })
+                        );
                         projectChooser.current.click();
                       }}
                     >
@@ -55,7 +59,7 @@ const MessagesParent = ({ user, size }) => {
               ref={projectChooser}
             >
               <div className="mr-2">
-                {user.projects[view] ? user.projects[view].title : "All"}
+                {projects[view] ? projects[view].title : "All"}
               </div>
               <BsChevronDown fontSize="14px"></BsChevronDown>
             </div>
@@ -66,7 +70,7 @@ const MessagesParent = ({ user, size }) => {
             className="col-lg-4 col-auto bg-white"
             onClick={() => {
               setChat((prev) =>
-                Object.assign({}, prev, { projectId: -1, chatId: -1 })
+                Object.assign({}, prev, { projectId: "", chatId: "" })
               );
             }}
           >

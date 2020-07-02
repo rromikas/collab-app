@@ -19,7 +19,6 @@ const ProjectDashboard = ({
   setPeople,
   size,
 }) => {
-  console.log("section and subsection", section, subsection);
   const [project, setProject] = useState({
     events: {},
     messages: {},

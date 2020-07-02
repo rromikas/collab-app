@@ -5,6 +5,7 @@ import * as firebase from "../../../database/firebase";
 import date from "date-and-time";
 import { BsX, BsCheck, BsReply, BsFillReplyFill } from "react-icons/bs";
 import Popover from "../../utility/Popover";
+import { uid } from "react-uid";
 
 const filters = ["All", "Pending", "Agreed", "Disagreed"];
 
@@ -43,6 +44,7 @@ const Requests = ({ projectId, user, size }) => {
                 <div className="popover-inner">
                   {filters.map((x) => (
                     <div
+                      key={uid(x)}
                       className="popover-content-item"
                       onClick={() => {
                         setFilter(x);
@@ -75,7 +77,7 @@ const Requests = ({ projectId, user, size }) => {
                 : x
             )
             .map((x) => (
-              <div className="col-xl-6 col-12">
+              <div className="col-xl-6 col-12" key={uid(x)}>
                 <div className="row no-gutters m-3 basic-card p-4">
                   <div
                     className="col-lg-3 col-4 d-none d-sm-block"

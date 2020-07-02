@@ -11,7 +11,6 @@ import "react-day-picker/lib/style.css";
 import { uid } from "react-uid";
 import uniqid from "uniqid";
 import * as firebase from "../../../database/firebase";
-import { Colors } from "../../utility/Colors";
 import Checkbox from "../../utility/Checkbox";
 import date from "date-and-time";
 import TimePicker from "react-time-picker";
@@ -76,7 +75,6 @@ const Calendar = ({ projectId, projects }) => {
             }
           })
         );
-        console.log("ALL events", allEvents);
         setEvents((prev) => Object.assign({}, prev, allEvents));
         setPeople((prev) => Object.assign({}, prev, allPeople));
       }
@@ -114,7 +112,6 @@ const Calendar = ({ projectId, projects }) => {
             }
           })
         );
-        console.log("ALL events", allEvents);
         setEvents((prev) => Object.assign({}, prev, allEvents));
         setPeople((prev) => Object.assign({}, prev, allPeople));
       }
@@ -199,6 +196,7 @@ const Calendar = ({ projectId, projects }) => {
                     <div className="popover-inner">
                       {Object.values(projects).map((x) => (
                         <div
+                          key={uid(x)}
                           className="popover-content-item"
                           onClick={() => {
                             setNewEvent((prev) =>
@@ -321,7 +319,7 @@ const Calendar = ({ projectId, projects }) => {
               <div className="popover-label text-left">Associate with...</div>
               <div className="mb-2">
                 {Object.values(people).map((x) => (
-                  <div className="d-flex mb-1">
+                  <div className="d-flex mb-1" key={uid(x)}>
                     <Checkbox
                       size={25}
                       setChecked={(checked) => {
@@ -457,7 +455,7 @@ const Calendar = ({ projectId, projects }) => {
       <div className="col-12">
         <div className="row no-gutters">
           {Object.values(people).map((x) => (
-            <div className="col-auto py-2 px-3">
+            <div className="col-auto py-2 px-3" key={uid(x)}>
               <div className="row no-gutters align-items-center">
                 <div className="col-auto mr-2">{x.username}</div>
                 <div
@@ -578,7 +576,10 @@ const Calendar = ({ projectId, projects }) => {
                 (x) => new Date(x.start).getTime() >= new Date().getTime()
               )
               .map((x) => (
-                <div className="col-sm-12 col-md-6 col-lg-4 col-xlg-3">
+                <div
+                  className="col-sm-12 col-md-6 col-lg-4 col-xlg-3"
+                  key={uid(x)}
+                >
                   <div
                     className="row no-gutters p-3 m-2 basic-card"
                     style={{

@@ -22,16 +22,27 @@ const ChatPreviews = ({ view, user, setChat, chat }) => {
     async function fetchMyAPI() {
       let allChats = {};
       let allPeople = {};
-      let projects = view === "all" ? user.projects : { [view]: { id: view } };
+      let projects =
+        view === "all"
+          ? user.projects
+            ? user.projects
+            : {}
+          : { [view]: { id: view } };
       await Promise.all(
         Object.values(projects).map(async (x) => {
           let data = await firebase.GetFromDatabase(`projects/${x.id}/people`);
-          delete data[user.id];
+          data = data ? data : {};
+          let ppl = {};
+          Object.keys(data).forEach((x) => {
+            if (data[x].status !== "invited" && x !== user.id) {
+              ppl[x] = data[x];
+            }
+          });
           allChats[x.id] = {};
-          allPeople[x.id] = data ? data : {};
+          allPeople[x.id] = ppl ? ppl : {};
           if (data) {
             await Promise.all(
-              Object.values(data).map(async (y) => {
+              Object.values(ppl).map(async (y) => {
                 let chatId =
                   user.id > y.id ? `${y.id}${user.id}` : `${user.id}${y.id}`;
                 let lastMessage = await firebase.GetFromDatabase(
@@ -68,6 +79,13 @@ const ChatPreviews = ({ view, user, setChat, chat }) => {
     <React.Fragment>
       {Object.keys(chats).map((x) => {
         return Object.keys(chats[x]).map((y) => {
+          let personId = y.replace(user.id, "");
+
+          let tempUser = people[x]
+            ? people[x][personId]
+              ? people[x][personId]
+              : { photo: "", username: "" }
+            : { photo: "", username: "" };
           return (
             <div
               key={uid(y)}
@@ -91,19 +109,13 @@ const ChatPreviews = ({ view, user, setChat, chat }) => {
                   borderRadius: "50%",
                   backgroundPosition: "center",
                   backgroundSize: "cover",
-                  backgroundImage: `url(${
-                    people[x] ? people[x][y.replace(user.id, "")].photo : ""
-                  })`,
+                  backgroundImage: `url(${tempUser.photo})`,
                 }}
               ></div>
               <div className="col d-lg-block d-none">
                 <div className="row no-gutters justify-content-between">
                   <div className="col-auto alt-chat-author">
-                    {people[x]
-                      ? people[x][y.replace(user.id, "")].username +
-                        " / " +
-                        user.projects[x].title
-                      : ""}
+                    {tempUser.username + " / " + user.projects[x].title}
                   </div>
                   <div className="col-auto chat-time d-lg-block d-none">
                     {chats[x][y].date && chats[x][y].date !== 0

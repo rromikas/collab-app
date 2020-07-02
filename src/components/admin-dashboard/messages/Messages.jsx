@@ -54,6 +54,9 @@ const Messages = ({ user, size, chat }) => {
           setMessages(data ? data : {});
         }
       );
+    } else {
+      console.log("turetu isvalyti zinutes");
+      setMessages({});
     }
     return function cleanUp() {
       if (chat.projectId && chat.chatId) {
@@ -129,7 +132,7 @@ const Messages = ({ user, size, chat }) => {
         style={{ height: "80px" }}
         className="row no-gutters collab-chat-write-message-box border-top align-items-center justify-content-center px-3"
       >
-        {chat.chatId === -1 ? (
+        {!chat.chatId ? (
           "Select chat"
         ) : (
           <React.Fragment>

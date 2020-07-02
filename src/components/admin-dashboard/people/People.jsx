@@ -5,7 +5,7 @@ import Popover from "../../utility/Popover";
 import * as firebase from "../../../database/firebase";
 import md5 from "md5";
 import { BsFillReplyFill } from "react-icons/bs";
-import uniqid from "uniqid";
+import uniqid, { time } from "uniqid";
 import Checkbox from "../../utility/Checkbox";
 import { BsChevronDown } from "react-icons/bs";
 import { uid } from "react-uid";
@@ -45,6 +45,7 @@ const People = ({ projects, user, size }) => {
     project: { title: "Select project", description: "", id: "" },
   });
   const [projectId, setProjectId] = useState("all");
+  const [tick, setTick] = useState(false);
   const [problem, setProblem] = useState("");
   const projectChooser = useRef(null);
   const peopleProjectChooser = useRef(null);
@@ -69,6 +70,7 @@ const People = ({ projects, user, size }) => {
             let data = await firebase.GetFromDatabase(
               `projects/${x.id}/people`
             );
+            data = data ? data : {};
             delete data[user.id];
             allPeople[x.id] = data;
           })
@@ -83,7 +85,17 @@ const People = ({ projects, user, size }) => {
         firebase.off(`projects/${projectId}/people`);
       }
     };
-  }, [projectId]);
+  }, [projectId, tick]);
+
+  useEffect(() => {
+    let timeout = setTimeout(() => {
+      setTick(!tick);
+    }, 5000);
+
+    return function cleanUp() {
+      clearTimeout(timeout);
+    };
+  }, [tick]);
 
   return (
     <div className="row no-gutters px-2 px-sm-3 px-md-4">
@@ -288,7 +300,9 @@ const People = ({ projects, user, size }) => {
                       ></div>
                     )}
 
-                    <div className="col-auto">{y.email}</div>
+                    <div className="col-auto">
+                      {y.email} / {x === "1" ? "All" : projects[x].title}
+                    </div>
                   </div>
                 ))
               )}

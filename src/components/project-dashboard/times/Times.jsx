@@ -4,6 +4,7 @@ import date from "date-and-time";
 import uniqid from "uniqid";
 import * as firebase from "../../../database/firebase";
 import NoTimes from "../../../pictures/NoTimes";
+import { uid } from "react-uid";
 
 const formatNumber = (number) => {
   let word = number.toString();
@@ -30,40 +31,50 @@ const calculatePersonalTime = (times, username) => {
   let minutes = 0;
   Object.values(times).forEach((x) => {
     Object.values(x).forEach((y) => {
-      console.log("Y", y.minutes, y.creator);
       if (y.creator === username) {
         minutes += y.minutes;
       }
     });
   });
-  console.log("minutes", minutes);
   let h = Math.floor(minutes / 60);
   let m = minutes - h * 60;
   return `${formatNumber(h)}:${formatNumber(m)}`;
 };
 
-const addTimeRecord = (timeRecord, projectId, onError) => {
-  let dateObj = new Date();
-  let key = date.format(dateObj, "YYYY-MM-DD");
-  let time = timeRecord.time;
-  let a = /^([0-9]*)$/.test(time);
-  let b = /[0-9]{1,}:[0-9]{1,}/.test(time);
-  if (a) {
-    time = parseInt(time) * 60;
-  } else if (b) {
-    let parts = time.split(":");
-    time = parseInt(parts[0]) * 60 + parseInt(parts[1]);
+const addTimeRecord = (timeRecord, projectId, onError, onSuccess) => {
+  console.log(timeRecord);
+  if (timeRecord.time) {
+    if (timeRecord.task) {
+      let dateObj = new Date();
+      let key = date.format(dateObj, "YYYY-MM-DD");
+      let time = timeRecord.time;
+      let a = /^([0-9]*)$/.test(time);
+      let b = /[0-9]{1,}:[0-9]{1,}/.test(time);
+      if (a) {
+        time = parseInt(time) * 60;
+      } else if (b) {
+        let parts = time.split(":");
+        time = parseInt(parts[0]) * 60 + parseInt(parts[1]);
+      } else {
+        return onError("wrong format");
+      }
+
+      let updates = {};
+
+      updates[
+        `projects/${projectId}/times/${key}/${uniqid("time-record-")}`
+      ] = {
+        minutes: time,
+        ...timeRecord,
+      };
+      firebase.UpdateDatabase(updates);
+      onSuccess();
+    } else {
+      onError("specify task");
+    }
   } else {
-    return onError("wrong format");
+    onError("enter time");
   }
-
-  let updates = {};
-
-  updates[`projects/${projectId}/times/${key}/${uniqid("time-record-")}`] = {
-    minutes: time,
-    ...timeRecord,
-  };
-  firebase.UpdateDatabase(updates);
 };
 
 const Times = ({ user, projectId, times, size, people }) => {
@@ -78,6 +89,7 @@ const Times = ({ user, projectId, times, size, people }) => {
     size.width > 768 ? size.height - 56 - 62.4 - 24 : size.height - 56 - 56;
   const addTimeButton = useRef(null);
   const [timeRecord, setTimeRecord] = useState(initialTimeRecord);
+  const [problem, setProblem] = useState("");
   return (
     <div
       className="row no-gutters position-relative px-3 px-md-4 py-3"
@@ -133,13 +145,27 @@ const Times = ({ user, projectId, times, size, people }) => {
                     className="d-block w-100"
                   ></textarea>
                 </div>
+                {problem ? (
+                  <label style={{ color: "red" }}>{problem}</label>
+                ) : (
+                  ""
+                )}
+
                 <div className="d-flex">
                   <div
                     className="btn-pro col-6 mr-1"
                     onClick={() => {
-                      addTimeRecord(timeRecord, projectId, (error) => {});
-                      setTimeRecord(initialTimeRecord);
-                      addTimeButton.current.click();
+                      addTimeRecord(
+                        timeRecord,
+                        projectId,
+                        (error) => {
+                          setProblem(error);
+                        },
+                        () => {
+                          setTimeRecord(initialTimeRecord);
+                          addTimeButton.current.click();
+                        }
+                      );
                     }}
                   >
                     Add
@@ -168,7 +194,7 @@ const Times = ({ user, projectId, times, size, people }) => {
             {Object.values(people)
               .filter((x) => x.permissions === "owner")
               .map((x) => (
-                <div className="row no-gutters align-items-center">
+                <div className="row no-gutters align-items-center" key={uid(x)}>
                   <div className="col-auto mr-2">{x.username}:</div>
                   <div className="col-auto">
                     {calculatePersonalTime(times, x.username)}
@@ -182,11 +208,14 @@ const Times = ({ user, projectId, times, size, people }) => {
           <div className="col-12">
             {Object.keys(times).length ? (
               Object.keys(times).map((x) => (
-                <div className="row no-gutters mb-3">
+                <div className="row no-gutters mb-3" key={uid(x)}>
                   <div className="col-12 mb-1 time-record-date">{x}</div>
                   <div className="col-12">
                     {Object.values(times[x]).map((y) => (
-                      <div className="row no-gutters times-table-row">
+                      <div
+                        className="row no-gutters times-table-row"
+                        key={uid(y)}
+                      >
                         <div className="col-4 pr-2">{y.time}</div>
                         <div className="col-4 pr-2">{y.creator}</div>
                         <div className="col-4">{y.task}</div>

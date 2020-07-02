@@ -7,7 +7,7 @@ import {
 } from "react-icons/bs";
 import * as firebase from "../../../database/firebase";
 import date from "date-and-time";
-import { BsChevronLeft } from "react-icons/bs";
+import { BsThreeDots } from "react-icons/bs";
 import Loader from "../../utility/Loader";
 import NoFiles from "../../../pictures/NoFiles";
 import Popover from "../../utility/Popover";
@@ -19,6 +19,7 @@ import md5 from "md5";
 import prettyFileIcons from "pretty-file-icons";
 import { Icons } from "../../../pictures/file-icons/index";
 import mime from "mime-types";
+import { uid } from "react-uid";
 
 const getMetadata = (metadata, path, filename) => {
   let myMetadata = { ...metadata };
@@ -36,7 +37,7 @@ const handleFileUpload = (e, path, user, projectId, onFinish = () => {}) => {
   console.log("file simple upload", file);
   if (file) {
     if (file.size < 10000000) {
-      if (file.name.length < 40) {
+      if (file.name.length < 400) {
         firebase.UploadFile(path, file, user.username, onFinish, projectId);
       } else {
         alert("file name is too long");
@@ -63,10 +64,8 @@ const Files = ({ projectId, user, setProject, size, metadata }) => {
   const [tick, setTick] = useState(false);
   const [filter, setFilter] = useState("date");
   useEffect(() => {
-    let pathString = path.reduce(
-      (a, b) => a.toString() + "/" + b.toString(),
-      ""
-    );
+    let pathString = path.join("/");
+
     firebase.GetFiles(pathString).then((res) => {
       let items = [];
       if (Object.values(metadata).length) {
@@ -119,12 +118,7 @@ const Files = ({ projectId, user, setProject, size, metadata }) => {
                           className="col-auto btn-pro mr-1"
                           onClick={() => {
                             firebase.CreateFolder(
-                              path.reduce(
-                                (a, b) => a.toString() + "/" + b.toString(),
-                                ""
-                              ) +
-                                "/" +
-                                newFolder.toString(),
+                              path.join("/") + "/" + newFolder.toString(),
                               user,
                               projectId,
                               () => setTick(!tick)
@@ -172,10 +166,7 @@ const Files = ({ projectId, user, setProject, size, metadata }) => {
                           onChange={(e) =>
                             handleFileUpload(
                               e,
-                              path.reduce(
-                                (a, b) => a.toString() + "/" + b.toString(),
-                                ""
-                              ),
+                              path.join("/"),
                               user,
                               projectId,
                               () => {
@@ -188,10 +179,7 @@ const Files = ({ projectId, user, setProject, size, metadata }) => {
                       </div>
                       <div className="popover-content-item">
                         <Dropbox
-                          path={path.reduce(
-                            (a, b) => a.toString() + "/" + b.toString(),
-                            ""
-                          )}
+                          path={path.join("/")}
                           user={user}
                           projectId={projectId}
                           onFinish={() => {
@@ -202,10 +190,7 @@ const Files = ({ projectId, user, setProject, size, metadata }) => {
                       </div>
                       <div className="popover-content-item">
                         <GoogleDrive
-                          path={path.reduce(
-                            (a, b) => a.toString() + "/" + b.toString(),
-                            ""
-                          )}
+                          path={path.join("/")}
                           user={user}
                           projectId={projectId}
                           onFinish={() => {
@@ -280,7 +265,7 @@ const Files = ({ projectId, user, setProject, size, metadata }) => {
           </div>
           <div className="row no-gutters px-3">
             {path.map((x, i) => (
-              <div className="col-auto">
+              <div className="col-auto" key={uid(x)}>
                 <div className="row no-gutters">
                   <div
                     className="col-auto mr-1 btn-link cursor-pointer"
@@ -309,12 +294,52 @@ const Files = ({ projectId, user, setProject, size, metadata }) => {
                   return (
                     <div
                       className="col-12 col-sm-4 col-lg-3 col-xl-2 file-card p-3 clickable-item"
-                      onClick={() => setPath((p) => p.concat([x.name]))}
+                      key={uid(x)}
                     >
-                      <div className="row no-gutters align-items-center">
+                      <div
+                        className="row no-gutters justify-content-end"
+                        style={{ position: "relative", zIndex: 5 }}
+                      >
+                        <Popover
+                          content={
+                            <div className="popover-inner">
+                              <div
+                                className="popover-content-item"
+                                onClick={() => {
+                                  let firebasePath = `projects/${projectId}/files/${path.join(
+                                    "/"
+                                  )}/${x.name}`;
+                                  let storagePath =
+                                    path.join("/") +
+                                    "/" +
+                                    x.name +
+                                    "/placeholder-rare-name";
+                                  console.log(
+                                    "Firebase path, sotrag path",
+                                    firebasePath,
+                                    storagePath
+                                  );
+                                  firebase
+                                    .DeleteFile(firebasePath, storagePath)
+                                    .then(() => setTick(!tick));
+                                }}
+                              >
+                                Delete
+                              </div>
+                            </div>
+                          }
+                        >
+                          <BsThreeDots fontSize="20px"></BsThreeDots>
+                        </Popover>
+                      </div>
+                      <div
+                        className="row no-gutters align-items-center"
+                        style={{ marginTop: "-17px" }}
+                      >
                         <div className="col-auto col-sm-12">
                           <div className="text-sm-center mr-2">
                             <BsFolder
+                              onClick={() => setPath((p) => p.concat([x.name]))}
                               className="clickable-item"
                               fontSize="50px"
                             ></BsFolder>
@@ -348,31 +373,79 @@ const Files = ({ projectId, user, setProject, size, metadata }) => {
                       : 0
                   )
                   .map((x) => {
+                    let icon;
+                    let extension =
+                      x.fileProvider === "google drive"
+                        ? mime.extension(x.mimeType)
+                        : mime.extension(mime.lookup(x.name));
+                    if (!Icons[extension]) {
+                      icon =
+                        Icons[prettyFileIcons.getIcon("fakeFile." + extension)];
+                    } else {
+                      icon = Icons[extension];
+                    }
                     return (
                       <div
                         className="col-12 col-sm-4 col-lg-3 col-xl-2 file-card p-3 clickable-item"
-                        onClick={async () => {
-                          if (x.fileProvider === "local files") {
-                            let url = await x.getDownloadURL();
-                            window.open(url);
-                          } else {
-                            window.open(x.previewLink);
-                          }
-                        }}
+                        key={uid(x)}
                       >
-                        <div className="row no-gutters align-items-center">
+                        <div
+                          className="row no-gutters justify-content-end"
+                          style={{ position: "relative", zIndex: 5 }}
+                        >
+                          <Popover
+                            content={
+                              <div className="popover-inner">
+                                <div
+                                  className="popover-content-item"
+                                  onClick={() => {
+                                    let firebasePath = `projects/${projectId}/files/${x.path}`;
+                                    let storagePath =
+                                      path.join("/") + "/" + x.name;
+                                    console.log(
+                                      "Firebase path, sotrag path",
+                                      firebasePath,
+                                      storagePath
+                                    );
+                                    firebase
+                                      .DeleteFile(firebasePath, storagePath)
+                                      .then(() => setTick(!tick));
+                                  }}
+                                >
+                                  Delete
+                                </div>
+                              </div>
+                            }
+                          >
+                            <BsThreeDots fontSize="20px"></BsThreeDots>
+                          </Popover>
+                        </div>
+                        <div
+                          className="row no-gutters align-items-center"
+                          style={{ marginTop: "-17px" }}
+                        >
                           <div className="col-auto col-sm-12">
                             <div className="text-sm-center mr-2">
                               <img
+                                onClick={async () => {
+                                  if (x.fileProvider === "local files") {
+                                    let url = await firebase.GetDownloadUrl(
+                                      path.reduce(
+                                        (a, b) =>
+                                          a.toString() + "/" + b.toString(),
+                                        ""
+                                      ) +
+                                        "/" +
+                                        x.name
+                                    );
+                                    window.open(url);
+                                  } else {
+                                    window.open(x.previewLink);
+                                  }
+                                }}
                                 style={{ width: "50px" }}
                                 className="image-fluid"
-                                src={
-                                  x.fileProvider === "google drive"
-                                    ? Icons[mime.extension(x.mimeType)]
-                                      ? Icons[mime.extension(x.mimeType)]
-                                      : Icons["unknown"]
-                                    : Icons[mime.extension(mime.lookup(x.name))]
-                                }
+                                src={icon}
                               ></img>
                             </div>
                           </div>

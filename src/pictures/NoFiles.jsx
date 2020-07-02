@@ -169,7 +169,7 @@ function NoFiles() {
         d="M202.54 262.18H346.33V359.11H202.54z"
         data-name="&lt;Rectangle&gt;"
       ></path>
-      <g fill="#0a80ff" clip-path="url(#42e7b1d1-2be2-47b0-aacb-a853df270819)">
+      <g fill="#0a80ff" clipPath="url(#42e7b1d1-2be2-47b0-aacb-a853df270819)">
         <path
           d="M190.35 355.61L226.56 299.55 241.74 324.07 274.44 290.21 302.47 324.07 326.99 273.86 390.05 374.29 185.68 367.28 190.35 355.61z"
           opacity="0.4"
@@ -192,7 +192,7 @@ function NoFiles() {
         d="M202.54 468.88H346.33V565.81H202.54z"
         data-name="&lt;Rectangle&gt;"
       ></path>
-      <g fill="#bdbdbd" clip-path="url(#f66b8fac-771d-49bf-85c7-4ce29a79f723)">
+      <g fill="#bdbdbd" clipPath="url(#f66b8fac-771d-49bf-85c7-4ce29a79f723)">
         <path
           d="M190.35 562.31L226.56 506.25 241.74 530.78 274.44 496.91 302.47 530.78 326.99 480.56 390.05 580.99 185.68 573.99 190.35 562.31z"
           opacity="0.4"

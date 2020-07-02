@@ -39,6 +39,19 @@ export const UpdateDatabase = (updates) => {
   });
 };
 
+export const GetDownloadUrl = (path) => {
+  console.log("PAth get ownalod url", path);
+  return new Promise((resolve, reject) => {
+    firebase
+      .storage()
+      .ref(path)
+      .getDownloadURL()
+      .then((url) => {
+        resolve(url);
+      });
+  });
+};
+
 export const GetFromDatabase = (path) => {
   return new Promise((resolve, reject) => {
     firebase
@@ -102,6 +115,23 @@ export const UploadFile = (path, file, uploadedBy, onSuccess, projectId) => {
   );
 };
 
+export const DeleteFile = (firebasePath, storagePath) => {
+  return new Promise((resolve, reject) => {
+    let updates = {};
+    updates[firebasePath] = [];
+
+    firebase
+      .storage()
+      .ref()
+      .child(storagePath)
+      .delete()
+      .then(() => {
+        UpdateDatabase(updates);
+        resolve(true);
+      });
+  });
+};
+
 export const UploadDropboxFile = (path, file, author, projectId) => {
   return new Promise((resolve, reject) => {
     let hashedName = md5(file.name);
@@ -122,7 +152,6 @@ export const UploadDropboxFile = (path, file, author, projectId) => {
     updates[`projects/${projectId}/files/${pathForFirebase}`] = {
       metadata: metadata.customMetadata,
     };
-    UpdateDatabase(updates);
 
     var f = new File([""], "nesvarbu");
     let uploadTask = firebase.storage().ref(pathForStorage).put(f, metadata);
@@ -135,6 +164,7 @@ export const UploadDropboxFile = (path, file, author, projectId) => {
         //error handling
       },
       function () {
+        UpdateDatabase(updates);
         resolve(true);
       }
     );
@@ -161,7 +191,6 @@ export const UploadGoogleDriveFile = (path, file, author, projectId) => {
     updates[`projects/${projectId}/files/${pathForFirebase}`] = {
       metadata: metadata.customMetadata,
     };
-    UpdateDatabase(updates);
 
     var f = new File([""], "nesvarbu");
     let uploadTask = firebase.storage().ref(pathForStorage).put(f, metadata);
@@ -174,6 +203,7 @@ export const UploadGoogleDriveFile = (path, file, author, projectId) => {
         //error handling
       },
       function () {
+        UpdateDatabase(updates);
         resolve(true);
       }
     );
@@ -199,7 +229,7 @@ export const CreateFolder = (path, user, projectId, onSuccess) => {
     createdBy: user.username,
     type: "folder",
   };
-  UpdateDatabase(updates);
+
   var f = new File([""], "placeholder");
   let uploadTask = firebase
     .storage()
@@ -214,6 +244,7 @@ export const CreateFolder = (path, user, projectId, onSuccess) => {
       //error handler
     },
     function () {
+      UpdateDatabase(updates);
       onSuccess();
     }
   );

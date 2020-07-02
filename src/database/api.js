@@ -22,7 +22,7 @@ export const AnswerToInvitation = (
 ) => {
   let updates = {};
 
-  if (answer === "rejected") {
+  if (answer === "Rejected") {
     updates[`projects/${invitation.project.id}/people/${user.id}`] = [];
   } else {
     updates[`projects/${invitation.project.id}/people/${user.id}`] = {

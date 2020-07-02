@@ -8,7 +8,6 @@ import { AuthenticateUser } from "./Authentication";
 import * as firebase from "./database/firebase";
 import { uid } from "react-uid";
 import md5 from "md5";
-import date from "date-and-time";
 import Loader from "./components/utility/Loader";
 
 const accounts = {

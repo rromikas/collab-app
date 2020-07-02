@@ -37,7 +37,6 @@ const AltChat = ({ projectId, user, size }) => {
   const chatHeight = size.width > 768 ? size.height - 222.4 : size.height - 192;
   const [chatId, setChatId] = useState(1);
   const [chatPerson, setChatPerson] = useState(0);
-  const chatPopover = useRef(null);
   const messagesEnd = useRef(null);
 
   const [people, setPeople] = useState({});
@@ -50,7 +49,13 @@ const AltChat = ({ projectId, user, size }) => {
   useEffect(() => {
     firebase.GetFromDatabase(`projects/${projectId}/people`).then((data) => {
       if (data) {
-        setPeople(data);
+        let ppl = {};
+        Object.keys(data).forEach((x) => {
+          if (data[x].status !== "invited") {
+            ppl[x] = data[x];
+          }
+        });
+        setPeople(ppl);
       }
     });
   }, [projectId]);
@@ -84,6 +89,8 @@ const AltChat = ({ projectId, user, size }) => {
           ? `${chatPerson}${user.id}`
           : `${user.id}${chatPerson}`;
       setChatId(newChatId);
+    } else {
+      setChatId(1);
     }
   }, [chatPerson]);
 
@@ -92,13 +99,12 @@ const AltChat = ({ projectId, user, size }) => {
       <div
         className="col-lg-4 col-auto bg-white"
         onClick={() => {
-          setChatId(1);
+          setChatPerson(0);
         }}
       >
         {Object.values(sliceObject(people, user.id)).map((x) => {
           let actualChatId =
             user.id < x.id ? `${user.id}${x.id}` : `${x.id}${user.id}`;
-          console.log("ACTU ID", actualChatId);
           let lastMessage = chats[actualChatId]
             ? chats[actualChatId].lastMessage
             : null;
@@ -109,7 +115,6 @@ const AltChat = ({ projectId, user, size }) => {
               seenBy: { [user.id]: { id: user.id } },
             };
           }
-          console.log("LAST MESSAGE", lastMessage);
           return (
             <div
               key={uid(x)}
@@ -169,19 +174,21 @@ const AltChat = ({ projectId, user, size }) => {
             Object.keys(people).length &&
             chats[chatId].messages ? (
               Object.values(chats[chatId].messages).map((x) => {
-                console.log("TA NESAMONIGA DATA", x.date);
+                let tempPerson = people[x.userId]
+                  ? people[x.userId]
+                  : { photo: "", username: "" };
                 return (
                   <div key={uid(x)} className={`row mb-2 no-gutters p-3`}>
                     <div
                       className="col-auto mr-2 bg-image square-50"
                       style={{
-                        backgroundImage: `url(${people[x.userId].photo})`,
+                        backgroundImage: `url(${tempPerson.photo})`,
                       }}
                     ></div>
                     <div className="col">
                       <div className="row no-gutters align-items-center">
                         <div className="col-auto mr-2 alt-chat-author">
-                          {people[x.userId].username}
+                          {tempPerson.username}
                         </div>
                         <div className="col-auto alt-chat-date">
                           {x.date
