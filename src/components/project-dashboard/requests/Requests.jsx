@@ -12,7 +12,7 @@ const filters = ["All", "Pending", "Agreed", "Disagreed"];
 const Requests = ({ projectId, user, size }) => {
   const filterChooser = useRef(null);
   const containerMinHeight =
-    size.width > 768 ? size.height - 62.4 - 24 - 56 : size.height - 56 - 56;
+    size.width > 768 ? size.height - 76 - 24 - 56 : size.height - 76 - 56;
   const [requests, setRequests] = useState({});
   const [filter, setFilter] = useState("all");
   useEffect(() => {

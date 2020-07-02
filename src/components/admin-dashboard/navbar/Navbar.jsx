@@ -22,16 +22,28 @@ const Navbar = ({ pageTitle, user, backlink }) => {
     <div className="row no-gutters justify-content-between align-items-center px-3 px-lg-4 py-2 flex-nowrap">
       <div className="col-auto mb-2">
         <div className="row no-gutters align-items-center">
-          {backlink.title !== "" && (
-            <div
-              className="col-auto mr-2 clickable-item"
-              onClick={() => history.push(`${backlink.path}`)}
-            >
-              <BsChevronLeft fontSize="16px"></BsChevronLeft>
-              {backlink.title}
+          <div
+            className="col-auto logo mr-md-5"
+            style={{ width: "158px", fontSize: "35px" }}
+          >
+            Collab app
+          </div>
+          <div className="col-auto">
+            <div className="row no-gutters px-lg-3 align-items-center">
+              {backlink.title !== "" && (
+                <div
+                  className="col-auto mr-2 clickable-item"
+                  onClick={() => history.push(`${backlink.path}`)}
+                >
+                  <BsChevronLeft fontSize="16px"></BsChevronLeft>
+                  {backlink.title}
+                </div>
+              )}
+              <div className="col-auto h2 mb-0 d-md-block d-none">
+                {pageTitle}
+              </div>
             </div>
-          )}
-          <div className="col-auto h2 mb-0 d-md-block d-none">{pageTitle}</div>
+          </div>
         </div>
       </div>
 

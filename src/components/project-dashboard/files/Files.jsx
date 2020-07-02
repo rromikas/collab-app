@@ -51,8 +51,8 @@ const handleFileUpload = (e, path, user, projectId, onFinish = () => {}) => {
 const Files = ({ projectId, user, setProject, size, metadata }) => {
   const listHeight =
     size.width > 768
-      ? size.height - 24 - 62.4 - 56 - 79.2
-      : size.height - 79.2 - 56 - 56;
+      ? size.height - 64 - 24 - 76 - 56 - 24
+      : size.height - 64 - 24 - 76 - 56;
   const uploader = useRef(null);
   const folderMaker = useRef(null);
   const fileUploadMaker = useRef(null);

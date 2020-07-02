@@ -86,7 +86,7 @@ const Times = ({ user, projectId, times, size, people }) => {
   };
   times = times ? times : {};
   const containerMinHeight =
-    size.width > 768 ? size.height - 56 - 62.4 - 24 : size.height - 56 - 56;
+    size.width > 768 ? size.height - 76 - 62.4 - 24 : size.height - 76 - 56;
   const addTimeButton = useRef(null);
   const [timeRecord, setTimeRecord] = useState(initialTimeRecord);
   const [problem, setProblem] = useState("");

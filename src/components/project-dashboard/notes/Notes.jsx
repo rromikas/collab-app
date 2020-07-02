@@ -8,7 +8,7 @@ import { BsJustify, BsGrid } from "react-icons/bs";
 
 const Notes = ({ size, notes, projectId, user }) => {
   const containerMinHeight =
-    size.width > 768 ? size.height - 56 - 62.4 - 24 : size.height - 56 - 56;
+    size.width > 768 ? size.height - 76 - 56 - 24 : size.height - 76 - 56;
   const [newNote, setNewNote] = useState({
     id: uniqid("note-"),
     user: { username: user.username, photo: user.photo },

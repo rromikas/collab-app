@@ -24,7 +24,8 @@ const isToday = (someDate) => {
 };
 
 const Messages = ({ user, size, chat }) => {
-  const chatHeight = size.width > 768 ? size.height - 230.4 : size.height - 256;
+  const chatHeight =
+    size.width > 768 ? size.height - 250.4 : size.height - 64 - 76 - 80 - 57;
   const messagesEnd = useRef(null);
 
   const [newMessage, setNewMessage] = useState({

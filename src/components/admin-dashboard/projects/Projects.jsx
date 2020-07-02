@@ -23,9 +23,7 @@ const deleteProject = (projectId) => {
 
 const Projects = ({ projects, userId, size }) => {
   const blockHeight =
-    size.width > 768
-      ? size.height - 62.4 - 48 - 24
-      : size.height - 48 - 56 - 62.4;
+    size.width > 768 ? size.height - 76 - 32 - 56 : size.height - 76 - 48 - 56;
   useEffect(() => {
     store.dispatch({ type: "SET_PAGE_TITLE", pageTitle: "Projects" });
   }, []);

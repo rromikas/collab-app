@@ -34,7 +34,10 @@ const sendMessage = (message, projectId, chatId) => {
 };
 
 const AltChat = ({ projectId, user, size }) => {
-  const chatHeight = size.width > 768 ? size.height - 222.4 : size.height - 192;
+  const chatHeight =
+    size.width > 768
+      ? size.height - 76 - 56 - 80 - 24
+      : size.height - 80 - 56 - 76;
   const [chatId, setChatId] = useState(1);
   const [chatPerson, setChatPerson] = useState(0);
   const messagesEnd = useRef(null);

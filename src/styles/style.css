@@ -11635,4 +11635,8 @@ input[type="text"]::placeholder {
   outline: none;
   border-color: #0a80ff;
 }
+
+.logo {
+  font-family: Vibur;
+}
 /*# sourceMappingURL=style.css.map */
