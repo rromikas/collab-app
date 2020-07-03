@@ -23,10 +23,16 @@ const Navbar = ({ pageTitle, user, backlink }) => {
       <div className="col-auto mb-2">
         <div className="row no-gutters align-items-center">
           <div
-            className="col-auto logo mr-md-5"
+            className="col-auto logo d-none d-md-block mr-md-5"
             style={{ width: "158px", fontSize: "35px" }}
           >
             Collab app
+          </div>
+          <div
+            className="col-auto logo mr-3 d-md-none"
+            style={{ fontSize: "35px" }}
+          >
+            Capp
           </div>
           <div className="col-auto">
             <div className="row no-gutters px-lg-3 align-items-center">
