@@ -5,9 +5,7 @@ import { BsChevronLeft } from "react-icons/bs";
 import Popover from "../../utility/Popover";
 import store from "../../../store/store";
 import { BsBell } from "react-icons/bs";
-import * as firebase from "../../../database/firebase";
 import { uid } from "react-uid";
-import randomColor from "randomcolor";
 import {
   MarkNotificationsAsChecked,
   AnswerToInvitation,
