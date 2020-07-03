@@ -65,6 +65,7 @@ const Requests = ({ projectId, user, size }) => {
         </div>
         <div className="row no-gutters">
           {Object.values(requests)
+            .reverse()
             .filter((x) =>
               filter === "All"
                 ? x

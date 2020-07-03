@@ -101,7 +101,7 @@ const Notes = ({ size, notes, projectId, user }) => {
           </div>
         </div>
         <div className="row no-gutters">
-          {Object.values(notes).map((x) => (
+          {Object.values(notes).reverse().map((x) => (
             <div
               className={`col-12 col-lg-${
                 structure === "list" ? "12" : "6"
