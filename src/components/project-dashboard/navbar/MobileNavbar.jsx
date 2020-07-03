@@ -39,7 +39,10 @@ const generalItems = [
 const MobileNavbar = ({ projectId, section, page, userId, people }) => {
   const permissions = people[userId] ? people[userId].permissions : "client";
   return (
-    <div className="row no-gutters border-bottom mobile-project-navbar">
+    <div
+      className="row no-gutters border-bottom mobile-project-navbar"
+      style={{ position: "fixed", bottom: 0, left: 0, zIndex: 10 }}
+    >
       {projectId
         ? (permissions === "owner" ? ownerItems : clientItems).map((x) => (
             <div

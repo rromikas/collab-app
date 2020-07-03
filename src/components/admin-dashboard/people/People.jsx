@@ -32,9 +32,7 @@ const sendInvitation = (invitation, user) => {
 
 const People = ({ projects, user, size }) => {
   const blockHeight =
-    size.width > 768
-      ? size.height - 48 - 24 - 62.4
-      : size.height - 62.4 - 56 - 48;
+    size.width > 768 ? size.height - 48 - 24 - 76 : size.height - 76 - 56 - 48;
   const runningProjects = Object.values(projects).filter(
     (x) => x.status !== "Deleted"
   );
