@@ -49,6 +49,7 @@ const handleFileUpload = (e, path, user, projectId, onFinish = () => {}) => {
 };
 
 const Files = ({ projectId, user, setProject, size, metadata }) => {
+  console.log("size", size.height);
   const listHeight =
     size.width > 768
       ? size.height - 64 - 24 - 76 - 56 - 24
