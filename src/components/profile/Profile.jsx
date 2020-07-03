@@ -10,7 +10,7 @@ import { uid } from "react-uid";
 const Profile = ({ user, projects }) => {
   const hiddenUploader = useRef(null);
   useEffect(() => {
-    store.dispatch({ type: "SET_PAGE_TITLE", pageTitle: "Profile" });
+    store.dispatch({ type: "SET_PAGE_TITLE", pageTitle: "" });
   }, []);
 
   const userDataShema = [
@@ -35,7 +35,7 @@ const Profile = ({ user, projects }) => {
 
   return (
     <div className="row no-gutters justify-content-center">
-      <div className="col-12 col-sm-5 col-md-4 col-lg-3 p-3 position-relative">
+      <div className="col-12 col-md-4 col-lg-3 p-3 position-relative">
         <div className="row no-gutters justify-content-center project-card p-4 bg-white">
           <div className="col-12">
             <div
