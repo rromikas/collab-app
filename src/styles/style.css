@@ -10966,6 +10966,25 @@ body {
           user-select: none;
 }
 
+.menu-item-chosen {
+  height: 47px;
+  line-height: 47px;
+  color: #0a80ff;
+  font-weight: 400;
+  -webkit-transition: color 0.3s ease;
+  transition: color 0.3s ease;
+  cursor: pointer;
+  font-size: 16px;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+}
+
+.menu-item:hover {
+  color: #0a80ff !important;
+}
+
 .menu-item {
   height: 47px;
   line-height: 47px;

@@ -43,7 +43,7 @@ const AdminDashboard = (props) => {
       <div className="row no-gutters flex-fill overflow-hidden">
         {user.accountType === "admin" && (
           <div className="col-auto mh-100">
-            <LeftSideMenu userId={user.id}></LeftSideMenu>
+            <LeftSideMenu userId={user.id} page={page}></LeftSideMenu>
           </div>
         )}
 

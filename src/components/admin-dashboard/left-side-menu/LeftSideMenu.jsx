@@ -10,7 +10,7 @@ import {
 import { uid } from "react-uid";
 import history from "../../../history";
 
-const LeftSideMenu = ({ userId }) => {
+const LeftSideMenu = ({ userId, page }) => {
   const items = [
     { name: "Projects", icon: <BsGrid fontSize="24px"></BsGrid> },
     { name: "Calendar", icon: <BsCalendar fontSize="24px"></BsCalendar> },
@@ -26,7 +26,9 @@ const LeftSideMenu = ({ userId }) => {
         {items.map((x) => (
           <div className="row no-gutters w-100" key={uid(x)}>
             <div
-              className="d-flex menu-item"
+              className={`d-flex menu-item${
+                page === x.name.toLowerCase() ? "-chosen" : ""
+              }`}
               onClick={() => {
                 if (userId) {
                   history.push(`/${userId}/${x.name.toLowerCase()}`);
@@ -35,7 +37,9 @@ const LeftSideMenu = ({ userId }) => {
             >
               <div
                 className="text-center mr-0 mr-md-3"
-                style={{ width: "40px" }}
+                style={{
+                  width: "40px",
+                }}
               >
                 {x.icon}
               </div>
