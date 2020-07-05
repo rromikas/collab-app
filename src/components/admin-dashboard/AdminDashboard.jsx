@@ -35,20 +35,23 @@ const AdminDashboard = (props) => {
   const [people, setPeople] = useState({}); //needed for mobile dashboard
   return (
     <div className="container-fluid d-flex flex-column h-100 px-0">
-      <div className="row no-gutters flex-shrink-0">
+      <div className="row no-gutters" style={{ flex: "0 0 auto" }}>
         <div className="col-12">
           <Navbar></Navbar>
         </div>
       </div>
-      <div className="row no-gutters flex-fill overflow-hidden">
+      <div
+        className="row no-gutters overflow-auto"
+        style={{ flex: "1 1 auto" }}
+      >
         {user.accountType === "admin" && (
-          <div className="col-auto mh-100">
+          <div className="col-auto">
             <LeftSideMenu userId={user.id} page={page}></LeftSideMenu>
           </div>
         )}
 
-        <div className="col mh-100 overflow-auto">
-          <div className="row no-gutters h-100">
+        <div className="col">
+          <div className="row no-gutters">
             <div
               className={`col-12 col-xl-${
                 user.accountType === "client" ? "10" : "12"
@@ -119,8 +122,8 @@ const AdminDashboard = (props) => {
         </div>
       </div>
       <div
-        className="row no-gutters d-flex d-md-none flex-shrink-0"
-        style={{ height: "56px" }}
+        className="row no-gutters d-flex d-md-none"
+        style={{ height: "56px", flex: "0 0 auto" }}
       >
         <div className="col-12">
           <MobileNavbar
