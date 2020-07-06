@@ -300,7 +300,9 @@ const People = ({ projects, user, size, users }) => {
                     )}
 
                     <div className="col-auto">
-                      {users[y.id]
+                      {y.email
+                        ? y.email
+                        : users[y.id]
                         ? users[y.id].email
                           ? users[y.id].email
                           : ""

@@ -4,6 +4,7 @@ import { uid } from "react-uid";
 import * as firebase from "../../../database/firebase";
 import uniqid from "uniqid";
 import NoMessages from "../../../pictures/NoMessages";
+import { connect } from "react-redux";
 
 const sliceObject = (obj, property) => {
   let newObj = { ...obj };
@@ -33,7 +34,7 @@ const sendMessage = (message, projectId, chatId) => {
   firebase.UpdateDatabase(updates);
 };
 
-const AltChat = ({ projectId, user, size }) => {
+const AltChat = ({ projectId, user, size, users }) => {
   const chatHeight =
     size.width > 768
       ? size.height - 76 - 56 - 80 - 24
@@ -87,15 +88,26 @@ const AltChat = ({ projectId, user, size }) => {
 
   useEffect(() => {
     if (chatPerson) {
-      let newChatId =
-        chatPerson < user.id
-          ? `${chatPerson}${user.id}`
-          : `${user.id}${chatPerson}`;
-      setChatId(newChatId);
+      if (chatPerson > 0) {
+        let newChatId =
+          chatPerson < user.id
+            ? `${chatPerson}${user.id}`
+            : `${user.id}${chatPerson}`;
+        setChatId(newChatId);
+      }
     } else {
       setChatId(1);
     }
   }, [chatPerson]);
+
+  let clients = Object.values(people).filter((x) => x.permissions === "client");
+  let clientsChatId;
+  if (clients.length === 2) {
+    clientsChatId =
+      clients[0].id < clients[1].id
+        ? `${clients[0].id}${clients[1].id}`
+        : `${clients[1].id}${clients[0].id}`;
+  }
 
   return (
     <div className="row no-gutters">
@@ -122,11 +134,11 @@ const AltChat = ({ projectId, user, size }) => {
             <div
               key={uid(x)}
               className={`row no-gutters border-bottom p-lg-3 p-2 chat-preview${
-                chatPerson === x.id ? " bg-white" : " bg-light"
+                chatId === actualChatId ? " bg-white" : " bg-light"
               }`}
               onClick={(e) => {
                 e.stopPropagation();
-                setChatPerson(x.id);
+                setChatId(actualChatId);
               }}
             >
               <div
@@ -137,12 +149,16 @@ const AltChat = ({ projectId, user, size }) => {
                   borderRadius: "50%",
                   backgroundPosition: "center",
                   backgroundSize: "cover",
-                  backgroundImage: `url(${x.photo})`,
+                  backgroundImage: `url(${
+                    users[x.id] ? users[x.id].photo : ""
+                  })`,
                 }}
               ></div>
               <div className="col d-lg-block d-none">
                 <div className="row no-gutters justify-content-between">
-                  <div className="col-auto alt-chat-author">{x.username}</div>
+                  <div className="col-auto alt-chat-author">
+                    {users[x.id] ? users[x.id].username : ""}
+                  </div>
                   <div className="col-auto chat-time d-lg-block d-none">
                     {lastMessage.date && lastMessage.date !== 0
                       ? isToday(lastMessage.date)
@@ -166,6 +182,104 @@ const AltChat = ({ projectId, user, size }) => {
             </div>
           );
         })}
+        {clients.length === 2 && user.accountType === "admin" && (
+          <div
+            onClick={(e) => {
+              e.stopPropagation();
+              setChatId(clientsChatId);
+            }}
+            className={`row no-gutters border-bottom p-lg-3 p-2 chat-preview${
+              chatId === clientsChatId ? " bg-white" : " bg-light"
+            }`}
+          >
+            <div className="col-auto position-relative p-2 d-block d-md-none">
+              <div
+                className="bg-image square-30 rounded-circle"
+                style={{
+                  transform: "translate(10px, 5px)",
+                  backgroundImage: `url(${
+                    users[clients[0].id] ? users[clients[0].id].photo : ""
+                  })`,
+                }}
+              ></div>
+              <div
+                className="bg-image square-30 rounded-circle position-absolute"
+                style={{
+                  top: "-1px",
+                  left: "-2px",
+                  backgroundImage: `url(${
+                    users[clients[1].id] ? users[clients[1].id].photo : ""
+                  })`,
+                }}
+              ></div>
+            </div>
+            <div className="col-12 d-none d-md-block">
+              <div className="row no-gutters align-items-center mb-2">
+                <div
+                  className="col-auto mr-2 bg-image square-40 rounded-circle"
+                  style={{
+                    backgroundImage: `url(${
+                      users[clients[0].id] ? users[clients[0].id].photo : ""
+                    })`,
+                  }}
+                ></div>
+                <div className="col mr-3 alt-chat-author">
+                  {users[clients[0].id] ? users[clients[0].id].username : ""}
+                </div>
+                <div className="col mr-2 alt-chat-author text-right">
+                  {users[clients[1].id] ? users[clients[1].id].username : ""}
+                </div>
+                <div
+                  className="col-auto bg-image square-40 rounded-circle"
+                  style={{
+                    backgroundImage: `url(${
+                      users[clients[1].id] ? users[clients[1].id].photo : ""
+                    })`,
+                  }}
+                ></div>
+              </div>
+              <div className="row no-gutters align-items-center justify-content-between">
+                {chats[clientsChatId] && chats[clientsChatId].lastMessage ? (
+                  <React.Fragment>
+                    <div className="col-auto">
+                      <div className="row no-gutters">
+                        <div className="col-auto mr-2 alt-chat-message">
+                          {chats[clientsChatId].lastMessage.userId
+                            ? users[chats[clientsChatId].lastMessage.userId]
+                              ? users[chats[clientsChatId].lastMessage.userId]
+                                  .username + ":"
+                              : ""
+                            : ""}
+                        </div>
+                        <div className="col-auto alt-chat-message">
+                          {chats[clientsChatId].lastMessage
+                            ? chats[clientsChatId].lastMessage.text
+                            : ""}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="col-auto chat-time d-lg-block d-none">
+                      {chats[clientsChatId].lastMessage.date &&
+                      chats[clientsChatId].lastMessage.date !== 0
+                        ? isToday(chats[clientsChatId].lastMessage.date)
+                          ? date.format(
+                              new Date(chats[clientsChatId].lastMessage.date),
+                              "hh:mm A"
+                            )
+                          : date.format(
+                              new Date(chats[clientsChatId].lastMessage.date),
+                              "hh:mm A MMM DD YYYY"
+                            )
+                        : ""}
+                    </div>
+                  </React.Fragment>
+                ) : (
+                  <div className="alt-chat-message">Haven't chated yet</div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
       <div className="col-lg-8 col bg-white border-left">
         <div className="row no-gutters">
@@ -177,21 +291,20 @@ const AltChat = ({ projectId, user, size }) => {
             Object.keys(people).length &&
             chats[chatId].messages ? (
               Object.values(chats[chatId].messages).map((x) => {
-                let tempPerson = people[x.userId]
-                  ? people[x.userId]
-                  : { photo: "", username: "" };
                 return (
                   <div key={uid(x)} className={`row mb-2 no-gutters p-3`}>
                     <div
                       className="col-auto mr-2 bg-image square-50"
                       style={{
-                        backgroundImage: `url(${tempPerson.photo})`,
+                        backgroundImage: `url(${
+                          users[x.userId] ? users[x.userId].photo : ""
+                        })`,
                       }}
                     ></div>
                     <div className="col">
                       <div className="row no-gutters align-items-center">
                         <div className="col-auto mr-2 alt-chat-author">
-                          {tempPerson.username}
+                          {users[x.userId] ? users[x.userId].username : ""}
                         </div>
                         <div className="col-auto alt-chat-date">
                           {x.date
@@ -283,4 +396,11 @@ const AltChat = ({ projectId, user, size }) => {
   );
 };
 
-export default AltChat;
+function mapp(state, ownProps) {
+  return {
+    users: state.publicUsers,
+    ...ownProps,
+  };
+}
+
+export default connect(mapp)(AltChat);

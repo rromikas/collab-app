@@ -11611,6 +11611,16 @@ input[type="text"]::placeholder {
   height: 50px !important;
 }
 
+.square-30 {
+  width: 30px !important;
+  height: 30px !important;
+}
+
+.square-40 {
+  width: 40px !important;
+  height: 40px !important;
+}
+
 .request-title {
   font-size: 22px;
   color: #373737;
