@@ -144,7 +144,7 @@ export const UploadDropboxFile = (path, file, author, projectId) => {
         path: pathForFirebase,
         fileProvider: "dropbox",
         previewLink: file.link,
-        uploadedBy: author,
+        uploadedBy: author.id,
       },
     };
 
@@ -181,7 +181,7 @@ export const UploadGoogleDriveFile = (path, file, author, projectId) => {
         type: "file",
         date: new Date(),
         path: pathForFirebase,
-        uploadedBy: author,
+        uploadedBy: author.id,
         fileProvider: "google drive",
         previewLink: file.url,
         mimeType: file.mimeType,
@@ -226,7 +226,7 @@ export const CreateFolder = (path, user, projectId, onSuccess) => {
   let updates = {};
   updates[`projects/${projectId}/files/${path}/metadata`] = {
     date: new Date(),
-    createdBy: user.username,
+    createdBy: user.id,
     type: "folder",
   };
 

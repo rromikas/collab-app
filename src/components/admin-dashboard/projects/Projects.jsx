@@ -6,6 +6,7 @@ import history from "../../../history";
 import NoProjects from "../../../pictures/NoProjects";
 import * as firebase from "../../../database/firebase";
 import store from "../../../store/store";
+import { connect } from "react-redux";
 
 const deleteProject = (projectId) => {
   let updates = {};
@@ -21,7 +22,7 @@ const deleteProject = (projectId) => {
   firebase.UpdateDatabase(updates);
 };
 
-const Projects = ({ projects, userId, size }) => {
+const Projects = ({ projects, userId, size, users }) => {
   const blockHeight =
     size.width > 768 ? size.height - 76 - 32 - 56 : size.height - 76 - 48 - 56;
   useEffect(() => {
@@ -69,7 +70,11 @@ const Projects = ({ projects, userId, size }) => {
                             <div style={{ fontWeight: "500" }} className="pr-1">
                               for
                             </div>
-                            <div>{x.creator.username}</div>
+                            <div>
+                              {users[x.user_id]
+                                ? users[x.user_id].username
+                                : ""}
+                            </div>
                           </div>
                         </div>
                         <div className="col-auto">
@@ -153,4 +158,10 @@ const Projects = ({ projects, userId, size }) => {
   );
 };
 
-export default Projects;
+function mapp(state, ownProps) {
+  return {
+    users: state.publicUsers,
+    ...ownProps,
+  };
+}
+export default connect(mapp)(Projects);

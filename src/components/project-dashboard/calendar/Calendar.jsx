@@ -18,6 +18,7 @@ import { BsTrash } from "react-icons/bs";
 import CustomToolbar from "./CustomToolbar";
 import randomColor from "randomcolor";
 import { AddOrEditCalendarEvent } from "../../../database/api";
+import { connect } from "react-redux";
 const localizer = momentLocalizer(moment); // or globalizeLocalizer
 
 const deleteEvent = (projectId, event) => {
@@ -30,7 +31,7 @@ const deleteEvent = (projectId, event) => {
   firebase.UpdateDatabase(updates);
 };
 
-const Calendar = ({ projectId, people }) => {
+const Calendar = ({ projectId, people, users }) => {
   const [events, setEvents] = useState({});
   const [newEvent, setNewEvent] = useState({
     start: new Date(Date.now()),
@@ -56,7 +57,9 @@ const Calendar = ({ projectId, people }) => {
     firebase.on(
       `projects/${projectId}/events/${date.format(calendarTime, "MM-YYYY")}`,
       (data) => {
-        setEvents(data ? data : {});
+        if (data) {
+          setEvents((prev) => Object.assign({}, prev, data));
+        }
       }
     );
     return function cleanUp() {
@@ -235,7 +238,9 @@ const Calendar = ({ projectId, people }) => {
                       }}
                       checked={newEvent.associatedWith === x.id}
                     ></Checkbox>
-                    <div className="ml-2"> {x.username}</div>
+                    <div className="ml-2">
+                      {users[x.id] ? users[x.id].username : ""}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -345,7 +350,9 @@ const Calendar = ({ projectId, people }) => {
           {Object.values(people).map((x) => (
             <div className="col-auto px-3 py-2" key={uid(x)}>
               <div className="row no-gutters align-items-center">
-                <div className="col-auto mr-2">{x.username}</div>
+                <div className="col-auto mr-2">
+                  {users[x.id] ? users[x.id].username : ""}
+                </div>
                 <div
                   className="col-auto"
                   style={{
@@ -516,4 +523,11 @@ const Calendar = ({ projectId, people }) => {
   );
 };
 
-export default Calendar;
+function mapp(state, ownProps) {
+  return {
+    users: state.publicUsers,
+    ...ownProps,
+  };
+}
+
+export default connect(mapp)(Calendar);

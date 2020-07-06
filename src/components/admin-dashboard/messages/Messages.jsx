@@ -6,6 +6,7 @@ import uniqid from "uniqid";
 import NoMessages from "../../../pictures/NoMessages";
 import ChatsPreview from "./ChatPreviews";
 import { SendMessage, MarkMessageAsSeen } from "../../../database/api";
+import { connect } from "react-redux";
 
 const sliceObject = (obj, property) => {
   let newObj = { ...obj };
@@ -23,7 +24,7 @@ const isToday = (someDate) => {
   );
 };
 
-const Messages = ({ user, size, chat }) => {
+const Messages = ({ user, size, chat, users }) => {
   const chatHeight =
     size.width > 768 ? size.height - 250.4 : size.height - 64 - 76 - 80 - 57;
   const messagesEnd = useRef(null);
@@ -92,14 +93,14 @@ const Messages = ({ user, size, chat }) => {
                       className="col-auto mr-2 bg-image square-50"
                       style={{
                         backgroundImage: `url(${
-                          people[x.userId] ? people[x.userId].photo : ""
+                          users[x.userId] ? users[x.userId].photo : ""
                         })`,
                       }}
                     ></div>
                     <div className="col">
                       <div className="row no-gutters align-items-center">
                         <div className="col-auto mr-2 alt-chat-author">
-                          {people[x.userId] ? people[x.userId].username : ""}
+                          {users[x.userId] ? users[x.userId].username : ""}
                         </div>
                         <div className="col-auto alt-chat-date">
                           {x.date
@@ -187,4 +188,11 @@ const Messages = ({ user, size, chat }) => {
   );
 };
 
-export default Messages;
+function mapp(state, ownProps) {
+  return {
+    users: state.publicUsers,
+    ...ownProps,
+  };
+}
+
+export default connect(mapp)(Messages);

@@ -17,6 +17,8 @@ import TimePicker from "react-time-picker";
 import { BsTrash } from "react-icons/bs";
 import CustomToolbar from "./CustomToolbar";
 import randomColor from "randomcolor";
+import { connect } from "react-redux";
+
 const localizer = momentLocalizer(moment); // or globalizeLocalizer
 
 const deleteEvent = (projectId, event) => {
@@ -29,7 +31,7 @@ const deleteEvent = (projectId, event) => {
   firebase.UpdateDatabase(updates);
 };
 
-const Calendar = ({ projectId, projects }) => {
+const Calendar = ({ projectId, projects, users }) => {
   const [events, setEvents] = useState({});
   const [people, setPeople] = useState({});
   const [problem, setProblem] = useState("");
@@ -331,7 +333,10 @@ const Calendar = ({ projectId, projects }) => {
                       }}
                       checked={newEvent.associatedWith === x.id}
                     ></Checkbox>
-                    <div className="ml-2"> {x.username}</div>
+                    <div className="ml-2">
+                      {" "}
+                      {users[x.id] ? users[x.id].username : ""}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -457,7 +462,9 @@ const Calendar = ({ projectId, projects }) => {
           {Object.values(people).map((x) => (
             <div className="col-auto py-2 px-3" key={uid(x)}>
               <div className="row no-gutters align-items-center">
-                <div className="col-auto mr-2">{x.username}</div>
+                <div className="col-auto mr-2">
+                  {users[x.id] ? users[x.id].username : ""}
+                </div>
                 <div
                   className="col-auto"
                   style={{
@@ -628,4 +635,11 @@ const Calendar = ({ projectId, projects }) => {
   );
 };
 
-export default Calendar;
+function mapp(state, ownProps) {
+  return {
+    users: state.publicUsers,
+    ...ownProps,
+  };
+}
+
+export default connect(mapp)(Calendar);

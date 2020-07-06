@@ -5,6 +5,7 @@ import uniqid from "uniqid";
 import * as firebase from "../../../database/firebase";
 import NoTimes from "../../../pictures/NoTimes";
 import { uid } from "react-uid";
+import { connect } from "react-redux";
 
 const formatNumber = (number) => {
   let word = number.toString();
@@ -27,11 +28,11 @@ const calculateTotalTime = (times) => {
   return `${formatNumber(h)}:${formatNumber(m)}`;
 };
 
-const calculatePersonalTime = (times, username) => {
+const calculatePersonalTime = (times, user_id) => {
   let minutes = 0;
   Object.values(times).forEach((x) => {
     Object.values(x).forEach((y) => {
-      if (y.creator === username) {
+      if (y.user_id === user_id) {
         minutes += y.minutes;
       }
     });
@@ -77,10 +78,10 @@ const addTimeRecord = (timeRecord, projectId, onError, onSuccess) => {
   }
 };
 
-const Times = ({ user, projectId, times, size, people }) => {
+const Times = ({ user, projectId, times, size, people, users }) => {
   const initialTimeRecord = {
     time: "",
-    creator: user.username,
+    user_id: user.id,
     task: "",
     description: "",
   };
@@ -100,7 +101,7 @@ const Times = ({ user, projectId, times, size, people }) => {
           <Popover
             content={
               <div className="popover-inner">
-                <div>
+                <div className="mb-1">
                   <label>Time</label>
                   <input
                     value={timeRecord.time}
@@ -115,7 +116,7 @@ const Times = ({ user, projectId, times, size, people }) => {
                     className="d-block"
                   ></input>
                 </div>
-                <div>
+                <div className="mb-1">
                   <label>Task</label>
                   <input
                     value={timeRecord.task}
@@ -195,9 +196,9 @@ const Times = ({ user, projectId, times, size, people }) => {
               .filter((x) => x.permissions === "owner")
               .map((x) => (
                 <div className="row no-gutters align-items-center" key={uid(x)}>
-                  <div className="col-auto mr-2">{x.username}:</div>
+                  <div className="col-auto mr-2">{users[x.id].username}:</div>
                   <div className="col-auto">
-                    {calculatePersonalTime(times, x.username)}
+                    {calculatePersonalTime(times, x.id)}
                   </div>
                 </div>
               ))}
@@ -217,7 +218,9 @@ const Times = ({ user, projectId, times, size, people }) => {
                         key={uid(y)}
                       >
                         <div className="col-4 pr-2">{y.time}</div>
-                        <div className="col-4 pr-2">{y.creator}</div>
+                        <div className="col-4 pr-2">
+                          {users[y.user_id].username}
+                        </div>
                         <div className="col-4">{y.task}</div>
                       </div>
                     ))}
@@ -241,4 +244,11 @@ const Times = ({ user, projectId, times, size, people }) => {
   );
 };
 
-export default Times;
+function mapp(state, ownProps) {
+  return {
+    users: state.publicUsers,
+    ...ownProps,
+  };
+}
+
+export default connect(mapp)(Times);

@@ -5,13 +5,14 @@ import Popover from "../../utility/Popover";
 import { AddNote } from "../../../database/api";
 import uniqid from "uniqid";
 import { BsJustify, BsGrid } from "react-icons/bs";
+import { connect } from "react-redux";
 
-const Notes = ({ size, notes, projectId, user }) => {
+const Notes = ({ size, notes, projectId, user, users }) => {
   const containerMinHeight =
     size.width > 768 ? size.height - 76 - 56 - 24 : size.height - 76 - 56;
   const [newNote, setNewNote] = useState({
     id: uniqid("note-"),
-    user: { username: user.username, photo: user.photo },
+    user_id: user.id,
     text: "",
   });
   const [structure, setStructure] = useState("list");
@@ -101,47 +102,60 @@ const Notes = ({ size, notes, projectId, user }) => {
           </div>
         </div>
         <div className="row no-gutters">
-          {Object.values(notes).reverse().map((x) => (
-            <div
-              className={`col-12 col-lg-${
-                structure === "list" ? "12" : "6"
-              } col-xl-${structure === "list" ? "12" : "4"}`}
-            >
+          {Object.values(notes)
+            .reverse()
+            .map((x) => (
               <div
-                key={uid(x)}
-                className={`row no-gutters p-4 m-${
-                  structure === "list" ? "2" : "3"
-                } basic-card`}
+                className={`col-12 col-lg-${
+                  structure === "list" ? "12" : "6"
+                } col-xl-${structure === "list" ? "12" : "4"}`}
               >
                 <div
-                  className="col-auto mr-2 bg-image square-50"
-                  style={{ backgroundImage: `url(${x.user.photo})` }}
-                ></div>
-                <div className="col">
-                  <div className="row no-gutters align-items-center">
-                    <div className="col-auto mr-3 alt-chat-author">
-                      {x.user.username}
-                    </div>
-                    <div className="col-auto alt-chat-date">
-                      {x.date
-                        ? date.format(new Date(x.date), "DD MMM, YYYY")
-                        : ""}
-                    </div>
-                  </div>
+                  key={uid(x)}
+                  className={`row no-gutters p-4 m-${
+                    structure === "list" ? "2" : "3"
+                  } basic-card`}
+                >
                   <div
-                    className="row no-gutters alt-chat-message overflow-auto"
-                    style={{ height: structure === "grid" ? "190px" : "auto" }}
-                  >
-                    {x.text}
+                    className="col-auto mr-2 bg-image square-50"
+                    style={{
+                      backgroundImage: `url(${users[x.user_id].photo})`,
+                    }}
+                  ></div>
+                  <div className="col">
+                    <div className="row no-gutters align-items-center">
+                      <div className="col-auto mr-3 alt-chat-author">
+                        {users[x.user_id].username}
+                      </div>
+                      <div className="col-auto alt-chat-date">
+                        {x.date
+                          ? date.format(new Date(x.date), "DD MMM, YYYY")
+                          : ""}
+                      </div>
+                    </div>
+                    <div
+                      className="row no-gutters alt-chat-message overflow-auto"
+                      style={{
+                        height: structure === "grid" ? "190px" : "auto",
+                      }}
+                    >
+                      {x.text}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
         </div>
       </div>
     </div>
   );
 };
 
-export default Notes;
+function mapp(state, ownProps) {
+  return {
+    users: state.publicUsers,
+    ...ownProps,
+  };
+}
+
+export default connect(mapp)(Notes);

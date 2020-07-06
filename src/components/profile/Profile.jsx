@@ -6,8 +6,9 @@ import store from "../../store/store";
 import date from "date-and-time";
 import * as firebase from "../../database/firebase";
 import { uid } from "react-uid";
+import { connect } from "react-redux";
 
-const Profile = ({ user, projects }) => {
+const Profile = ({ user, projects, users }) => {
   const hiddenUploader = useRef(null);
   useEffect(() => {
     store.dispatch({ type: "SET_PAGE_TITLE", pageTitle: "" });
@@ -23,12 +24,36 @@ const Profile = ({ user, projects }) => {
   ];
 
   const [userData, setUserData] = useState({
-    name: user.username,
-    surname: user.surname ? user.surname : "",
-    phone: user.phone ? user.phone : "",
-    location: user.location ? user.location : "",
-    website: user.website ? user.website : "",
-    linkedin: user.linkedin ? user.linkedin : "",
+    username: users[user.id]
+      ? users[user.id].username
+        ? users[user.id].username
+        : ""
+      : "",
+    surname: users[user.id]
+      ? users[user.id].surname
+        ? users[user.id].surname
+        : ""
+      : "",
+    phone: users[user.id]
+      ? users[user.id].phone
+        ? users[user.id].phone
+        : ""
+      : "",
+    location: users[user.id]
+      ? users[user.id].location
+        ? users[user.id].location
+        : ""
+      : "",
+    website: users[user.id]
+      ? users[user.id].website
+        ? users[user.id].website
+        : ""
+      : "",
+    linkedin: users[user.id]
+      ? users[user.id].linkedin
+        ? users[user.id].linkedin
+        : ""
+      : "",
   });
 
   const [edit, setEdit] = useState(false);
@@ -46,8 +71,11 @@ const Profile = ({ user, projects }) => {
                 background: "white",
                 overflow: "hidden",
                 position: "relative",
-                backgroundImage:
-                  user.photo !== "" ? `url(${user.photo})` : "unset",
+                backgroundImage: users[user.id]
+                  ? users[user.id].photo !== ""
+                    ? `url(${users[user.id].photo})`
+                    : "unset"
+                  : "unset",
               }}
             >
               <div
@@ -70,7 +98,9 @@ const Profile = ({ user, projects }) => {
             </div>
           </div>
           <div className="col-12 mx-2 ml-md-3 mr-md-3">
-            <div className="text-center mt-3 h1">{user.username}</div>
+            <div className="text-center mt-3 h1 text-truncate">
+              {users[user.id] ? users[user.id].username : ""}
+            </div>
           </div>
           <div className="col-12">
             {Object.keys(userData)
@@ -78,7 +108,7 @@ const Profile = ({ user, projects }) => {
               .map((x) => (
                 <div className="row no-gutters" key={uid(x)}>
                   <div className="col-12">
-                    <label>{x}</label>
+                    <label>{x === "username" ? "name" : x}</label>
                     {/* <div style={{ minHeight: "20px" }}>{userData[x]}</div> */}
                     <div className="w-100 text-center mb-2">
                       <input
@@ -105,9 +135,9 @@ const Profile = ({ user, projects }) => {
                 onClick={() => {
                   if (edit) {
                     let updates = {};
-                    updates[`users/${user.id}`] = Object.assign(
+                    updates[`publicUsers/${user.id}`] = Object.assign(
                       {},
-                      user,
+                      users[user.id],
                       userData
                     );
                     firebase.UpdateDatabase(updates);
@@ -150,10 +180,14 @@ const Profile = ({ user, projects }) => {
                     style={{
                       height: "40px",
                       width: "40px",
-                      backgroundImage: `url(${x.creator.photo})`,
+                      backgroundImage: `url(${
+                        users[x.user_id] ? users[x.user_id].photo : ""
+                      })`,
                     }}
                   ></div>
-                  <div className="col">{x.creator.username}</div>
+                  <div className="col">
+                    {users[x.user_id] ? users[x.user_id].username : ""}
+                  </div>
                 </div>
                 <label>Date</label>
                 <div className="mb-3">
@@ -184,4 +218,11 @@ const Profile = ({ user, projects }) => {
   );
 };
 
-export default Profile;
+function mapp(state, ownProps) {
+  return {
+    users: state.publicUsers,
+    ...ownProps,
+  };
+}
+
+export default connect(mapp)(Profile);

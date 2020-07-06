@@ -61,13 +61,19 @@ function createDemoUser() {
   let updates = {};
   Object.keys(accounts).forEach((x) => {
     updates[`users/${x}`] = accounts[x];
+    updates[`publicUsers/${x}`] = {
+      photo: accounts[x].photo,
+      username: accounts[x].username,
+      email: accounts[x].email,
+      id: accounts[x].id,
+    };
   });
 
   firebase.UpdateDatabase(updates);
 }
 // createDemoUser();
 
-const MainPage = () => {
+const MainPage = ({ users }) => {
   const [loading, setLoading] = useState(false);
   return (
     <div
@@ -88,10 +94,14 @@ const MainPage = () => {
                   <div
                     className="col-auto mr-2 photo-circle-sm"
                     style={{
-                      backgroundImage: `url(${x.photo})`,
+                      backgroundImage: `url(${
+                        users[x.id] ? users[x.id].photo : ""
+                      })`,
                     }}
                   ></div>
-                  <div className="col-auto mr-2">{x.email}</div>
+                  <div className="col-auto mr-2">
+                    {users[x.id] ? users[x.id].email : ""}
+                  </div>
                 </div>
               </div>
 
@@ -121,6 +131,15 @@ const MainPage = () => {
   );
 };
 
+function mapp(state, ownProps) {
+  return {
+    users: state.publicUsers,
+    ...ownProps,
+  };
+}
+
+const connectedMainPage = connect(mapp)(MainPage);
+
 const resizer = () => {
   store.dispatch({
     type: "SET_SIZE",
@@ -148,10 +167,28 @@ function App({ user }) {
       store.dispatch({ type: "SET_PAGE_TITLE", pageTitle: "Select Account" });
     }
   }, [user.id]);
+
+  useEffect(() => {
+    firebase.on("publicUsers", (data) => {
+      if (data) {
+        store.dispatch({ type: "SET_PUBLIC_USERS", publicUsers: data });
+      }
+    });
+    return function cleanUp() {
+      firebase.off("publicUsers");
+    };
+  });
+  // useEffect(() => {
+  //   firebase.GetFromDatabase("publicUsers").then((data) => {
+  //     if (data) {
+  //       store.dispatch({ type: "SET_PUBLIC_USERS", publicUsers: data });
+  //     }
+  //   });
+  // });
   return (
     <Router history={history}>
       <Switch>
-        <Route exact path="/" component={MainPage}></Route>
+        <Route exact path="/" component={connectedMainPage}></Route>
         <Route
           path="/:userId/:page/:projectId/:section/:subsection"
           component={UserDashobard}

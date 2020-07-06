@@ -20,6 +20,7 @@ import prettyFileIcons from "pretty-file-icons";
 import { Icons } from "../../../pictures/file-icons/index";
 import mime from "mime-types";
 import { uid } from "react-uid";
+import { connect } from "react-redux";
 
 const getMetadata = (metadata, path, filename) => {
   let myMetadata = { ...metadata };
@@ -38,7 +39,7 @@ const handleFileUpload = (e, path, user, projectId, onFinish = () => {}) => {
   if (file) {
     if (file.size < 10000000) {
       if (file.name.length < 400) {
-        firebase.UploadFile(path, file, user.username, onFinish, projectId);
+        firebase.UploadFile(path, file, user.id, onFinish, projectId);
       } else {
         alert("file name is too long");
       }
@@ -48,7 +49,7 @@ const handleFileUpload = (e, path, user, projectId, onFinish = () => {}) => {
   }
 };
 
-const Files = ({ projectId, user, size, metadata }) => {
+const Files = ({ projectId, user, size, metadata, users }) => {
   const listHeight =
     size.width > 768
       ? size.height - 64 - 24 - 76 - 56 - 24
@@ -463,7 +464,10 @@ const Files = ({ projectId, user, size, metadata }) => {
                                 className="text-sm-center file-name-fixed mr-2 col-12"
                                 style={{ fontSize: "14px" }}
                               >
-                                by {x.uploadedBy}
+                                by{" "}
+                                {users[x.uploadedBy]
+                                  ? users[x.uploadedBy].username
+                                  : ""}
                               </div>
                             </div>
                             <div className="row no-gutters">
@@ -501,4 +505,11 @@ const Files = ({ projectId, user, size, metadata }) => {
   );
 };
 
-export default Files;
+function mapp(state, ownProps) {
+  return {
+    users: state.publicUsers,
+    ...ownProps,
+  };
+}
+
+export default connect(mapp)(Files);

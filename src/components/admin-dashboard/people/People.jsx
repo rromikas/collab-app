@@ -9,6 +9,7 @@ import uniqid, { time } from "uniqid";
 import Checkbox from "../../utility/Checkbox";
 import { BsChevronDown } from "react-icons/bs";
 import { uid } from "react-uid";
+import { connect } from "react-redux";
 
 const sendInvitation = (invitation, user) => {
   let id = uniqid("notification-");
@@ -18,9 +19,9 @@ const sendInvitation = (invitation, user) => {
   ] = { status: "invited", email: invitation.toWhom };
   updates[`users/${md5(invitation.toWhom)}/notifications/${id}`] = {
     permissions: invitation.permissions,
-    photo: user.photo,
+    user_id: user.id,
     status: "asked",
-    text: `${user.username} invited you to the project "${invitation.project.title}"`,
+    text: `invited you to the project "${invitation.project.title}"`,
     type: "invitation",
     project: invitation.project,
     id: id,
@@ -30,7 +31,7 @@ const sendInvitation = (invitation, user) => {
   firebase.UpdateDatabase(updates);
 };
 
-const People = ({ projects, user, size }) => {
+const People = ({ projects, user, size, users }) => {
   const blockHeight =
     size.width > 768 ? size.height - 48 - 24 - 76 : size.height - 76 - 56 - 48;
   const runningProjects = Object.values(projects).filter(
@@ -289,17 +290,22 @@ const People = ({ projects, user, size }) => {
                         <div className="col-auto mr-2">Invitation sent to</div>
                       </React.Fragment>
                     )}
-                    {y.photo && (
+                    {users[y.id] && users[y.id].photo && (
                       <div
                         className="col-auto mr-2 photo-circle-sm"
                         style={{
-                          backgroundImage: `url(${y.photo})`,
+                          backgroundImage: `url(${users[y.id].photo})`,
                         }}
                       ></div>
                     )}
 
                     <div className="col-auto">
-                      {y.email} / {x === "1" ? "All" : projects[x].title}
+                      {users[y.id]
+                        ? users[y.id].email
+                          ? users[y.id].email
+                          : ""
+                        : ""}{" "}
+                      / {x === "1" ? "All" : projects[x].title}
                     </div>
                   </div>
                 ))
@@ -320,4 +326,11 @@ const People = ({ projects, user, size }) => {
   );
 };
 
-export default People;
+function mapp(state, ownProps) {
+  return {
+    users: state.publicUsers,
+    ...ownProps,
+  };
+}
+
+export default connect(mapp)(People);

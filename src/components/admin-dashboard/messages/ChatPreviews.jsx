@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import * as firebase from "../../../database/firebase";
 import { uid } from "react-uid";
 import date from "date-and-time";
+import { connect } from "react-redux";
 
 const isToday = (someDate) => {
   const today = new Date();
@@ -14,7 +15,7 @@ const isToday = (someDate) => {
   );
 };
 
-const ChatPreviews = ({ view, user, setChat, chat }) => {
+const ChatPreviews = ({ view, user, setChat, chat, users }) => {
   const [chats, setChats] = useState({});
   const [people, setPeople] = useState({});
   const [tick, setTick] = useState(false);
@@ -80,12 +81,6 @@ const ChatPreviews = ({ view, user, setChat, chat }) => {
       {Object.keys(chats).map((x) => {
         return Object.keys(chats[x]).map((y) => {
           let personId = y.replace(user.id, "");
-
-          let tempUser = people[x]
-            ? people[x][personId]
-              ? people[x][personId]
-              : { photo: "", username: "" }
-            : { photo: "", username: "" };
           return (
             <div
               key={uid(y)}
@@ -109,13 +104,13 @@ const ChatPreviews = ({ view, user, setChat, chat }) => {
                   borderRadius: "50%",
                   backgroundPosition: "center",
                   backgroundSize: "cover",
-                  backgroundImage: `url(${tempUser.photo})`,
+                  backgroundImage: `url(${users[personId].photo})`,
                 }}
               ></div>
               <div className="col d-lg-block d-none">
                 <div className="row no-gutters justify-content-between">
                   <div className="col-auto alt-chat-author">
-                    {tempUser.username + " / " + user.projects[x].title}
+                    {users[personId].username + " / " + user.projects[x].title}
                   </div>
                   <div className="col-auto chat-time d-lg-block d-none">
                     {chats[x][y].date && chats[x][y].date !== 0
@@ -145,4 +140,11 @@ const ChatPreviews = ({ view, user, setChat, chat }) => {
   );
 };
 
-export default ChatPreviews;
+function mapp(state, ownProps) {
+  return {
+    users: state.publicUsers,
+    ...ownProps,
+  };
+}
+
+export default connect(mapp)(ChatPreviews);

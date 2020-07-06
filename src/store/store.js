@@ -61,12 +61,22 @@ function calendarDateReducer(state = new Date(), action) {
       return state;
   }
 }
+function publicUsersReducer(state = new Date(), action) {
+  switch (action.type) {
+    case "SET_PUBLIC_USERS":
+      return action.publicUsers;
+    default:
+      return state;
+  }
+}
+
 const rootReducer = combineReducers({
   user: userReducer,
   pageTitle: pageTitleReducer,
   backlink: backlinkReducer,
   size: sizeReducer,
   calendarDate: calendarDateReducer,
+  publicUsers: publicUsersReducer,
 });
 
 const store = createStore(

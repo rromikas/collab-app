@@ -21,7 +21,7 @@ const createProject = async (project, user) => {
           let id = uniqid("notification-");
           updates[`users/${userId}/notifications/${id}`] = {
             permissions: x.permissions,
-            photo: user.photo,
+            user_id: user.id,
             text: `${user.username} invited you to the project "${project.title}"`,
             type: "invitation",
             project: project,
@@ -34,11 +34,11 @@ const createProject = async (project, user) => {
       })
     );
 
-    updates[`users/${project.creator.id}/projects/${project.id}`] = project;
+    updates[`users/${user.id}/projects/${project.id}`] = project;
     updates[`projects/${project.id}`] = project;
     console.log("Updates new project", updates);
     firebase.UpdateDatabase(updates);
-    history.push(`/${project.creator.id}/projects`);
+    history.push(`/${user.id}/projects`);
   }
 };
 
@@ -54,16 +54,13 @@ const NewProject = ({ user }) => {
     people: {
       [user.id]: {
         id: user.id,
-        photo: user.photo,
-        username: user.username,
-        email: user.email,
         permissions: "owner",
         color: randomColor(),
       },
     },
 
     status: "Running",
-    creator: { username: user.username, photo: user.photo, id: user.id },
+    user_id: user.id,
   });
 
   const newMemberAdder = useRef(null);

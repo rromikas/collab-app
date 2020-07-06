@@ -36,7 +36,7 @@ const ProjectDashboard = ({
     });
 
     firebase.GetFromDatabase(`projects/${projectId}`).then((data) => {
-      if (data) {
+      if (data && data.title) {
         store.dispatch({ type: "SET_PAGE_TITLE", pageTitle: data.title });
         setProject((pr) => Object.assign({}, pr, data));
       }
@@ -52,9 +52,11 @@ const ProjectDashboard = ({
 
   useEffect(() => {
     firebase.on(`projects/${projectId}`, (data) => {
-      setProject(data);
-      if (data.people) {
-        setPeople(data.people);
+      if (data) {
+        setProject(data);
+        if (data.people) {
+          setPeople(data.people);
+        }
       }
     });
 

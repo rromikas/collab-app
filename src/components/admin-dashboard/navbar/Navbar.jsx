@@ -11,7 +11,7 @@ import {
   AnswerToInvitation,
 } from "../../../database/api";
 
-const Navbar = ({ pageTitle, user, backlink }) => {
+const Navbar = ({ pageTitle, user, backlink, users }) => {
   const userPhoto = useRef(null);
   const bell = useRef(null);
   let notifications = user.notifications ? user.notifications : {};
@@ -74,10 +74,17 @@ const Navbar = ({ pageTitle, user, backlink }) => {
                     >
                       <div
                         className="col-auto photo-circle-sm mr-2"
-                        style={{ backgroundImage: `url(${x.photo})` }}
+                        style={{
+                          backgroundImage: `url(${
+                            users[x.user_id] ? users[x.user_id].photo : ""
+                          })`,
+                        }}
                       ></div>
                       <div className="col px-0">
-                        <div className="row no-gutters mb-2">{x.text}</div>
+                        <div className="row no-gutters mb-2">
+                          {users[x.user_id] ? users[x.user_id].username : ""}{" "}
+                          {x.text}
+                        </div>
                         {x.type === "invitation" && (
                           <div className="row no-gutters w-100 mb-2">
                             <div
@@ -134,10 +141,17 @@ const Navbar = ({ pageTitle, user, backlink }) => {
                     >
                       <div
                         className="col-auto photo-circle-sm mr-2"
-                        style={{ backgroundImage: `url(${x.photo})` }}
+                        style={{
+                          backgroundImage: `url(${
+                            users[x.user_id] ? users[x.user_id].photo : ""
+                          })`,
+                        }}
                       ></div>
                       <div className="col px-0">
-                        <div className="row no-gutters mb-2">{x.text}</div>
+                        <div className="row no-gutters mb-2">
+                          {users[x.user_id] ? users[x.user_id].username : ""}{" "}
+                          {x.text}
+                        </div>
                         {x.status === "asked" ? (
                           x.type === "invitation" && (
                             <div className="row no-gutters w-100 mb-2">
@@ -220,6 +234,15 @@ const Navbar = ({ pageTitle, user, backlink }) => {
                 <div
                   className="popover-content-item"
                   onClick={() => {
+                    history.push(`/${user.id}/profile`);
+                    userPhoto.current.click();
+                  }}
+                >
+                  Profile
+                </div>
+                <div
+                  className="popover-content-item"
+                  onClick={() => {
                     store.dispatch({
                       type: "SET_USER",
                       user: {
@@ -263,6 +286,7 @@ function mapStateToProps(state, ownProps) {
   return {
     pageTitle: state.pageTitle,
     user: state.user,
+    users: state.publicUsers,
     backlink: state.backlink,
     ...ownProps,
   };

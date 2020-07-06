@@ -6,10 +6,11 @@ import date from "date-and-time";
 import { BsX, BsCheck, BsReply, BsFillReplyFill } from "react-icons/bs";
 import Popover from "../../utility/Popover";
 import { uid } from "react-uid";
+import { connect } from "react-redux";
 
 const filters = ["All", "Pending", "Agreed", "Disagreed"];
 
-const Requests = ({ projectId, user, size }) => {
+const Requests = ({ projectId, user, size, users }) => {
   const filterChooser = useRef(null);
   const containerMinHeight =
     size.width > 768 ? size.height - 76 - 24 - 56 : size.height - 76 - 56;
@@ -135,7 +136,9 @@ const Requests = ({ projectId, user, size }) => {
                     <div className="row no-gutters border-bottom my-3">
                       <div className="mr-4 col-auto">
                         <label className="mr-2">Author</label>
-                        <div className="text-primary">{x.creator.username}</div>
+                        <div className="text-primary">
+                          {users[x.user_id].username}
+                        </div>
                       </div>
                       <div className="mr-2 col-auto">
                         <label>Date</label>
@@ -198,4 +201,11 @@ const Requests = ({ projectId, user, size }) => {
   );
 };
 
-export default Requests;
+function mapp(state, ownProps) {
+  return {
+    users: state.publicUsers,
+    ...ownProps,
+  };
+}
+
+export default connect(mapp)(Requests);

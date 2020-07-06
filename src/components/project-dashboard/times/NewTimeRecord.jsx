@@ -15,7 +15,7 @@ const addTimeRecord = (timeRecord, projectId) => {
 const NewTimeRecord = () => {
   const [timeRecord, setTimeRecord] = useState({
     time: 0,
-    creator: "",
+    user_id: "",
     task: "",
   });
   return (

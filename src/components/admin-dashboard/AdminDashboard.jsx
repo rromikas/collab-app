@@ -58,7 +58,9 @@ const AdminDashboard = (props) => {
               } mx-auto`}
             >
               {user.accountType === "admin" ? (
-                page === "people" ? (
+                page === "profile" ? (
+                  <Profile user={user} projects={projects}></Profile>
+                ) : page === "people" ? (
                   <People
                     user={user}
                     projects={projects}

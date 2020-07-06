@@ -6,15 +6,16 @@ import uniqid from "uniqid";
 import randomColor from "randomcolor";
 import { BsChevronLeft } from "react-icons/bs";
 import date from "date-and-time";
+import { connect } from "react-redux";
 
-const NewRequest = ({ user, projectId, people }) => {
+const NewRequest = ({ user, projectId, people, users }) => {
   const [request, setRequest] = useState({
     title: "",
     description: "",
     projectId: projectId,
     id: uniqid("request-"),
     date: new Date(Date.now()).toString(),
-    creator: { username: user.username, photo: user.photo, id: user.id },
+    user_id: user.id,
     status: "pending",
     discussion: {},
   });
@@ -48,7 +49,9 @@ const NewRequest = ({ user, projectId, people }) => {
             <div className="row no-gutter">
               <div className="col-auto mr-2">
                 <label className="mr-2">Author</label>
-                <div className="text-primary">{user.username}</div>
+                <div className="text-primary">
+                  {users[user.id] ? users[user.id].username : ""}
+                </div>
               </div>
               <div className="col-auto">
                 <label className="mr-2">Date</label>
@@ -117,8 +120,8 @@ const NewRequest = ({ user, projectId, people }) => {
                         `users/${p.id}/notifications/${notificationId}`
                       ] = {
                         seen: false,
-                        photo: request.creator.photo,
-                        text: `${request.creator.username} created new request`,
+                        user_id: user.id,
+                        text: `created new request`,
                         type: "request",
                         requestId: request.id,
                         projectId: request.projectId,
@@ -148,4 +151,11 @@ const NewRequest = ({ user, projectId, people }) => {
   );
 };
 
-export default NewRequest;
+function mapp(state, ownProps) {
+  return {
+    users: state.publicUsers,
+    ...ownProps,
+  };
+}
+
+export default connect(mapp)(NewRequest);
