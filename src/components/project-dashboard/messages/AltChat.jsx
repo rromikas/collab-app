@@ -192,7 +192,7 @@ const AltChat = ({ projectId, user, size, users }) => {
               chatId === clientsChatId ? " bg-white" : " bg-light"
             }`}
           >
-            <div className="col-auto position-relative p-2 d-block d-md-none">
+            <div className="col-auto position-relative p-2 d-block d-lg-none">
               <div
                 className="bg-image square-30 rounded-circle"
                 style={{
@@ -213,7 +213,7 @@ const AltChat = ({ projectId, user, size, users }) => {
                 }}
               ></div>
             </div>
-            <div className="col-12 d-none d-md-block">
+            <div className="col-12 d-none d-lg-block">
               <div className="row no-gutters align-items-center mb-2">
                 <div
                   className="col-auto mr-2 bg-image square-40 rounded-circle"
