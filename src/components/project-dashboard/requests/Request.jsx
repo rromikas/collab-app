@@ -5,14 +5,15 @@ import Agreement from "../../../pictures/Agreement";
 import date from "date-and-time";
 import history from "../../../history";
 import uniqid from "uniqid";
+import { connect } from "react-redux";
 
-const Request = ({ projectId, requestId, user }) => {
+const Request = ({ projectId, requestId, user, users }) => {
   const [request, setRequest] = useState({
     title: "",
     description: "",
     status: "",
     date: new Date(),
-    creator: { username: "", photo: "" },
+    user_id: "",
     discussion: {},
   });
 
@@ -138,7 +139,11 @@ const Request = ({ projectId, requestId, user }) => {
             <div className="row no-gutters border-bottom my-3">
               <div className="mr-4 col-auto">
                 <label className="mr-2">Author</label>
-                <div className="text-primary">{request.creator.username}</div>
+                <div className="text-primary">
+                  {users[request.user_id]
+                    ? users[request.user_id].username
+                    : ""}
+                </div>
               </div>
               <div className="mr-2 col-auto">
                 <label>Date</label>
@@ -169,12 +174,16 @@ const Request = ({ projectId, requestId, user }) => {
                 <div className="row no-gutters p-3 border">
                   <div
                     className="col-auto mr-3 bg-image square-50"
-                    style={{ backgroundImage: `url(${x.user.photo})` }}
+                    style={{
+                      backgroundImage: `url(${
+                        users[x.user_id] ? users[x.user_id].photo : ""
+                      })`,
+                    }}
                   ></div>
                   <div className="col">
                     <div className="row no-gutters align-items-center">
                       <div className="col-auto mr-2 alt-chat-author">
-                        {x.user.username}
+                        {users[x.user_id] ? users[x.user_id].username : ""}
                       </div>
                       <div className="col-auto alt-chat-date">
                         {x.date
@@ -207,10 +216,7 @@ const Request = ({ projectId, requestId, user }) => {
                         ] = {
                           message: newMessage,
                           date: new Date(),
-                          user: {
-                            photo: user.photo,
-                            username: user.username,
-                          },
+                          user_id: user.id,
                         };
                         firebase.UpdateDatabase(updates);
                         setNewMessage("");
@@ -235,10 +241,7 @@ const Request = ({ projectId, requestId, user }) => {
                       ] = {
                         message: newMessage,
                         date: new Date(),
-                        user: {
-                          photo: user.photo,
-                          username: user.username,
-                        },
+                        user_id: user.id,
                       };
                       firebase.UpdateDatabase(updates);
                       setNewMessage("");
@@ -256,4 +259,11 @@ const Request = ({ projectId, requestId, user }) => {
   );
 };
 
-export default Request;
+function mapp(state, ownProps) {
+  return {
+    users: state.publicUsers,
+    ...ownProps,
+  };
+}
+
+export default connect(mapp)(Request);
