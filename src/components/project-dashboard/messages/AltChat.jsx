@@ -5,6 +5,7 @@ import * as firebase from "../../../database/firebase";
 import uniqid from "uniqid";
 import NoMessages from "../../../pictures/NoMessages";
 import { connect } from "react-redux";
+import { BsPeople } from "react-icons/bs";
 
 const sliceObject = (obj, property) => {
   let newObj = { ...obj };
@@ -280,6 +281,81 @@ const AltChat = ({ projectId, user, size, users }) => {
             </div>
           </div>
         )}
+        <div
+          onClick={() => setChatId("groupchat")}
+          className={`row no-gutters justify-content-lg-between justify-content-center border-bottom p-lg-3 p-2 chat-preview${
+            chatId === "groupchat" ? " bg-white" : " bg-light"
+          }`}
+        >
+          <div
+            className="d-block d-lg-none col-auto"
+            style={{ lineHeight: "50px" }}
+          >
+            <div className="row no-gutters">
+              <BsPeople fontSize="24px" className="col-auto m-auto"></BsPeople>
+              <div className="col-auto">{Object.keys(people).length}</div>
+            </div>
+          </div>
+
+          <div className="col-auto mb-2 d-none d-lg-block">
+            <div className="row no-gutters">
+              {Object.values(people).map((x, i) => (
+                <div
+                  className="col-auto mr-2 bg-image rounded-circle"
+                  key={uid(`gr-chat-ppl-${x}`)}
+                  style={{
+                    marginLeft: i !== 0 ? "-25px" : "0px",
+                    width: "40px",
+                    height: "40px",
+                    backgroundImage: `url(${
+                      users[x.id] ? users[x.id].photo : ""
+                    })`,
+                  }}
+                ></div>
+              ))}
+            </div>
+          </div>
+          <div className="col-auto d-lg-block d-none">Group chat</div>
+          {chats["groupchat"] && chats["groupchat"].lastMessage && (
+            <div className="col-12 d-lg-block d-none">
+              <div className="row no-gutters align-items-center justify-content-between">
+                <React.Fragment>
+                  <div className="col-auto">
+                    <div className="row no-gutters">
+                      <div className="col-auto mr-2 alt-chat-message">
+                        {chats["groupchat"].lastMessage.userId
+                          ? users[chats["groupchat"].lastMessage.userId]
+                            ? users[chats["groupchat"].lastMessage.userId]
+                                .username + ":"
+                            : ""
+                          : ""}
+                      </div>
+                      <div className="col-auto alt-chat-message">
+                        {chats["groupchat"].lastMessage
+                          ? chats["groupchat"].lastMessage.text
+                          : ""}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="col-auto chat-time d-lg-block d-none">
+                    {chats["groupchat"].lastMessage.date &&
+                    chats["groupchat"].lastMessage.date !== 0
+                      ? isToday(chats["groupchat"].lastMessage.date)
+                        ? date.format(
+                            new Date(chats["groupchat"].lastMessage.date),
+                            "hh:mm A"
+                          )
+                        : date.format(
+                            new Date(chats["groupchat"].lastMessage.date),
+                            "hh:mm A MMM DD YYYY"
+                          )
+                      : ""}
+                  </div>
+                </React.Fragment>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
       <div className="col-lg-8 col bg-white border-left">
         <div className="row no-gutters">
@@ -344,6 +420,8 @@ const AltChat = ({ projectId, user, size, users }) => {
           >
             {chatId === 1 ? (
               "Select chat"
+            ) : chatId === clientsChatId ? (
+              ""
             ) : (
               <div className="row no-gutters w-100 align-items-center">
                 <div
