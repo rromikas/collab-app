@@ -94,14 +94,10 @@ const MainPage = ({ users }) => {
                   <div
                     className="col-auto mr-2 photo-circle-sm"
                     style={{
-                      backgroundImage: `url(${
-                        users[x.id] ? users[x.id].photo : ""
-                      })`,
+                      backgroundImage: `url(${x.photo})`,
                     }}
                   ></div>
-                  <div className="col-auto mr-2">
-                    {users[x.id] ? users[x.id].email : ""}
-                  </div>
+                  <div className="col-auto mr-2">{x.email}</div>
                 </div>
               </div>
 
