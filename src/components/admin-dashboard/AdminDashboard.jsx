@@ -123,20 +123,14 @@ const AdminDashboard = (props) => {
           </div>
         </div>
       </div>
-      <div
-        className="row no-gutters d-flex d-md-none"
-        style={{ height: "56px", flex: "0 0 auto" }}
-      >
-        <div className="col-12">
-          <MobileNavbar
-            page={page}
-            userId={user.id}
-            projectId={projectId}
-            people={people}
-            section={section}
-          ></MobileNavbar>
-        </div>
-      </div>
+
+      <MobileNavbar
+        page={page}
+        user={user}
+        projectId={projectId}
+        people={people}
+        section={section}
+      ></MobileNavbar>
     </div>
   );
 };

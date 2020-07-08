@@ -420,7 +420,7 @@ const AltChat = ({ projectId, user, size, users }) => {
           >
             {chatId === 1 ? (
               "Select chat"
-            ) : chatId === clientsChatId ? (
+            ) : chatId === clientsChatId && user.accountType === "admin" ? (
               ""
             ) : (
               <div className="row no-gutters w-100 align-items-center">
