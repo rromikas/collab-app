@@ -7,6 +7,7 @@ import date from "date-and-time";
 import * as firebase from "../../database/firebase";
 import { uid } from "react-uid";
 import { connect } from "react-redux";
+import uniqid from "uniqid";
 
 const Profile = ({ user, projects, users }) => {
   const hiddenUploader = useRef(null);
@@ -167,7 +168,10 @@ const Profile = ({ user, projects, users }) => {
       {Object.values(projects).length ? (
         <div className="col-12 col-md-8 p-3">
           {Object.values(projects).map((x) => (
-            <div className="row no-gutters project-card p-4 bg-white mb-3">
+            <div
+              className="row no-gutters project-card p-4 bg-white mb-3"
+              key={uniqid("project-")}
+            >
               <div className="col">
                 <label>Title</label>
                 <div className="mb-3 text-truncate">{x.title}</div>

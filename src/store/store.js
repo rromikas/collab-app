@@ -70,6 +70,20 @@ function publicUsersReducer(state = new Date(), action) {
   }
 }
 
+function notificationReducer(
+  state = { title: "", message: "", expired: true },
+  action
+) {
+  switch (action.type) {
+    case "SET_NOTIFICATION":
+      return action.notification;
+    case "UPDATE_NOTIFICATION":
+      return Object.assign({}, state, action.notification);
+    default:
+      return state;
+  }
+}
+
 const rootReducer = combineReducers({
   user: userReducer,
   pageTitle: pageTitleReducer,
@@ -77,6 +91,7 @@ const rootReducer = combineReducers({
   size: sizeReducer,
   calendarDate: calendarDateReducer,
   publicUsers: publicUsersReducer,
+  notification: notificationReducer,
 });
 
 const store = createStore(

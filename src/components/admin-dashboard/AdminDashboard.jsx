@@ -12,6 +12,7 @@ import EditProject from "./projects/EditProject";
 import MobileNavbar from "../project-dashboard/navbar/MobileNavbar";
 import { connect } from "react-redux";
 import Profile from "../profile/Profile";
+import Toast from "../utility/Toast";
 
 const sliceObject = (obj, property) => {
   let newObj = { ...obj };

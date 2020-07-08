@@ -57,7 +57,6 @@ const Messages = ({ user, size, chat, users }) => {
         }
       );
     } else {
-      console.log("turetu isvalyti zinutes");
       setMessages({});
     }
     return function cleanUp() {

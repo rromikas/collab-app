@@ -754,3 +754,44 @@ input[type="text"]::placeholder {
 .logo {
   font-family: Vibur;
 }
+
+.login-referals:hover {
+  text-decoration: underline;
+}
+
+.flex-center {
+  align-items: center;
+  justify-content: center;
+}
+
+.toast-pro {
+  border-radius: 0.5rem;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.38);
+  overflow: hidden;
+  position: fixed;
+  left: 50px;
+  bottom: 50px;
+  transition: all 0.5s;
+}
+
+.toast-pro-title {
+  font-weight: 500;
+}
+
+.toast-close-icon {
+  width: 35px !important;
+  height: 35px !important;
+  @extend .flex-center, .d-flex;
+  border-radius: 50%;
+  cursor: pointer;
+  background: #e2e3e5;
+  transition: all 0.3s;
+}
+
+.toast-close-icon:hover {
+  background: #cfd0d1;
+}
+
+.toast-title {
+  font-weight: 600 !important;
+}

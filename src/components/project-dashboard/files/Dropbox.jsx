@@ -5,7 +5,7 @@ import { UploadDropboxFile } from "../../../database/firebase";
 
 async function onSuccess(path, files, user, onFinish, projectId) {
   await Promise.all(
-    files.map((x) => UploadDropboxFile(path, x, user.username, projectId))
+    files.map((x) => UploadDropboxFile(path, x, user, projectId))
   );
   onFinish();
 }

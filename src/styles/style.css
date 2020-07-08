@@ -7378,7 +7378,7 @@ button.bg-dark:focus {
   display: table-cell !important;
 }
 
-.d-flex {
+.d-flex, .toast-close-icon {
   display: -webkit-box !important;
   display: -ms-flexbox !important;
   display: flex !important;
@@ -11667,5 +11667,52 @@ input[type="text"]::placeholder {
 
 .logo {
   font-family: Vibur;
+}
+
+.login-referals:hover {
+  text-decoration: underline;
+}
+
+.flex-center, .toast-close-icon {
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+}
+
+.toast-pro {
+  border-radius: 0.5rem;
+  -webkit-box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.38);
+          box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.38);
+  overflow: hidden;
+  position: fixed;
+  left: 50px;
+  bottom: 50px;
+  -webkit-transition: all 0.5s;
+  transition: all 0.5s;
+}
+
+.toast-pro-title {
+  font-weight: 500;
+}
+
+.toast-close-icon {
+  width: 35px !important;
+  height: 35px !important;
+  border-radius: 50%;
+  cursor: pointer;
+  background: #e2e3e5;
+  -webkit-transition: all 0.3s;
+  transition: all 0.3s;
+}
+
+.toast-close-icon:hover {
+  background: #cfd0d1;
+}
+
+.toast-title {
+  font-weight: 600 !important;
 }
 /*# sourceMappingURL=style.css.map */

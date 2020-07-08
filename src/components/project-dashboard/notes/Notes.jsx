@@ -106,6 +106,7 @@ const Notes = ({ size, notes, projectId, user, users }) => {
             .reverse()
             .map((x) => (
               <div
+                key={uniqid("note-")}
                 className={`col-12 col-lg-${
                   structure === "list" ? "12" : "6"
                 } col-xl-${structure === "list" ? "12" : "4"}`}

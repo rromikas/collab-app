@@ -1,8 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import date from "date-and-time";
-import { uid } from "react-uid";
-import * as firebase from "../../../database/firebase";
 import uniqid from "uniqid";
+import * as firebase from "../../../database/firebase";
 import NoMessages from "../../../pictures/NoMessages";
 import { connect } from "react-redux";
 import { BsPeople } from "react-icons/bs";
@@ -133,7 +132,7 @@ const AltChat = ({ projectId, user, size, users }) => {
           }
           return (
             <div
-              key={uid(x)}
+              key={uniqid("preview-")}
               className={`row no-gutters border-bottom p-lg-3 p-2 chat-preview${
                 chatId === actualChatId ? " bg-white" : " bg-light"
               }`}
@@ -302,7 +301,7 @@ const AltChat = ({ projectId, user, size, users }) => {
               {Object.values(people).map((x, i) => (
                 <div
                   className="col-auto mr-2 bg-image rounded-circle"
-                  key={uid(`gr-chat-ppl-${x}`)}
+                  key={uniqid(`gr-chat-ppl-`)}
                   style={{
                     marginLeft: i !== 0 ? "-25px" : "0px",
                     width: "40px",
@@ -368,7 +367,10 @@ const AltChat = ({ projectId, user, size, users }) => {
             chats[chatId].messages ? (
               Object.values(chats[chatId].messages).map((x) => {
                 return (
-                  <div key={uid(x)} className={`row mb-2 no-gutters p-3`}>
+                  <div
+                    key={uniqid("chat-message-")}
+                    className={`row mb-2 no-gutters p-3`}
+                  >
                     <div
                       className="col-auto mr-2 bg-image square-50"
                       style={{

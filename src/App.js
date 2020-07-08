@@ -9,6 +9,7 @@ import * as firebase from "./database/firebase";
 import { uid } from "react-uid";
 import md5 from "md5";
 import Loader from "./components/utility/Loader";
+import Toast from "./components/utility/Toast";
 
 const accounts = {
   [md5("admin1@email.com")]: {
@@ -200,6 +201,7 @@ function App({ user }) {
         <Route path="/:userId/:page" component={UserDashobard}></Route>
         <Route path="/:userId" component={UserDashobard}></Route>
       </Switch>
+      <Toast></Toast>
     </Router>
   );
 }

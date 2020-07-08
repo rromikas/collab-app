@@ -80,18 +80,19 @@ export const off = (path) => {
   firebase.database().ref(path).off("value");
 };
 
-export const UploadFile = (path, file, uploadedBy, onSuccess, projectId) => {
+export const UploadFile = (path, file, user, onSuccess, projectId) => {
   let hashedName = md5(file.name);
   let pathForFirebase = `${path}/${hashedName}`;
   let pathForStorage = `${path}/${file.name}`;
   let metadata = {
     customMetadata: {
       path: pathForFirebase,
-      uploadedBy: uploadedBy,
+      uploadedBy: user.id,
       date: new Date(),
       type: "file",
       fileProvider: "local files",
       mimeType: file.type,
+      hiddenFromClients: user.accountType === "admin" ? true : false,
     },
   };
   let updates = {};
@@ -133,6 +134,7 @@ export const DeleteFile = (firebasePath, storagePath) => {
 };
 
 export const UploadDropboxFile = (path, file, author, projectId) => {
+  console.log("ATUHOR", author);
   return new Promise((resolve, reject) => {
     let hashedName = md5(file.name);
     let pathForFirebase = `${path}/${hashedName}`;
@@ -145,6 +147,7 @@ export const UploadDropboxFile = (path, file, author, projectId) => {
         fileProvider: "dropbox",
         previewLink: file.link,
         uploadedBy: author.id,
+        hiddenFromClients: author.accountType === "admin" ? true : false,
       },
     };
 
@@ -185,6 +188,7 @@ export const UploadGoogleDriveFile = (path, file, author, projectId) => {
         fileProvider: "google drive",
         previewLink: file.url,
         mimeType: file.mimeType,
+        hiddenFromClients: author.accountType === "admin" ? true : false,
       },
     };
     let updates = {};

@@ -5,7 +5,7 @@ import { UploadGoogleDriveFile } from "../../../database/firebase";
 
 async function onSuccess(path, files, user, onFinish, projectId) {
   await Promise.all(
-    files.map((x) => UploadGoogleDriveFile(path, x, user.username, projectId))
+    files.map((x) => UploadGoogleDriveFile(path, x, user, projectId))
   );
   onFinish();
 }

@@ -21,6 +21,7 @@ import { Icons } from "../../../pictures/file-icons/index";
 import mime from "mime-types";
 import { uid } from "react-uid";
 import { connect } from "react-redux";
+import store from "../../../store/store";
 
 const getMetadata = (metadata, path, filename) => {
   let myMetadata = { ...metadata };
@@ -29,7 +30,12 @@ const getMetadata = (metadata, path, filename) => {
   });
   myMetadata = myMetadata[filename]
     ? myMetadata[filename].metadata
-    : { uploadedBy: "", previewLink: "", date: new Date() };
+    : {
+        uploadedBy: "",
+        previewLink: "",
+        date: new Date(),
+        hiddenFromClients: false,
+      };
   return myMetadata;
 };
 
@@ -39,7 +45,7 @@ const handleFileUpload = (e, path, user, projectId, onFinish = () => {}) => {
   if (file) {
     if (file.size < 10000000) {
       if (file.name.length < 400) {
-        firebase.UploadFile(path, file, user.id, onFinish, projectId);
+        firebase.UploadFile(path, file, user, onFinish, projectId);
       } else {
         alert("file name is too long");
       }
@@ -57,6 +63,7 @@ const Files = ({ projectId, user, size, metadata, users }) => {
   const uploader = useRef(null);
   const folderMaker = useRef(null);
   const fileUploadMaker = useRef(null);
+  const fileSettings = useRef(null);
   const sortMaker = useRef(null);
   const [fileSystem, setFileSystem] = useState({ prefixes: [], items: [] });
   const [loading, setLoading] = useState(false);
@@ -65,9 +72,11 @@ const Files = ({ projectId, user, size, metadata, users }) => {
   const [tick, setTick] = useState(false);
   const [filter, setFilter] = useState("date");
   useEffect(() => {
-    let pathString = path.join("/");
+    let isCanceled = false;
+    async function fetchFiles() {
+      let pathString = path.join("/");
 
-    firebase.GetFiles(pathString).then((res) => {
+      let res = await firebase.GetFiles(pathString);
       let items = [];
       if (Object.values(metadata).length) {
         res.items.forEach((x) => {
@@ -77,9 +86,16 @@ const Files = ({ projectId, user, size, metadata, users }) => {
           items.push(item);
         });
       }
+      if (!isCanceled) {
+        setFileSystem({ prefixes: res.prefixes, items: items });
+      }
+    }
 
-      setFileSystem({ prefixes: res.prefixes, items: items });
-    });
+    fetchFiles();
+
+    return () => {
+      isCanceled = true;
+    };
   }, [path, tick, metadata]);
 
   return (
@@ -297,42 +313,49 @@ const Files = ({ projectId, user, size, metadata, users }) => {
                       className="col-12 col-sm-4 col-lg-3 col-xl-2 file-card p-3 clickable-item"
                       key={uid(x)}
                     >
-                      <div
-                        className="row no-gutters justify-content-end"
-                        style={{ position: "relative", zIndex: 5 }}
-                      >
-                        <Popover
-                          content={
-                            <div className="popover-inner">
-                              <div
-                                className="popover-content-item"
-                                onClick={() => {
-                                  let firebasePath = `projects/${projectId}/files/${path.join(
-                                    "/"
-                                  )}/${x.name}`;
-                                  let storagePath =
-                                    path.join("/") +
-                                    "/" +
-                                    x.name +
-                                    "/placeholder-rare-name";
-                                  console.log(
-                                    "Firebase path, sotrag path",
-                                    firebasePath,
-                                    storagePath
-                                  );
-                                  firebase
-                                    .DeleteFile(firebasePath, storagePath)
-                                    .then(() => setTick(!tick));
-                                }}
-                              >
-                                Delete
-                              </div>
-                            </div>
-                          }
+                      {user.accountType === "admin" ? (
+                        <div
+                          className="row no-gutters justify-content-end"
+                          style={{ position: "relative", zIndex: 5 }}
                         >
-                          <BsThreeDots fontSize="20px"></BsThreeDots>
-                        </Popover>
-                      </div>
+                          <Popover
+                            content={
+                              <div className="popover-inner">
+                                <div
+                                  className="popover-content-item"
+                                  onClick={() => {
+                                    let firebasePath = `projects/${projectId}/files/${path.join(
+                                      "/"
+                                    )}/${x.name}`;
+                                    let storagePath =
+                                      path.join("/") +
+                                      "/" +
+                                      x.name +
+                                      "/placeholder-rare-name";
+                                    console.log(
+                                      "Firebase path, sotrag path",
+                                      firebasePath,
+                                      storagePath
+                                    );
+                                    firebase
+                                      .DeleteFile(firebasePath, storagePath)
+                                      .then(() => setTick(!tick));
+                                  }}
+                                >
+                                  Delete
+                                </div>
+                              </div>
+                            }
+                          >
+                            <BsThreeDots fontSize="20px"></BsThreeDots>
+                          </Popover>
+                        </div>
+                      ) : (
+                        <div
+                          style={{ width: "20px", height: "20px", opacity: 0 }}
+                        ></div>
+                      )}
+
                       <div
                         className="row no-gutters align-items-center"
                         style={{ marginTop: "-17px" }}
@@ -361,7 +384,13 @@ const Files = ({ projectId, user, size, metadata, users }) => {
                   );
                 })}
                 {fileSystem.items
-                  .filter((x) => x.name !== "placeholder-rare-name")
+                  .filter(
+                    (x) =>
+                      x.name !== "placeholder-rare-name" &&
+                      (user.accountType === "client"
+                        ? !x.hiddenFromClients
+                        : true)
+                  )
                   .sort((a, b) =>
                     a[filter] > b[filter]
                       ? filter === "date"
@@ -373,7 +402,7 @@ const Files = ({ projectId, user, size, metadata, users }) => {
                         : -1
                       : 0
                   )
-                  .map((x) => {
+                  .map((x, i) => {
                     let icon;
                     let extension =
                       x.fileProvider === "google drive"
@@ -390,37 +419,103 @@ const Files = ({ projectId, user, size, metadata, users }) => {
                         className="col-12 col-sm-4 col-lg-3 col-xl-2 file-card p-3 clickable-item"
                         key={uid(x)}
                       >
-                        <div
-                          className="row no-gutters justify-content-end"
-                          style={{ position: "relative", zIndex: 5 }}
-                        >
-                          <Popover
-                            content={
-                              <div className="popover-inner">
-                                <div
-                                  className="popover-content-item"
-                                  onClick={() => {
-                                    let firebasePath = `projects/${projectId}/files/${x.path}`;
-                                    let storagePath =
-                                      path.join("/") + "/" + x.name;
-                                    console.log(
-                                      "Firebase path, sotrag path",
-                                      firebasePath,
-                                      storagePath
-                                    );
-                                    firebase
-                                      .DeleteFile(firebasePath, storagePath)
-                                      .then(() => setTick(!tick));
-                                  }}
-                                >
-                                  Delete
-                                </div>
-                              </div>
-                            }
+                        {user.accountType === "admin" ? (
+                          <div
+                            className="row no-gutters justify-content-end"
+                            style={{ position: "relative", zIndex: 5 }}
                           >
-                            <BsThreeDots fontSize="20px"></BsThreeDots>
-                          </Popover>
-                        </div>
+                            <Popover
+                              content={
+                                <div className="popover-inner">
+                                  <div
+                                    className="popover-content-item"
+                                    onClick={() => {
+                                      document
+                                        .getElementById(`file-settings-${i}`)
+                                        .click();
+                                      let firebasePath = `projects/${projectId}/files/${x.path}`;
+                                      let storagePath =
+                                        path.join("/") + "/" + x.name;
+                                      console.log(
+                                        "Firebase path, sotrag path",
+                                        firebasePath,
+                                        storagePath
+                                      );
+                                      firebase
+                                        .DeleteFile(firebasePath, storagePath)
+                                        .then(() => setTick(!tick));
+                                    }}
+                                  >
+                                    Delete
+                                  </div>
+                                  {x.hiddenFromClients ? (
+                                    <div
+                                      className="popover-content-item"
+                                      onClick={() => {
+                                        document
+                                          .getElementById(`file-settings-${i}`)
+                                          .click();
+                                        let updates = {};
+                                        updates[
+                                          `projects/${projectId}/files/${x.path}/metadata/hiddenFromClients`
+                                        ] = false;
+                                        firebase.UpdateDatabase(updates);
+                                        store.dispatch({
+                                          type: "SET_NOTIFICATION",
+                                          notification: {
+                                            title: "Success",
+                                            message: `File is visible for clients`,
+                                            type: "success",
+                                          },
+                                        });
+                                      }}
+                                    >
+                                      Share with clients
+                                    </div>
+                                  ) : (
+                                    <div
+                                      className="popover-content-item"
+                                      onClick={() => {
+                                        document
+                                          .getElementById(`file-settings-${i}`)
+                                          .click();
+                                        let updates = {};
+                                        updates[
+                                          `projects/${projectId}/files/${x.path}/metadata/hiddenFromClients`
+                                        ] = true;
+                                        firebase.UpdateDatabase(updates);
+                                        store.dispatch({
+                                          type: "SET_NOTIFICATION",
+                                          notification: {
+                                            title: "Success",
+                                            message:
+                                              "File was hidden from clients",
+                                            type: "success",
+                                          },
+                                        });
+                                      }}
+                                    >
+                                      Hide from clients
+                                    </div>
+                                  )}
+                                </div>
+                              }
+                            >
+                              <div id={`file-settings-${i}`}>
+                                <BsThreeDots fontSize="20px"></BsThreeDots>
+                              </div>
+                            </Popover>
+                          </div>
+                        ) : (
+                          <div
+                            style={{
+                              width: "20px",
+                              height: "20px",
+                              opacity: 0,
+                            }}
+                          ></div>
+                        )}
+
                         <div
                           className="row no-gutters align-items-center"
                           style={{ marginTop: "-17px" }}
